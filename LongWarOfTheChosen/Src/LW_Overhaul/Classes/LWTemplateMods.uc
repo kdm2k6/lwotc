@@ -840,6 +840,7 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 	local X2Effect_MaybeApplyDirectionalWorldDamage WorldDamage;
 	local X2Effect_DeathFromAbove_LW        DeathEffect;
 	local X2Effect_ApplyWeaponDamage        WeaponDamageEffect;
+	local array<X2AbilityCost>				AbilityCosts;
 
 	// WOTC TODO: Trying this out. Should be put somewhere more appropriate.
 	if (Template.DataName == 'ReflexShotModifier')
@@ -2341,10 +2342,11 @@ function ReconfigGear(X2ItemTemplate Template, int Difficulty)
 
 		switch (EquipmentTemplate.DataName)
 		{
+			case 'ChosenSniperPistol_XCOM':
 			case 'AlienHunterPistol_CV':
 			case 'AlienHunterPistol_MG':
 			case 'AlienHunterPistol_BM':
-				EquipmentTemplate.InventorySlot = eInvSlot_Utility;
+				EquipmentTemplate.InventorySlot = eInvSlot_PrimaryWeapon;
 				X2WeaponTemplate(EquipmentTemplate).RangeAccuracy = class'X2Item_SMGWeapon'.default.MIDSHORT_BEAM_RANGE;
 				X2WeaponTemplate(EquipmentTemplate).StowedLocation = eSlot_RearBackPack;
 				EquipmentTemplate.Abilities.AddItem('PistolStandardShot'); // in base-game, this ability is a class ability, so need it added for utility slot pistols

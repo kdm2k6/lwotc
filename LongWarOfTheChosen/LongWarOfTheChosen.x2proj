@@ -73,6 +73,7 @@
     <Folder Include="Src\NewPromotionScreenByDefault_Integrated\" />
     <Folder Include="Localization\PI_Integrated\" />
     <Folder Include="Src\PI_Integrated\" />
+    <Folder Include="Src\PrimaryPistolsIntegrated\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\XComAI.ini" />
@@ -1086,6 +1087,15 @@
     <Content Include="Src\PI_Integrated\Classes\XCom_Perfect_Information_UITooltipInfoList.uc" />
     <Content Include="Src\PI_Integrated\Classes\XCom_Perfect_Information_X2Action_ApplyWeaponDamageToUnit.uc" />
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_LastShotBreakdown.uc" />
+    <Content Include="Content\PrimaryPistolsMod.upk" />
+    <Content Include="Config\XComPrimaryPistols.ini" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\X2AbilityCost_QuickdrawActionPointsPatched.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\X2Ability_PrimaryPistols.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\X2DownloadableContentInfo_PrimaryPistols.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\X2Item_PrimaryPistols.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\XComGameStateSingleton_ListenerManager.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\XGWeaponPatched.uc" />
+    <Content Include="Src\PrimaryPistolsIntegrated\Classes\X2Item_PrimaryDLC.uc" />
   </ItemGroup>
   <!-- Everything below is borrowed from the https://github.com/WOTCStrategyOverhaul/CovertInfiltration project -->
   <!-- The weird stuff below (until Target) is required or otherwise ModBuddy project breaks ¯\_(ツ)_/¯ P.S. Also don't try to make it more sane -->

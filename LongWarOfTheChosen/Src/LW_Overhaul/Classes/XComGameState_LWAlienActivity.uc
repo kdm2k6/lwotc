@@ -1022,10 +1022,13 @@ function MaybeAddChosenToMission(XComGameState_MissionSite MissionState)
 
 			if(ChosenState.ChosenControlsRegion(MissionState.Region))
 			{
+				`LWTrace("Mission Type: " $ MissionState.GeneratedMission.Mission.sType);
 				if(default.ExcludeChosenFromMissionTypes.Find(MissionState.GeneratedMission.Mission.sType) != INDEX_NONE)
 				{
 					// Can't be on this mission no matter what
 					break;
+				} else {
+					`LWTrace("Chosen going to be allowed on mission: " $ MissionState.GeneratedMission.Mission.sType);
 				}
 
 				if(ChosenState.NumEncounters == 0 || MissionState.GetMissionSource().bGoldenPath)
