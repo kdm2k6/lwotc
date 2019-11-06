@@ -34,13 +34,45 @@ static function bool CanAddItemToInventory_CH_Improved(out int bCanAddItem, cons
 
     if (WeaponTemplate != none)
     {
-        if (Slot == eInvSlot_Pistol && default.PistolCategories.Find(WeaponTemplate.WeaponCat) != INDEX_NONE)
+        if (Slot == eInvSlot_Pistol && TriggerIsItemValidForPistolSlot(WeaponTemplate))
         {
             DisabledReason = "";
             return false;
         }
     }
     return CanAddItemToInventory_CH(bCanAddItem, Slot, ItemTemplate, Quantity, UnitState, CheckGameState, DisabledReason);
+}
+
+// Fires an 'IsItemValidForPistolSlot' event that allows listeners to override
+// the default behavior for whether a weapon is valid for the pistol slot or not.
+//
+// The default behavior is specified in the event's tuple as the 'IsItemValid'
+// boolean before the first listener receives the event. To override the defaul
+// value, listeners just need to change the value of that element in the tuple.
+//
+// The event takes the form:
+//
+//  {
+//     ID: IsItemValidForPistolSlot,
+//     Data: [inout bool IsItemValid],
+//     Source: WeaponTemplate (X2WeaponTemplate)
+//  }
+//
+static function bool TriggerIsItemValidForPistolSlot(X2WeaponTemplate WeaponTemplate)
+{
+	local XComLWTuple OverrideTuple;
+
+	OverrideTuple = new class'XComLWTuple';
+	OverrideTuple.Id = 'IsItemValidForPistolSlot';
+    OverrideTuple.Data.Add(1);
+    
+    // Default to 'true' if the weapon's category is in the PistolCategories array
+	OverrideTuple.Data[0].Kind = XComLWTVBool;
+	OverrideTuple.Data[0].b = default.PistolCategories.Find(WeaponTemplate.WeaponCat) != INDEX_NONE;
+
+	`XEVENTMGR.TriggerEvent(OverrideTuple.Id, OverrideTuple, WeaponTemplate);
+
+	return OverrideTuple.Data[0].b;
 }
 
 static event OnPostTemplatesCreated()

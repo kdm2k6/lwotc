@@ -57,7 +57,7 @@ static function bool CanAddItemToPistolSlot(CHItemSlot Slot, XComGameState_Unit 
 
     if(WeaponTemplate != none)
     {
-		return (class'X2DownloadableContentInfo_WOTC_PistolSlot'.default.PistolCategories.Find(WeaponTemplate.WeaponCat) != INDEX_NONE);
+		return (class'X2DownloadableContentInfo_WOTC_PistolSlot'.static.TriggerIsItemValidForPistolSlot(WeaponTemplate));
     }
     
     return false;
@@ -67,27 +67,55 @@ static function bool CanAddItemToPistolSlot(CHItemSlot Slot, XComGameState_Unit 
 static function bool HasPistolSlot(CHItemSlot Slot, XComGameState_Unit UnitState, out string LockedReason, optional XComGameState CheckGameState)
 {
 	local name Ability;
+	local bool DefaultCanHaveSlot;
+
+	DefaultCanHaveSlot = true;
 
 	if (default.AbilityInteractsWithPistolSlot.Length == 0)
 	{
-		return UnitState.IsSoldier() && !UnitState.IsRobotic();
+		DefaultCanHaveSlot = UnitState.IsSoldier() && !UnitState.IsRobotic();
 	}
-
-	foreach default.AbilityInteractsWithPistolSlot(Ability)
+	else
 	{
-		if (UnitState.HasSoldierAbility(Ability, true))
+		foreach default.AbilityInteractsWithPistolSlot(Ability)
 		{
-			if (default.ABILITY_EXCLUDES_SLOT == true)
+			if (UnitState.HasSoldierAbility(Ability, true))
 			{
-				return false;
-			}
-			if (default.ABILITY_EXCLUDES_SLOT == false)
-			{
-				return true;
+				DefaultCanHaveSlot = !default.ABILITY_EXCLUDES_SLOT;
 			}
 		}
 	}
-	return true;
+	return TriggerSoldierHasPistolSlot(UnitState, DefaultCanHaveSlot);
+}
+
+// Fires an 'SoldierHasPistolSlot' event that allows listeners to override
+// the default behavior for whether a weapon is valid for the pistol slot or not.
+//
+// The default behavior is specified in the event's tuple as the 'IsItemValid'
+// boolean before the first listener receives the event. To override the defaul
+// value, listeners just need to change the value of that element in the tuple.
+//
+// The event takes the form:
+//
+//  {
+//     ID: SoldierHasPistolSlot,
+//     Data: [inout bool HasPistolSlot],
+//     Source: UnitState (XComGameState_Unit)
+//  }
+//
+static function bool TriggerSoldierHasPistolSlot(XComGameState_Unit UnitState, bool DefaultCanHaveSlot)
+{
+	local XComLWTuple OverrideTuple;
+
+	OverrideTuple = new class'XComLWTuple';
+	OverrideTuple.Id = 'SoldierHasPistolSlot';
+    OverrideTuple.Data.Add(1);
+	OverrideTuple.Data[0].Kind = XComLWTVBool;
+	OverrideTuple.Data[0].b = DefaultCanHaveSlot;
+
+	`XEVENTMGR.TriggerEvent(OverrideTuple.Id, OverrideTuple, UnitState);
+
+	return OverrideTuple.Data[0].b;
 }
 
 static function int PistolGetPriority(CHItemSlot Slot, XComGameState_Unit UnitState, optional XComGameState CheckGameState)
@@ -103,7 +131,7 @@ static function bool ShowPistolItemInLockerList(CHItemSlot Slot, XComGameState_U
     {
 		if(WeaponTemplate.InventorySlot == eInvSlot_SecondaryWeapon)
 		  {
-			return (class'X2DownloadableContentInfo_WOTC_PistolSlot'.default.PistolCategories.Find(WeaponTemplate.WeaponCat) != INDEX_NONE);
+			return (class'X2DownloadableContentInfo_WOTC_PistolSlot'.static.TriggerIsItemValidForPistolSlot(WeaponTemplate));
 		  }
 		return false;
 	  }
