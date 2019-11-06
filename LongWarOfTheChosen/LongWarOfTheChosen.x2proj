@@ -72,6 +72,8 @@
     <Folder Include="Src\WallClimbOverride\" />
     <Folder Include="Src\LW_Tuple\" />
     <Folder Include="Src\LW_FactionBalance\" />
+    <Folder Include="Localization\WOTC_PistolSlot_Integrated\" />
+    <Folder Include="Src\WOTC_PistolSlot_Integrated\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\XComAI.ini" />
@@ -1086,6 +1088,10 @@
     <Content Include="Src\LW_Overhaul\Classes\X2Condition_HeadshotEnabled.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCharges_Teamwork.uc" />
     <Content Include="Src\LW_Overhaul\Classes\LWGiveSoldierRewardWrapper.uc" />
+    <Content Include="Config\XComPistolSlot.ini" />
+    <Content Include="Localization\WOTC_PistolSlot_Integrated\WotC_VestSlot.int" />
+    <Content Include="Src\WOTC_PistolSlot_Integrated\Classes\X2DownloadableContentInfo_WOTC_PistolSlot.uc" />
+    <Content Include="Src\WOTC_PistolSlot_Integrated\Classes\X2StrategyElement_WOTC_PistolSlot.uc" />
   </ItemGroup>
   <!-- Everything below is borrowed from the https://github.com/WOTCStrategyOverhaul/CovertInfiltration project -->
   <!-- The weird stuff below (until Target) is required or otherwise ModBuddy project breaks ¯\_(ツ)_/¯ P.S. Also don't try to make it more sane -->
