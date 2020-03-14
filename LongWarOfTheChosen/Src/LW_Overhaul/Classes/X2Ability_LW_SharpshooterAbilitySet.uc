@@ -415,7 +415,7 @@ static function X2AbilityTemplate LongWatchPassive()
 	local X2AbilityTemplate						Template;
 	local X2AbilityTargetStyle                  TargetStyle;
 	local X2AbilityTrigger						Trigger;
-	local X2Effect_ModifyReactionFire           ReactionFire;
+	local X2Effect_LongWatchCritReaction        ReactionFire;
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'LongWatchPassive');
 	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_long_watch";

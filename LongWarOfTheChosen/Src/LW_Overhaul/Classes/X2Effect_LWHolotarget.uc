@@ -172,14 +172,27 @@ simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState
 {
 	local X2Action_TargetDefinition OutlineAction;
 	local XComGameState_Unit UnitState;
+	local XComGameStateContext_Ability AbilityContext;
+	local XComGameState_Unit SourceState;
+	local XComGameStateHistory History;
 
-	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	History = `XCOMHISTORY;
+
+	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
+	if( AbilityContext != None )
 	{
-		UnitState = XComGameState_Unit(ActionMetadata.StateObject_NewState);
-		if (EffectApplyResult == 'AA_Success' && UnitState != none)
+		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
+		if( SourceState != None )
 		{
-			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-			OutlineAction.bEnableOutline = true;
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			{
+				UnitState = XComGameState_Unit(ActionMetadata.StateObject_NewState);
+				if (EffectApplyResult == 'AA_Success' && UnitState != none)
+				{
+					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+					OutlineAction.bEnableOutline = true;
+				}
+			}
 		}
 	}
 }
@@ -187,13 +200,26 @@ simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState
 simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult, XComGameState_Effect RemovedEffect)
 {
 	local X2Action_TargetDefinition OutlineAction;
+	local XComGameStateContext_Ability AbilityContext;
+	local XComGameState_Unit SourceState;
+	local XComGameStateHistory History;
 
-	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	History = `XCOMHISTORY;
+
+	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
+	if( AbilityContext != None )
 	{
-		if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
+		if( SourceState != None )
 		{
-			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-			OutlineAction.bEnableOutline = false;
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			{
+				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+				{
+					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+					OutlineAction.bEnableOutline = false;
+				}
+			}
 		}
 	}
 }
@@ -201,13 +227,26 @@ simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeG
 simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata )
 {
 	local X2Action_TargetDefinition OutlineAction;
+	local XComGameStateContext_Ability AbilityContext;
+	local XComGameState_Unit SourceState;
+	local XComGameStateHistory History;
 
-	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	History = `XCOMHISTORY;
+
+	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
+	if( AbilityContext != None )
 	{
-		if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
+		if( SourceState != None )
 		{
-			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-			OutlineAction.bEnableOutline = true;
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			{
+				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+				{
+					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+					OutlineAction.bEnableOutline = false;
+				}
+			}
 		}
 	}
 }

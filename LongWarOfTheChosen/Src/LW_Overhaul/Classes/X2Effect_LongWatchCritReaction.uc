@@ -1,9 +1,9 @@
-class X2Effect_ModifyReactionFire extends X2Effect_Persistent;
-
-var bool bAllowCrit;
+class X2Effect_LongWatchCritReaction extends X2Effect_Persistent;
 
 function bool AllowReactionFireCrit(XComGameState_Unit UnitState, XComGameState_Unit TargetState) 
 { 
+	local int Tiles;
+
 	Tiles = UnitState.TileDistanceBetween(TargetState);
 	//  remove number of tiles within visible range (which is in meters, so convert to units, and divide that by tile size)
 	Tiles -= UnitState.GetVisibilityRadius() * class'XComWorldData'.const.WORLD_METERS_TO_UNITS_MULTIPLIER / class'XComWorldData'.const.WORLD_StepSize;
