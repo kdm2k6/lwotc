@@ -231,9 +231,9 @@ LocPromotionPopupText="<Bullet/> This is a special shot in which the soldier adj
 [PrecisionShot X2AbilityTemplate]
 LocFriendlyName="Precision Shot"
 LocFlyOverText="Precision Shot"
-LocLongDescription="Take a special shot with +30 bonus to critical chance and 33% bonus critical damage. Three-turn cooldown."
-LocHelpText="Take a special shot with +30 bonus to critical chance and 33% bonus critical damage. Three-turn cooldown."
-LocPromotionPopupText="<Bullet/> Take a special shot with +30 bonus to critical chance and 33% bonus critical damage. Three-turn cooldown.<br/>"
+LocLongDescription="Take a special shot that pierces 2 points of armor and is 20% more likely to critically hit. If a critical hit is scored, the shot will pierce an additional 2 armor and deal +3 damage. Four-turn cooldown."
+LocHelpText="Take a special shot that pierces 2 points of armor and is 20% more likely to critically hit. If a critical hit is scored, the shot will pierce an additional 2 armor and deal +3 damage. Four-turn cooldown."
+LocPromotionPopupText="<Bullet/> Take a special shot that pierces 2 points of armor and is 20% more likely to critically hit.<br/><Bullet/> If a critical hit is scored, the shot will pierce an additional 2 armor and deal +3 damage.<br/><Bullet/> The pierce bonuses stack with other sources, such as AP Rounds, allowing Sharpshooters with this perk to deal effective damage to heavily armored enemies.<br/><Bullet/>Four-turn cooldown.<br/>"
 
 [CyclicFire X2AbilityTemplate]
 LocFriendlyName="Cyclic Fire"
