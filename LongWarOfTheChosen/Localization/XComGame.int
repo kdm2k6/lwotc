@@ -5035,3 +5035,10 @@ LocFriendlyName="Advanced Teamwork"
 LocHelpText="Grant an additional action point to a bondmate. Has one or two charges per mission depending on bond level, shared between bondmates."
 LocLongDescription="Grant an additional action point to a bondmate. Has one or two charges per mission depending on bond level, shared between bondmates."
 ; End Translation
+
+[Predator X2AbilityTemplate]
+LocFriendlyName="Predator"
+LocLongDescription="Ranged attacks against flanked enemies deal +2 damage."
+LocHelpText="Ranged attacks against flanked enemies deal +2 damage."
+LocFlyOverText="Predator"
+LocPromotionPopupText="<Bullet/> Ranged attacks against flanked enemies deal +2 damage."

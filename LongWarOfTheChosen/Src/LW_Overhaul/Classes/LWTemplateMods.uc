@@ -1100,6 +1100,8 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 	// bugfix for Flashbangs doing damage
 	if (Template.DataName == 'HuntersInstinct')
 	{
+		Template.IconImage = "img:///UILibrary_LW_PerkPack.LW_AbilityKubikuri";
+
 		Template.AbilityTargetEffects.length = 0;
 		DamageModifier = new class'X2Effect_HuntersInstinctDamage_LW';
 		DamageModifier.BonusDamage = class'X2Ability_RangerAbilitySet'.default.INSTINCT_DMG;

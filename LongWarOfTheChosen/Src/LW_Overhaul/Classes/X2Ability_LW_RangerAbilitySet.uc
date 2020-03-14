@@ -16,6 +16,7 @@ var config int COMBAT_FITNESS_DEFENSE;
 var config int FORTIFY_COOLDOWN;
 var config int FORTIFY_DEFENSE;
 var config int SPRINTER_MOBILITY;
+var config int PREDATOR_BONUS_DAMAGE;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -29,6 +30,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(AddFortify());
 	Templates.AddItem(AddSprinter());
 	Templates.AddItem(AddPassSidearm());
+	Templates.AddItem(AddPredator());
 	return Templates;
 }
 
@@ -449,6 +451,35 @@ static function X2AbilityTemplate AddPassSidearm()
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+
+	return Template;
+}
+
+static function X2AbilityTemplate AddPredator()
+{
+	local X2AbilityTemplate						Template;
+	local X2Effect_HuntersInstinctDamage        DamageModifier;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'Predator');
+
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_hunter";
+
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
+
+	DamageModifier = new class'X2Effect_HuntersInstinctDamage_LW';
+	DamageModifier.BonusDamage = default.PREDATOR_BONUS_DAMAGE;
+	DamageModifier.BonusCritChance = 0;
+	DamageModifier.BuildPersistentEffect(1, true, false, true);
+	DamageModifier.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,, Template.AbilitySourceName);
+	Template.AddTargetEffect(DamageModifier);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	//  NOTE: No visualization on purpose!
 
 	return Template;
 }
