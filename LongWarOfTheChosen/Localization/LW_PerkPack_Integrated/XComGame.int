@@ -202,9 +202,10 @@ LocPromotionPopupText="<Bullet/> Gain +10 aim and +10 defense when 7 or more til
 [LowProfile X2AbilityTemplate]
 LocFriendlyName="Low Profile"
 LocFlyOverText="Low Profile"
-LocLongDescription="Makes partial cover count as full."
-LocHelpText="Makes partial cover count as full."
-LocPromotionPopupText="<Bullet/> Makes partial cover count as full.<br/>"
+LocLongDescription="Makes partial cover count as full. Also gain 2 mobility."
+LocHelpText="Makes partial cover count as full. Also gain 2 mobility."
+LocPromotionPopupText="<Bullet/> Makes partial cover count as full.<br/><Bullet/> Low Profile also provides 2 bonus mobility.<br/>"
+; REMIND @CHRIS TO ADD ABILITY TAGS AT SOME POINT SO THAT LOC CAN READ FROM THE CONFIG
 
 [DoubleTap X2AbilityTemplate]
 LocFriendlyName="Double Tap"

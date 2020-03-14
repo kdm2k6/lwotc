@@ -118,6 +118,7 @@ var localized string LocCoveringFire;
 var localized string LocCoveringFireMalus;
 var config bool NO_STANDARD_ATTACKS_WHEN_ON_FIRE;
 var config bool NO_MELEE_ATTACKS_WHEN_ON_FIRE;
+var config int LOW_PROFILE_MOBILITY;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -895,6 +896,7 @@ static function X2AbilityTemplate AddLowProfileAbility()
 {
 	local X2AbilityTemplate					Template;
 	local X2Effect_LowProfile_LW			DefModifier;
+	local StatEffect						X2Effect_PersistentStatChange;
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'LowProfile');
 	Template.IconImage = "img:///UILibrary_LW_PerkPack.LW_AbilityLowProfile";
@@ -908,8 +910,17 @@ static function X2AbilityTemplate AddLowProfileAbility()
 	DefModifier = new class 'X2Effect_LowProfile_LW';
 	DefModifier.BuildPersistentEffect (1, true, false);
 	DefModifier.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
-	Template.AddTargetEffect (DefModifier);
+	Template.AddTargetEffect(DefModifier);
+
+	StatEffect = new class'X2Effect_PersistentStatChange';
+	StatEffect.AddPersistentStatChange(eStat_Mobility, float(default.LOW_PROFILE_MOBILITY));
+	StatEffect.BuildPersistentEffect(1, true, false, false);
+	Template.AddTargetEffect(StatEffect);
+	
+	Template.SetUIStatMarkup(class'XLocalizedData'.default.MobilityLabel, eStat_Mobility, default.LOW_PROFILE_MOBILITY);
+
 	Template.bCrossClassEligible = true;
+
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;	
 	//no visualization
 	return Template;
