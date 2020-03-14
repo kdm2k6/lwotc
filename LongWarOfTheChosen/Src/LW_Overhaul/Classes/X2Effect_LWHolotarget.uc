@@ -12,6 +12,7 @@ var config int HOLO_BM_AIM_BONUS;
 var config int HDHOLO_CV_CRIT_BONUS;
 var config int HDHOLO_MG_CRIT_BONUS;
 var config int HDHOLO_BM_CRIT_BONUS;
+var config bool INDEPENDENT_TRACKING_REVEALS_ENEMIES;
 
 var localized string HoloTargetEffectName;
 
@@ -184,7 +185,7 @@ simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState
 		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
 		if( SourceState != None )
 		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
 			{
 				UnitState = XComGameState_Unit(ActionMetadata.StateObject_NewState);
 				if (EffectApplyResult == 'AA_Success' && UnitState != none)
@@ -214,7 +215,7 @@ simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeG
 		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
 		if( SourceState != None )
 		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
 			{
 				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
 				{
@@ -225,7 +226,7 @@ simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeG
 		}
 	}
 
-	super.AddX2ActionsForVisualization_Removed(VisualizeGameState, ActionMetadata, EffectApplyResult);
+	super.AddX2ActionsForVisualization_Removed(VisualizeGameState, ActionMetadata, EffectApplyResult, RemovedEffect);
 }
 
 simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata )
@@ -243,7 +244,7 @@ simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGam
 		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
 		if( SourceState != None )
 		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0)
+			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
 			{
 				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
 				{
@@ -254,7 +255,7 @@ simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGam
 		}
 	}
 
-	super.AddX2ActionsForVisualization_Sync(VisualizeGameState, ActionMetadata, EffectApplyResult);
+	super.AddX2ActionsForVisualization_Sync(VisualizeGameState, ActionMetadata);
 }
 
 DefaultProperties

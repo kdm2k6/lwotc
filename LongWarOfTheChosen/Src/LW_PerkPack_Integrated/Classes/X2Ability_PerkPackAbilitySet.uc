@@ -1280,7 +1280,6 @@ static function X2AbilityTemplate WalkFireDamage()
 
 }
 
-
 static function X2AbilityTemplate AddPrecisionShotAbility()
 {
 	local X2AbilityTemplate					Template;
@@ -1366,8 +1365,7 @@ static function X2AbilityTemplate AddPrecisionShotAbility()
 static function X2AbilityTemplate PrecisionShotDamage()
 {
     local X2AbilityTemplate Template;
-    local X2Effect_PrecisionShotCritDamage CritEffect;
-	local X2Effect_PrecisionShotPierce PierceEffect;
+    local X2Effect_PrecisionShotCritDamage DamageEffect;
 
     `CREATE_X2ABILITY_TEMPLATE (Template, 'PrecisionShotDamage');
     Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_momentum";
@@ -1378,16 +1376,10 @@ static function X2AbilityTemplate PrecisionShotDamage()
     Template.AbilityTargetStyle = default.SelfTarget;
     Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 
-    CritEffect = new class'X2Effect_PrecisionShotCritDamage';
-    CritEffect.BuildPersistentEffect(1, true, false, false);
-    CritEffect.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, false,, Template.AbilitySourceName);
-
-	PierceEffect = new class'X2Effect_PrecisionShotPierce';
-	PierceEffect.BuildPersistentEffect(1, true, false, false);
-    PierceEffect.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, false,, Template.AbilitySourceName);
-
-    Template.AddTargetEffect(CritEffect);
-	Template.AddTargetEffect(PierceEffect);
+    DamageEffect = new class'X2Effect_PrecisionShotCritDamage';
+    DamageEffect.BuildPersistentEffect(1, true, false, false);
+    DamageEffect.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, false,, Template.AbilitySourceName);
+    Template.AddTargetEffect(DamageEffect);
 
     Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
     return Template;

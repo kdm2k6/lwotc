@@ -508,11 +508,11 @@ LocFlyOverText="HiDef Holo"
 LocPromotionPopupText="<Bullet/> The critical hit bonus is +<Ability:HDHOLO_CV_CRIT_BONUS_LW/> with the basic Holotargeter, but improves to +<Ability:HDHOLO_MG_CRIT_BONUS_LW/> and +<Ability:HDHOLO_BM_CRIT_BONUS_LW/> with advanced technology Holotargeting devices.<br/>"
 
 [IndependentTracking X2AbilityTemplate]
-LocFriendlyName="Predictive Algorithms"
-LocLongDescription="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and stay permanently revealed while holotargeted."
-LocHelpText="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and stay permanently revealed while holotargeted."
+LocFriendlyName="Independent Tracking"
+LocLongDescription="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s)."
+LocHelpText="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s)."
 LocFlyOverText="Independent Tracking"
-LocPromotionPopupText="<Bullet/> A Holotargeted enemy remains so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s).<br/><Bullet/> Holotargeting an enemy also reveals them for the duration of the effect, which causes their outline to be displayed through walls and in the fog of war.<br/><Bullet/>Additional uses of Holotargeting on the same target will not stack.<br/>"
+LocPromotionPopupText="<Bullet/> A Holotargeted enemy remains so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s).<br/><Bullet/> Additional uses of Holotargeting on the same target will not stack.<br/>"
 
 [VitalPointTargeting X2AbilityTemplate]
 LocFriendlyName="Vital Point Targeting"
