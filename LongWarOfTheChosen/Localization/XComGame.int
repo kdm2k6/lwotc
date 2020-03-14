@@ -538,7 +538,7 @@ LocPromotionPopupText="<Bullet/> You do <Ability:ALPHA_MIKE_FOXTROT_DAMAGE_LW/> 
 [LongWatch X2AbilityTemplate]
 LocFriendlyName="Long Watch"
 LocLongDescription="Allow Overwatch to trigger with Squadsight, and allows reaction shots at squadsight range to deal critical hits."
-LocHelpText="Fire on the first enemy that moves within your line of sight. Enemies at squadsight range can be targeted and critically hit."
+LocHelpText="Fire on the first enemy that moves within your line of sight, including squadsight."
 LocLongDescriptionWhenConcealed="Fire on the first enemy that moves within your line of sight but only if you are revealed. Enemies at squadsight range can be targeted and critically hit."
 LocFlyOverText="Long Watch"
 LocFriendlyNameWhenConcealed="Long Watch (Concealed)"
