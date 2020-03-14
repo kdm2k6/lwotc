@@ -77,6 +77,7 @@
     <Folder Include="Src\LW_Tuple\" />
     <Folder Include="Src\LW_FactionBalance\" />
     <Folder Include="Src\WallClimbOverride\Classes\" />
+    <Folder Include="Content\robojumperSquadSelect_Integrated\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\XComAI.ini" />
@@ -579,6 +580,9 @@
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_InfiltrationModifier.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_ItemWeight.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_JavelinRockets.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_LongWatchCritReaction.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_LWHolotarget.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_MaybeApplyDirectionalWorldDamage.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_ModifyNonReactionFire.uc" />
@@ -686,6 +690,9 @@
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_MissionSiteRebelRaid_LW.uc" />
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_MissionSiteRendezvous_LW.uc" />
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_WorldRegion_LWStrategyAI.uc" />
+    <Content Include="Src\LW_PerkPack_Integrated\Classes\X2Effect_PrecisionShotPierce.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_PerkPack_Integrated\LW_PerkPack.uci" />
     <Content Include="Src\LW_PerkPack_Integrated\Classes\UIArmory_LWExpandedPromotionSummaryItem.uc" />
     <Content Include="Src\LW_PerkPack_Integrated\Classes\UIArmory_MainMenu_LW.uc" />
@@ -1065,7 +1072,6 @@
     <Content Include="Src\LW_Overhaul\Classes\X2LWCovertActionsModTemplate.uc" />
     <Content Include="Config\XComAcademyUnlocks.ini" />
     <Content Include="Config\XComLW_FactionBalance.ini" />
-    <Content Include="Content\UICollection_SupremeFocus.upk" />
     <Content Include="Src\LW_FactionBalance\Classes\X2AbilityCooldown_Grapple.uc" />
     <Content Include="Src\LW_FactionBalance\Classes\X2Ability_Parkour.uc" />
     <Content Include="Src\LW_FactionBalance\Classes\X2DownloadableContentInfo_LW_FactionBalance.uc" />
@@ -1079,11 +1085,6 @@
     <Content Include="Content\Missions\Obj_SecureUFO_LW.umap" />
     <Content Include="Src\LW_Overhaul\Classes\SeqAct_LWStartReinforcements.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2LWResistanceOrdersModTemplate.uc" />
-    <Content Include="Content\CrossbowVektor.upk" />
-    <Content Include="Content\EW_MEC_Weapons.upk" />
-    <Content Include="Content\FX_MEC_WP_Chaingun.upk" />
-    <Content Include="Content\FX_MEC_WP_Particle_Beam.upk" />
-    <Content Include="Content\FX_MEC_WP_Railgun.upk" />
     <Content Include="Src\LW_WeaponsAndArmor\Classes\X2Item_SparkWeapons.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_Whirlwind2.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Condition_HeadshotEnabled.uc" />
@@ -1111,6 +1112,7 @@
     <Content Include="Src\LW_Overhaul\Classes\X2Ability_DarkEvents_LW.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Condition_ChanceBasedTacticalDE.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Condition_UnitPropsTacticalDE.uc" />
+    <Content Include="Content\robojumperSquadSelect_Integrated\UILibrary_robojumperSquadSelect.upk" />
   </ItemGroup>
   <!-- Everything below is borrowed from the https://github.com/WOTCStrategyOverhaul/CovertInfiltration project -->
   <!-- The weird stuff below (until Target) is required or otherwise ModBuddy project breaks ¯\_(ツ)_/¯ P.S. Also don't try to make it more sane -->

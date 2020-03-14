@@ -926,6 +926,11 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 		Template.AddShooterEffect (PersistentStatChangeEffect);
 	}
 
+	if (Template.DataName == 'LongWatch')
+	{
+		Template.AdditionalAbilities.AddItem('LongWatchPassive');
+	}
+
 	if (Template.DataName == 'HailofBullets')
 	{
 		InventoryCondition = new class'X2Condition_UnitInventory';

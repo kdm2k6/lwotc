@@ -31,6 +31,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(AddAlphaMikeFoxtrot());
 	Templates.AddItem(AddDoubleTap2());
 	Templates.AddItem(AddDoubleTap2ActionPoint());
+	Templates.AddItem(LongWatchPassive());
 
 	return Templates;
 }
@@ -408,6 +409,40 @@ static function X2AbilityTemplate AddDoubleTap2ActionPoint()
 	return Template;
 
 }
+
+static function X2AbilityTemplate LongWatchPassive()
+{
+	local X2AbilityTemplate						Template;
+	local X2AbilityTargetStyle                  TargetStyle;
+	local X2AbilityTrigger						Trigger;
+	local X2Effect_ModifyReactionFire           ReactionFire;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'LongWatchPassive');
+	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_long_watch";
+	
+    Template.eAbilityIconBehaviorHUD = 2;
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.Hostility = eHostility_Neutral;
+
+	Template.AbilityToHitCalc = default.DeadEye;
+
+	TargetStyle = new class'X2AbilityTarget_Self';
+	Template.AbilityTargetStyle = TargetStyle;
+
+	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
+	Template.AbilityTriggers.AddItem(Trigger);
+
+	ReactionFire = new class'X2Effect_LongWatchCritReaction';
+	ReactionFire.BuildPersistentEffect(1, true, true, true);
+	ReactionFire.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
+	Template.AddTargetEffect(ReactionFire);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	//  NOTE: No visualization on purpose!
+
+	return Template;
+}
+
 defaultproperties
 {
 	DoubleTapActionPoint=DoubleTap;

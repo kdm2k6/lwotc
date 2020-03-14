@@ -896,7 +896,7 @@ static function X2AbilityTemplate AddLowProfileAbility()
 {
 	local X2AbilityTemplate					Template;
 	local X2Effect_LowProfile_LW			DefModifier;
-	local StatEffect						X2Effect_PersistentStatChange;
+	local X2Effect_PersistentStatChange		StatEffect;
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'LowProfile');
 	Template.IconImage = "img:///UILibrary_LW_PerkPack.LW_AbilityLowProfile";
@@ -1279,6 +1279,7 @@ static function X2AbilityTemplate WalkFireDamage()
     return Template;
 
 }
+
 
 static function X2AbilityTemplate AddPrecisionShotAbility()
 {
