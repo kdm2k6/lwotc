@@ -690,9 +690,6 @@
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_MissionSiteRebelRaid_LW.uc" />
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_MissionSiteRendezvous_LW.uc" />
     <Content Include="Src\LW_Overhaul\Classes\XComGameState_WorldRegion_LWStrategyAI.uc" />
-    <Content Include="Src\LW_PerkPack_Integrated\Classes\X2Effect_PrecisionShotPierce.uc">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Src\LW_PerkPack_Integrated\LW_PerkPack.uci" />
     <Content Include="Src\LW_PerkPack_Integrated\Classes\UIArmory_LWExpandedPromotionSummaryItem.uc" />
     <Content Include="Src\LW_PerkPack_Integrated\Classes\UIArmory_MainMenu_LW.uc" />

@@ -195,6 +195,8 @@ simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState
 			}
 		}
 	}
+
+	super.AddX2ActionsForVisualization(VisualizeGameState, ActionMetadata, EffectApplyResult);
 }
 
 simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult, XComGameState_Effect RemovedEffect)
@@ -222,6 +224,8 @@ simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeG
 			}
 		}
 	}
+
+	super.AddX2ActionsForVisualization_Removed(VisualizeGameState, ActionMetadata, EffectApplyResult);
 }
 
 simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata )
@@ -249,6 +253,8 @@ simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGam
 			}
 		}
 	}
+
+	super.AddX2ActionsForVisualization_Sync(VisualizeGameState, ActionMetadata, EffectApplyResult);
 }
 
 DefaultProperties
