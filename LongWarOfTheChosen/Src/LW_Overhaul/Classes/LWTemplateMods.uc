@@ -215,6 +215,7 @@ var config bool CONCEAL_ENDS_TURN;
 var config int SERIAL_CRIT_MALUS_PER_KILL;
 var config int SERIAL_AIM_MALUS_PER_KILL;
 var config bool SERIAL_DAMAGE_FALLOFF;
+var config float SHADOWSTEP_DETECTION_RANGE_REDUCTION;
 var config int FUSION_SWORD_FIRE_CHANCE;
 
 var config array<ItemTableEntry> ItemTable;
@@ -886,6 +887,7 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 	local X2Effect_MaybeApplyDirectionalWorldDamage WorldDamage;
 	local X2Effect_DeathFromAbove_LW        DeathEffect;
 	local X2Effect_ApplyWeaponDamage        WeaponDamageEffect;
+	local X2Effect_PersistentStatChange		CovertEffect;
 
 	// WOTC TODO: Trying this out. Should be put somewhere more appropriate.
 	if (Template.DataName == 'ReflexShotModifier')
@@ -1109,6 +1111,15 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 		DamageModifier.BuildPersistentEffect(1, true, false, true);
 		DamageModifier.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,, Template.AbilitySourceName);
 		Template.AddTargetEffect(DamageModifier);
+	}
+
+	if (Template.DataName == 'Shadowstep')
+	{
+		CovertEffect = new class'X2Effect_PersistentStatChange';
+		CovertEffect.BuildPersistentEffect(1,true,false);
+		CovertEffect.SetDisplayInfo (ePerkBuff_Passive,Template.LocFriendlyName, Template.GetMyHelpText(), Template.IconImage,,, Template.AbilitySourceName); 
+		CovertEffect.AddPersistentStatChange(eStat_DetectionModifier, default.SHADOWSTEP_DETECTION_RANGE_REDUCTION);
+		Template.AddTargetEffect(CovertEffect);
 	}
 
 	// bugfix for several vanilla perks being lost after bleeding out/revive

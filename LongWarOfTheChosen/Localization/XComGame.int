@@ -5042,3 +5042,9 @@ LocLongDescription="Ranged attacks against flanked enemies deal +2 damage."
 LocHelpText="Ranged attacks against flanked enemies deal +2 damage."
 LocFlyOverText="Predator"
 LocPromotionPopupText="<Bullet/> Ranged attacks against flanked enemies deal +2 damage."
+
+[Shadowstep X2AbilityTemplate]
+LocFriendlyName="Shadowstep"
+LocLongDescription="You no longer trigger reaction fire, and enemies have 15% smaller detection range against you."
+LocHelpText="This soldier does not trigger reaction fire, and enemies have 15% smaller detection range against you"
+LocPromotionPopupText="<Bullet/> A <Ability:ClassName/> with Shadowstep will not trigger Overwatch shots or Suppression fire, but they will be unable to draw Overwatch fire away from their teammates.<br/><Bullet/> Enemies have 15% smaller detection range against you, as denoted by red tiles surrounding enemies who are not alerted to your presence.<br/>"
