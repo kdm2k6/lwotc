@@ -119,6 +119,11 @@ var localized string LocCoveringFireMalus;
 var config bool NO_STANDARD_ATTACKS_WHEN_ON_FIRE;
 var config bool NO_MELEE_ATTACKS_WHEN_ON_FIRE;
 var config int LOW_PROFILE_MOBILITY;
+var config int LONEWOLF_AIM_BONUS;
+var config int LONEWOLF_DEF_BONUS;
+var config int LONEWOLF_CRIT_BONUS;
+var config int LONEWOLF_DODGE_BONUS;
+var config int LONEWOLF_MIN_DIST_TILES;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -883,6 +888,12 @@ static function X2AbilityTemplate AddLoneWolfAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	AimandDefModifiers = new class 'X2Effect_LoneWolf';
+	AimandDefModifiers.EffectName = 'LoneWolf';
+	AimandDefModifiers.AIM_BONUS = default.LONEWOLF_AIM_BONUS;
+	AimandDefModifiers.DEF_BONUS = default.LONEWOLF_DEF_BONUS;
+	AimandDefModifiers.CRIT_BONUS = default.LONEWOLF_CRIT_BONUS;
+	AimandDefModifiers.DODGE_BONUS = default.LONEWOLF_DODGE_BONUS;
+	AimandDefModifiers.MIN_DIST_TILES = default.LONEWOLF_MIN_DIST_TILES;
 	AimandDefModifiers.BuildPersistentEffect (1, true, false);
 	AimandDefModifiers.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect (AimandDefModifiers);

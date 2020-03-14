@@ -484,7 +484,7 @@ LocFriendlyName="Ghostwalker"
 LocFlyOverText="Ghostwalker"
 LocLongDescription="Activate this ability to reduce enemy detection range against you by almost 25% for the rest of your turn as well as the following turn."
 LocHelpText="Reduce enemy detection range by 25% for two turns."
-LocPromotionPopupText="<Bullet/> Activate this ability to reduce enemy detection range against you by almost 25% for two turns (including the current turn), as denoted by red tiles surrounding enemies who are not alerted to your presence.<br/><Bullet/> <Ability:SelfCooldown/>-turn cooldown.<br/><Bullet/> Requires no actions to activate.<br/><Bullet/> This ability also grants a small reduction in this soldier's impact on infiltration times.<br/><Bullet/> Does not apply to ADVENT security towers."
+LocPromotionPopupText="<Bullet/> Activate this ability to reduce enemy detection range against you by almost 25% for two turns (including the current turn), as denoted by red tiles surrounding enemies who are not alerted to your presence.<br/><Bullet/> <Ability:SelfCooldown/>-turn cooldown.<br/><Bullet/> Requires no actions to activate.<br/><Bullet/> This ability also slightly improves soldier infiltration times, reducing the total infiltration time of the soldier by 5%.<br/><Bullet/> Does not apply to ADVENT security towers."
 
 [Kubikuri X2AbilityTemplate]
 LocFriendlyName="Kubikiri"

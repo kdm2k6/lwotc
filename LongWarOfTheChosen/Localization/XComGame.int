@@ -271,9 +271,9 @@ LocPromotionPopupText="<Bullet/> Coup de Grâce grants +50 aim, +50 critical cha
 [Tradecraft X2AbilityTemplate]
 LocFriendlyName="Tradecraft"
 LocFlyOverText="Tradecraft"
-LocLongDescription="This soldier has significantly reduced infiltration times while on missions."
-LocHelpText="This soldier has significantly reduced infiltration times while on missions."
-LocPromotionPopupText="<Bullet/> This soldier has significantly reduced infiltration times while on missions.<br/>"
+LocLongDescription="This soldier has reduced infiltration times while on missions, and gains +10 crit and +10 defense when not within 7 tiles of an ally."
+LocHelpText="This soldier has reduced infiltration times while on missions, and gains +10 crit and +10 defense when not within 7 tiles of an ally."
+LocPromotionPopupText="<Bullet/> This perk improves infiltration, reducing the total infiltration time of the soldier by 15%.<br/><Bullet/> Also grants +10 crit and +10 defense when not within 7 tiles of an ally."
 
 ;;;;;;;;;;;;;;;;;;;;  SPECIALIST ABILITIES ;;;;;;;;;;;;;;;;;;;;;;;
 

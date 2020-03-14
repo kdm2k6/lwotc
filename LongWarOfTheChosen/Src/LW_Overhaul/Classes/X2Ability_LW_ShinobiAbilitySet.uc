@@ -18,6 +18,12 @@ var config int COUP_DE_GRACE_2_HIT_BONUS;
 var config int COUP_DE_GRACE_2_CRIT_BONUS;
 var config int COUP_DE_GRACE_2_DAMAGE_BONUS;
 
+var config int TRADECRAFT_LONE_AIM_BONUS;
+var config int TRADECRAFT_LONE_DEF_BONUS;
+var config int TRADECRAFT_LONE_CRIT_BONUS;
+var config int TRADECRAFT_LONE_DODGE_BONUS;
+var config int TRADECRAFT_LONE_MIN_DIST_TILES;
+
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Templates;
@@ -28,7 +34,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(AddCoupDeGraceAbility());
 	Templates.AddItem(AddCoupDeGracePassive());
 	Templates.AddItem(AddCoupDeGrace2Ability());
-	Templates.AddItem(PurePassive('Tradecraft', "img:///UILibrary_LW_Overhaul.LW_AbilityTradecraft", true));
+	Templates.AddItem(AddTradecraft());
 	return Templates;
 }
 
@@ -210,4 +216,34 @@ static function X2AbilityTemplate AddWhirlwindPassive()
 	Template = PurePassive('WhirlwindPassive', "img:///UILibrary_PerkIcons.UIPerk_riposte", , 'eAbilitySource_Perk');
 
 	return Template;
+}
+
+tatic function X2AbilityTemplate AddTradecraft()
+{
+	local X2AbilityTemplate					Template;
+	local X2Effect_LoneWolf					AimandDefModifiers;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'Tradecraft');
+	Template.IconImage = "img:///UILibrary_LW_Overhaul.LW_AbilityTradecraft"";
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
+	Template.bIsPassive = true;
+	AimandDefModifiers = new class 'X2Effect_LoneWolf';
+	AimandDefModifiers.EffectName = 'Tradecraft';
+	AimandDefModifiers.AIM_BONUS = default.TRADECRAFT_LONE_AIM_BONUS;
+	AimandDefModifiers.DEF_BONUS = default.TRADECRAFT_LONE_DEF_BONUS;
+	AimandDefModifiers.CRIT_BONUS = default.TRADECRAFT_LONE_CRIT_BONUS;
+	AimandDefModifiers.CRIT_BONUS = default.TRADECRAFT_LONE_DODGE_BONUS;
+	AimandDefModifiers.MIN_DIST_TILES = default.TRADECRAFT_LONE_MIN_DIST_TILES;
+	AimandDefModifiers.BuildPersistentEffect (1, true, false);
+	AimandDefModifiers.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
+	Template.AddTargetEffect (AimandDefModifiers);
+	Template.bCrossClassEligible = true;
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;	
+	//no visualization
+	return Template;		
 }

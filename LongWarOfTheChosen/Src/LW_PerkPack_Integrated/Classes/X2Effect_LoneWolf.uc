@@ -8,10 +8,11 @@ class X2Effect_LoneWolf extends X2Effect_Persistent config (LW_SoldierSkills);
 
 `include(LW_PerkPack_Integrated\LW_PerkPack.uci)
 
-var config int LONEWOLF_AIM_BONUS;
-var config int LONEWOLF_DEF_BONUS;
-var config int LONEWOLF_CRIT_BONUS;
-var config int LONEWOLF_MIN_DIST_TILES;
+var int AIM_BONUS;
+var int DEF_BONUS;
+var int CRIT_BONUS;
+var int DODGE_BONUS;
+var int MIN_DIST_TILES;
 
 function bool NearestAllyBeyondRange (XComGameState_Unit LWUnit)
 {
@@ -63,11 +64,11 @@ function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit 
 		{
 			ShotInfo.ModType = eHit_Success;
 			ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.LONEWOLF_AIM_BONUS;
+			ShotInfo.Value = default.AIM_BONUS;
 			ShotModifiers.AddItem(ShotInfo);
 			ShotInfo.ModType = eHit_Crit;
 			ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.LONEWOLF_CRIT_BONUS;
+			ShotInfo.Value = default.CRIT_BONUS;
 			ShotModifiers.AddItem(ShotInfo);			
 		}
     }    
@@ -84,7 +85,12 @@ function GetToHitAsTargetModifiers(XComGameState_Effect EffectState, XComGameSta
 	{
 		ShotInfo.ModType = eHit_Success;
 		ShotInfo.Reason = FriendlyName;
-		ShotInfo.Value = -default.LONEWOLF_DEF_BONUS;
+		ShotInfo.Value = -default.DEF_BONUS;
+		ShotModifiers.AddItem(ShotInfo);
+
+		ShotInfo.ModType = eHit_Graze;
+		ShotInfo.Reason = FriendlyName;
+		ShotInfo.Value = default.DODGE_BONUS;
 		ShotModifiers.AddItem(ShotInfo);
 	}
 }
@@ -92,5 +98,4 @@ function GetToHitAsTargetModifiers(XComGameState_Effect EffectState, XComGameSta
 defaultproperties
 {
     DuplicateResponse=eDupe_Ignore
-    EffectName="LoneWolf"
 }
