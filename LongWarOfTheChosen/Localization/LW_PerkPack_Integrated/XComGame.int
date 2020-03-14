@@ -153,9 +153,9 @@ LocPromotionPopupText="<Bullet/> Gain +1 damage on critical hits for every two e
 [HardTarget X2AbilityTemplate]
 LocFriendlyName="Hard Target"
 LocFlyOverText="Hard Target"
-LocLongDescription="Gain 5 dodge per enemy you can see, up to a maximum of +30."
-LocHelpText="Gain 5 dodge per enemy you can see, up to a maximum of +30."
-LocPromotionPopupText="<Bullet/> Gain 5 dodge per enemy you can see, up to a maximum of +30.<br/><Bullet/> Units visible at squadsight ranges do not confer bonus.<br/><Bullet/> This ability does not provide defensive bonuses if the unit is disoriented, stunned, panicking, on fire or otherwise impaired."
+LocLongDescription="Gain 4 dodge per enemy you can see, up to a maximum of +40."
+LocHelpText="Gain 4 dodge per enemy you can see, up to a maximum of +40."
+LocPromotionPopupText="<Bullet/> Gain 4 dodge per enemy you can see, up to a maximum of +40.<br/><Bullet/> Units visible at squadsight ranges do not confer bonus.<br/><Bullet/> This ability does not provide defensive bonuses if the unit is disoriented, stunned, panicking, on fire or otherwise impaired."
 
 [Infighter X2AbilityTemplate]
 LocFriendlyName="Infighter"
@@ -1004,10 +1004,10 @@ Summary="Explosives can inflict critical damage."
 
 [HuntersInstinct X2AbilityTemplate]
 LocFriendlyName="Hunter's Instincts"
-LocLongDescription="Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage."
-LocHelpText="Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage."
+LocLongDescription="Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage, and melee attacks gain 15% critical hit chance."
+LocHelpText="Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage, and melee attacks gain 15% critical hit chance."
 LocFlyOverText="Hunter's Instincts"
-LocPromotionPopupText="<Bullet/> Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage."
+LocPromotionPopupText="<Bullet/> Ranged attacks against flanked enemies deal +<Ability:HUNTERSINSTINCTDMG/> damage, and melee attacks gain 15% critical hit chance."
 
 [HitWhereItHurts X2AbilityTemplate]
 LocFriendlyName="Deadshot"
