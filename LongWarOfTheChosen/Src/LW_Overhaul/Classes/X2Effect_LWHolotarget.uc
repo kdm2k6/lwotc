@@ -167,6 +167,51 @@ function int GetDefendingDamageModifier(
 	return DamageMod;
 }
 
+//Implements Predictive Algorithms
+simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult)
+{
+	local X2Action_TargetDefinition OutlineAction;
+	local XComGameState_Unit UnitState;
+
+	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	{
+		UnitState = XComGameState_Unit(ActionMetadata.StateObject_NewState);
+		if (EffectApplyResult == 'AA_Success' && UnitState != none)
+		{
+			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+			OutlineAction.bEnableOutline = true;
+		}
+	}
+}
+
+simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult, XComGameState_Effect RemovedEffect)
+{
+	local X2Action_TargetDefinition OutlineAction;
+
+	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	{
+		if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+		{
+			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+			OutlineAction.bEnableOutline = false;
+		}
+	}
+}
+
+simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata )
+{
+	local X2Action_TargetDefinition OutlineAction;
+
+	if(SourceUnit.FindAbility('IndependentTracking').ObjectID > 0)
+	{
+		if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
+		{
+			OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
+			OutlineAction.bEnableOutline = true;
+		}
+	}
+}
+
 DefaultProperties
 {
 	EffectName = "LWHoloTarget"
