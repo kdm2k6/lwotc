@@ -295,6 +295,9 @@ CannotModifyOnMissionSoldierTooltip="Cannot modify soldier currently on mission"
 [X2Effect_LWHolotarget]
 HoloTargetEffectName="Holotargeted"
 
+[X2Effect_PredictiveAlgorithms]
+TrackingEffectName="Tracked"
+
 [XComGameState_LWPersistentSquad]
 +DefaultSquadNames="Menace"
 +DefaultSquadNames="Voodoo"

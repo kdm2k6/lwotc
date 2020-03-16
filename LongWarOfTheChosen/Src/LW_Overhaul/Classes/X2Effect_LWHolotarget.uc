@@ -12,7 +12,6 @@ var config int HOLO_BM_AIM_BONUS;
 var config int HDHOLO_CV_CRIT_BONUS;
 var config int HDHOLO_MG_CRIT_BONUS;
 var config int HDHOLO_BM_CRIT_BONUS;
-var config bool INDEPENDENT_TRACKING_REVEALS_ENEMIES;
 
 var localized string HoloTargetEffectName;
 
@@ -166,96 +165,6 @@ function int GetDefendingDamageModifier(
 		}
 	}
 	return DamageMod;
-}
-
-//Implements Predictive Algorithms
-simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult)
-{
-	local X2Action_TargetDefinition OutlineAction;
-	local XComGameState_Unit UnitState;
-	local XComGameStateContext_Ability AbilityContext;
-	local XComGameState_Unit SourceState;
-	local XComGameStateHistory History;
-
-	History = `XCOMHISTORY;
-
-	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
-	if( AbilityContext != None )
-	{
-		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
-		if( SourceState != None )
-		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
-			{
-				UnitState = XComGameState_Unit(ActionMetadata.StateObject_NewState);
-				if (EffectApplyResult == 'AA_Success' && UnitState != none)
-				{
-					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-					OutlineAction.bEnableOutline = true;
-				}
-			}
-		}
-	}
-
-	super.AddX2ActionsForVisualization(VisualizeGameState, ActionMetadata, EffectApplyResult);
-}
-
-simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata, const name EffectApplyResult, XComGameState_Effect RemovedEffect)
-{
-	local X2Action_TargetDefinition OutlineAction;
-	local XComGameStateContext_Ability AbilityContext;
-	local XComGameState_Unit SourceState;
-	local XComGameStateHistory History;
-
-	History = `XCOMHISTORY;
-
-	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
-	if( AbilityContext != None )
-	{
-		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
-		if( SourceState != None )
-		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
-			{
-				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
-				{
-					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-					OutlineAction.bEnableOutline = false;
-				}
-			}
-		}
-	}
-
-	super.AddX2ActionsForVisualization_Removed(VisualizeGameState, ActionMetadata, EffectApplyResult, RemovedEffect);
-}
-
-simulated function AddX2ActionsForVisualization_Sync( XComGameState VisualizeGameState, out VisualizationActionMetadata ActionMetadata )
-{
-	local X2Action_TargetDefinition OutlineAction;
-	local XComGameStateContext_Ability AbilityContext;
-	local XComGameState_Unit SourceState;
-	local XComGameStateHistory History;
-
-	History = `XCOMHISTORY;
-
-	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
-	if( AbilityContext != None )
-	{
-		SourceState = XComGameState_Unit(History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex));
-		if( SourceState != None )
-		{
-			if(SourceState.FindAbility('IndependentTracking').ObjectID > 0 && default.INDEPENDENT_TRACKING_REVEALS_ENEMIES)
-			{
-				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
-				{
-					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-					OutlineAction.bEnableOutline = false;
-				}
-			}
-		}
-	}
-
-	super.AddX2ActionsForVisualization_Sync(VisualizeGameState, ActionMetadata);
 }
 
 DefaultProperties

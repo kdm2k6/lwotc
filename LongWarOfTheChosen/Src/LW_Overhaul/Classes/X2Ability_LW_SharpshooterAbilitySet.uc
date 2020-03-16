@@ -41,6 +41,8 @@ static function X2AbilityTemplate AddHolotarget()
 	local X2AbilityTemplate                 Template;
 	local X2AbilityCost_ActionPoints        ActionPointCost;
 	local X2Effect_LWHoloTarget				Effect;
+	local X2Effect_PredictiveAlgorithms		TrackingEffect;
+	local XMBCondition_SourceAbilities		TrackingCondition;
 	local X2Condition_Visibility			TargetVisibilityCondition;
 	local X2Condition_UnitEffects			SuppressedCondition;
 
@@ -101,6 +103,15 @@ static function X2AbilityTemplate AddHolotarget()
 	Effect.bApplyOnHit = true;
 	Effect.bApplyOnMiss = true;
 	Template.AddTargetEffect(Effect);
+
+	TrackingEffect = new class'X2Effect_PredictiveAlgorithms'; //The effect checks whether the soldier has the ability
+	TrackingEffect.BuildPersistentEffect(default.TRACKING_DURATION, false, false, false, eGameRule_PlayerTurnBegin);
+	TrackingEffect.SetDisplayInfo(ePerkBuff_Penalty, class'X2Effect_PredictiveAlgorithms'.default.TrackingEffectName, Template.GetMyLongDescription(), "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true, Template.AbilitySourceName);
+	TrackingEffect.bRemoveWhenTargetDies = true;
+	TrackingEffect.bUseSourcePlayerState = true;
+	TrackingEffect.bApplyOnHit = true;
+	TrackingEffect.bApplyOnMiss = true;
+	Template.AddTargetEffect(TrackingEffect);
 
     Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;

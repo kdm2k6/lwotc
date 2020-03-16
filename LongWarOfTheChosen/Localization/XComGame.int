@@ -508,11 +508,11 @@ LocFlyOverText="HiDef Holo"
 LocPromotionPopupText="<Bullet/> The critical hit bonus is +<Ability:HDHOLO_CV_CRIT_BONUS_LW/> with the basic Holotargeter, but improves to +<Ability:HDHOLO_MG_CRIT_BONUS_LW/> and +<Ability:HDHOLO_BM_CRIT_BONUS_LW/> with advanced technology Holotargeting devices.<br/>"
 
 [IndependentTracking X2AbilityTemplate]
-LocFriendlyName="Independent Tracking"
-LocLongDescription="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s)."
-LocHelpText="A Holotargeted enemy will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s)."
+LocFriendlyName="Predictive Algorithms"
+LocLongDescription="Holotargeted enemies will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and will stay revealed in the fog of war until the effect wears off."
+LocHelpText="Holotargeted enemies will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and will stay revealed in the fog of war until the effect wears off."
 LocFlyOverText="Independent Tracking"
-LocPromotionPopupText="<Bullet/> A Holotargeted enemy remains so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s).<br/><Bullet/> Additional uses of Holotargeting on the same target will not stack.<br/>"
+LocPromotionPopupText="<Bullet/> A Holotargeted enemy remains so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s).<br/> Holotargeted enemies are also visible as outlines even when no soldier has direct vision on them, but they can't be targeted by squadsight.<Bullet/><br/><Bullet/> Additional uses of Holotargeting on the same target will not stack.<br/>"
 
 [VitalPointTargeting X2AbilityTemplate]
 LocFriendlyName="Vital Point Targeting"
