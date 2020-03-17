@@ -24,6 +24,10 @@ var config int TRADECRAFT_LONE_CRIT_BONUS;
 var config int TRADECRAFT_LONE_DODGE_BONUS;
 var config int TRADECRAFT_LONE_MIN_DIST_TILES;
 
+var config int SILENT_TAKEDOWN_DURATION;
+var config int SILENT_TAKEDOWN_CHARGES;
+var config bool REFRESH_TAKEDOWN_ON_CONCEAL;
+
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Templates;
@@ -35,6 +39,9 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(AddCoupDeGracePassive());
 	Templates.AddItem(AddCoupDeGrace2Ability());
 	Templates.AddItem(AddTradecraft());
+	Templates.AddItem(AddSilentTakedown());
+	Templates.AddItem(AddSilentTakedownDamage()); //Additional Ability
+	Templates.AddItem(AddSilentTakedownCharges()); //Additional Ability
 	return Templates;
 }
 
@@ -218,20 +225,19 @@ static function X2AbilityTemplate AddWhirlwindPassive()
 	return Template;
 }
 
-tatic function X2AbilityTemplate AddTradecraft()
+static function X2AbilityTemplate AddTradecraft()
 {
 	local X2AbilityTemplate					Template;
 	local X2Effect_LoneWolf					AimandDefModifiers;
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'Tradecraft');
-	Template.IconImage = "img:///UILibrary_LW_Overhaul.LW_AbilityTradecraft"";
+	Template.IconImage = "img:///UILibrary_LW_Overhaul.LW_AbilityTradecraft";
 	Template.AbilitySourceName = 'eAbilitySource_Perk';
 	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
 	Template.Hostility = eHostility_Neutral;
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SelfTarget;
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
-	Template.bIsPassive = true;
 	AimandDefModifiers = new class 'X2Effect_LoneWolf';
 	AimandDefModifiers.EffectName = 'Tradecraft';
 	AimandDefModifiers.AIM_BONUS = default.TRADECRAFT_LONE_AIM_BONUS;
@@ -246,4 +252,164 @@ tatic function X2AbilityTemplate AddTradecraft()
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;	
 	//no visualization
 	return Template;		
+}
+
+static function X2AbilityTemplate AddSilentTakedown()
+{
+	local X2AbilityTemplate                 Template;
+	local X2AbilityCost_ActionPoints        ActionPointCost;
+	local X2AbilityCost_Charges				ChargeCost;
+	local X2AbilityCharges					Charges;
+	local X2AbilityToHitCalc_StandardMelee  StandardMelee;
+	local X2Effect_GrantActionPoints		GrantActionPoints;
+	local X2Effect_PreventDetection			NoDetectionRadiusEffect;
+	local X2Effect_ApplyWeaponDamage        WeaponDamageEffect;
+	local X2Condition_RequireConcealed		ConcealmentCondition;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'SilentTakedown_LW');
+	`LOG("Creating Silent Takedown ability");
+
+	Template.AbilitySourceName = 'eAbilitySource_Standard';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_AlwaysShow;
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+	Template.CinescriptCameraType = "Ranger_Reaper";
+	Template.IconImage = "img:///UILibrary_LW_PerkPack.LW_AbilityKubikuri";
+	Template.bHideOnClassUnlock = false;
+	Template.ShotHUDPriority = class'UIUtilities_Tactical'.const.CLASS_SERGEANT_PRIORITY;
+	Template.AbilityConfirmSound = "TacticalUI_SwordConfirm";
+	Template.bCrossClassEligible = false;
+
+	//Only lose concealment if you dont kill the primary target
+	Template.ConcealmentRule = eConceal_KillShot;
+
+	ActionPointCost = new class'X2AbilityCost_ActionPoints';
+	ActionPointCost.iNumPoints = 1;
+	ActionPointCost.bConsumeAllPoints = true;
+	Template.AbilityCosts.AddItem(ActionPointCost);
+	
+	Charges = new class 'X2AbilityCharges';
+	Charges.InitialCharges = default.SILENT_TAKEDOWN_CHARGES;
+	Template.AbilityCharges = Charges;
+
+	ChargeCost = new class'X2AbilityCost_Charges';
+	ChargeCost.NumCharges = 1;
+	Template.AbilityCosts.AddItem(ChargeCost);
+
+	StandardMelee = new class'X2AbilityToHitCalc_StandardMelee';
+	Template.AbilityToHitCalc = StandardMelee;
+
+	Template.AbilityTargetStyle = new class'X2AbilityTarget_MovingMelee';
+	Template.TargetingMethod = class'X2TargetingMethod_MeleePath';
+
+	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
+
+	// Target Conditions
+	Template.AbilityTargetConditions.AddItem(default.LivingHostileTargetProperty);
+	Template.AbilityTargetConditions.AddItem(default.MeleeVisibilityCondition);
+
+	// Shooter Conditions
+	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
+	Template.AddShooterEffectExclusions();
+
+	ConcealmentCondition = new class'X2Condition_RequireConcealed';
+	Template.AbilityShooterConditions.AddItem(ConcealmentCondition);
+
+	// No detection radius effect
+	NoDetectionRadiusEffect = new class'X2Effect_PreventDetection';
+	NoDetectionRadiusEffect.EffectName = 'MusashiTakedownNoDetectionRadius';
+	NoDetectionRadiusEffect.BuildPersistentEffect(default.SILENT_TAKEDOWN_DURATION, false, true, false, eGameRule_PlayerTurnEnd);
+	NoDetectionRadiusEffect.bRemoveWhenTargetConcealmentBroken = true;
+	NoDetectionRadiusEffect.DuplicateResponse = eDupe_Refresh;
+	Template.AddShooterEffect(NoDetectionRadiusEffect);
+
+	// Damage Effect
+	WeaponDamageEffect = new class'X2Effect_ApplyWeaponDamage';
+	WeaponDamageEffect.bBypassSustainEffects = true; //FUCK PRIESTS
+	Template.AddTargetEffect(WeaponDamageEffect);
+
+	// Movement Effect
+	GrantActionPoints = new class'X2Effect_GrantActionPoints';
+	GrantActionPoints.bApplyOnMiss = true;
+	GrantActionPoints.NumActionPoints = 1;
+	GrantActionPoints.PointType = class'X2CharacterTemplateManager'.default.MoveActionPoint;
+	Template.AddShooterEffect(GrantActionPoints);
+
+	Template.bAllowBonusWeaponEffects = true;
+	Template.bSkipMoveStop = true;
+	
+	// Voice events
+	Template.SourceMissSpeech = 'SwordMiss';
+
+	Template.BuildNewGameStateFn = TypicalMoveEndAbility_BuildGameState;
+	Template.BuildInterruptGameStateFn = TypicalMoveEndAbility_BuildInterruptGameState;
+
+	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
+	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
+	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.MeleeLostSpawnIncreasePerUse;
+
+	Template.AdditionalAbilities.AddItem('SilentTakedownDamage_LW');
+	if(default.REFRESH_TAKEDOWN_ON_CONCEAL)
+	{
+		Template.AdditionalAbilities.AddItem('SilentTakedownCharges_LW');
+	}
+
+	return Template;
+}
+
+static function X2AbilityTemplate AddSilentTakedownDamage()
+{
+    local X2AbilityTemplate Template;
+    local X2Effect_SilentTakedownDamage DamageEffect;
+
+    `CREATE_X2ABILITY_TEMPLATE (Template, 'SilentTakedownDamage_LW');
+    Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_momentum";
+    Template.AbilitySourceName = 'eAbilitySource_Perk';
+    Template.eAbilityIconBehaviorHUD = 2;
+    Template.Hostility = 2;
+    Template.AbilityToHitCalc = default.DeadEye;
+    Template.AbilityTargetStyle = default.SelfTarget;
+    Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
+    DamageEffect = new class'X2Effect_SilentTakedownDamage';
+    DamageEffect.BuildPersistentEffect(1, true, false, false);
+    DamageEffect.SetDisplayInfo(0, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, false,, Template.AbilitySourceName);
+    Template.AddTargetEffect(DamageEffect);
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    return Template;
+}
+
+static function X2AbilityTemplate AddSilentTakedownCharges()
+{
+	local X2AbilityTemplate						Template;
+	local X2AbilityTrigger_EventListener		Trigger;
+	local X2Effect_RestoreTakedownCharges		ChargeEffect;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'SilentTakedownCharges_LW');
+
+	//	Icon
+	Template.AbilitySourceName = 'eAbilitySource_Standard';
+	Template.IconImage = "img:///UILibrary_XPACK_Common.PerkIcons.UIPerk_Interrupt";
+    Template.eAbilityIconBehaviorHUD = eAbilityIconBehavior_NeverShow;
+	Template.bDisplayInUITacticalText = false;
+	Template.bDisplayInUITooltip = false;
+	Template.bDontDisplayInAbilitySummary = true;
+	Template.bHideOnClassUnlock = true;
+
+	//	Targeting and Triggering
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	
+	Trigger = new class'X2AbilityTrigger_EventListener';
+	Trigger.ListenerData.Deferral = ELD_OnStateSubmitted;
+	Trigger.ListenerData.EventID = 'UnitConcealmentEntered';
+	Trigger.ListenerData.Filter = eFilter_Unit;
+	Template.AbilityTriggers.AddItem(Trigger);
+
+	ChargeEffect = new class'X2Effect_RestoreTakedownCharges';
+	ChargeEffect.OriginalCharges = default.SILENT_TAKEDOWN_CHARGES;
+	Template.AddShooterEffect(ChargeEffect);
+	
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+
+	return Template;
 }

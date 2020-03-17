@@ -275,6 +275,13 @@ LocLongDescription="This soldier has reduced infiltration times while on mission
 LocHelpText="This soldier has reduced infiltration times while on missions, and gains +10 crit and +10 defense when not within 7 tiles of an ally."
 LocPromotionPopupText="<Bullet/> This perk improves infiltration, reducing the total infiltration time of the soldier by 15%.<br/><Bullet/> Also grants +10 crit and +10 defense when not within 7 tiles of an ally."
 
+[SilentTakedown_LW X2AbilityTemplate]
+LocFriendlyName="Silent Takedown"
+LocFlyOverText="Silent Takedown"
+LocLongDescription="Execute a special melee attack that prevents your concealment from being broken if you kill the enemy, but deals less damage. 2 charges."
+LocHelpText="Execute a special melee attack that prevents your concealment from being broken if you kill the enemy."
+LocPromotionPopupText="<Bullet/> Silent Takedown reduces the soldier's detection range to 0 until the end of the turn, and also retains concealment if the enemy is killed.<br/><Bullet/> After using Silent Takedown the soldier gains a move-only action to return to cover.<br/><Bullet/> Silent Takedown has a 25% damage penalty and does not gain extra damage from range. It also ignores Sustain.<br/><Bullet/> Silent Takedown has 2 charges, which are restored if the soldier regains concealment during a mission.<br/>"
+
 ;;;;;;;;;;;;;;;;;;;;  SPECIALIST ABILITIES ;;;;;;;;;;;;;;;;;;;;;;;
 
 [Failsafe X2AbilityTemplate]
@@ -484,17 +491,17 @@ LocPromotionPopupText="<Bullet/> Anytime you equip a pistol (of any technology l
 
 [Holotarget X2AbilityTemplate]
 LocFriendlyName="Holotarget"
-LocLongDescription="Holotarget your enemy to grant an aim bonus to all attacks on this target by you and your allies for the remainder of the turn."
-LocHelpText="Holotarget an enemy to grant a bonus to attacks against this target."
+LocLongDescription="Holotarget your enemy to grant an aim bonus to all attacks on this target by you and your allies for two turns."
+LocHelpText="Holotarget an enemy to grant a bonus to attacks against this target for two turns."
 LocFlyOverText="Holotarget"
-LocPromotionPopupText="<Bullet/> Holotargeting takes a single action and does not automatically end your turn.<br/><Bullet/> The Holotargeting effect lasts for a single turn.<br/><Bullet/> Multiple holotarget effects do not stack with each other.<br/><Bullet/> The aim bonus is +<Ability:HOLO_CV_AIM_BONUS_LW/> for the basic Holotargeter, and improves to +<Ability:HOLO_MG_AIM_BONUS_LW/> and +<Ability:HOLO_BM_AIM_BONUS_LW/> with better technology.<br/><Bullet/> Holotargeting does not break concealment for you or your squad."
+LocPromotionPopupText="<Bullet/> Holotargeting takes a single action and does not automatically end your turn.<br/><Bullet/> The Holotargeting effect lasts for two turns.<br/><Bullet/> Multiple holotarget effects do not stack with each other.<br/><Bullet/> The aim bonus is +<Ability:HOLO_CV_AIM_BONUS_LW/> for the basic Holotargeter, and improves to +<Ability:HOLO_MG_AIM_BONUS_LW/> and +<Ability:HOLO_BM_AIM_BONUS_LW/> with better technology.<br/><Bullet/> Holotargeting does not break concealment for you or your squad."
 
 [RapidTargeting X2AbilityTemplate]
 LocFriendlyName="Rapid Targeting"
 LocLongDescription="You may Holotarget an enemy as a free action with a <Ability:RAPID_TARGETING_COOLDOWN_LW/>-turn cooldown. In addition, Holotargeting no longer ends your turn."
 LocHelpText="Activate to Holotarget an enemy as a free action."
 LocFlyOverText="Holotarget"
-LocPromotionPopupText="<Bullet/> Using your Holotargeter no longer ends your turn.<br/><Bullet/> In addition, Rapid Targeting lets you periodically use Holotargeting against a single enemy as a free action.<br/><Bullet/> This works with HiDef Holo, Independent Tracking, and Vital Point Targeting.<br/><Bullet/> This does not stack with Multitargeting.<br/><Bullet/> This ability has a <Ability:RAPID_TARGETING_COOLDOWN_LW/> turn cooldown.<br/><Bullet/> Holotargeting does not break concealment for your squad."
+LocPromotionPopupText="<Bullet/> Using your Holotargeter no longer ends your turn.<br/><Bullet/> In addition, Rapid Targeting lets you periodically use Holotargeting against a single enemy as a free action.<br/><Bullet/> This works with both HiDef Holo and Vital Point Targeting.<br/><Bullet/> This does not stack with Multitargeting.<br/><Bullet/> This ability has a <Ability:RAPID_TARGETING_COOLDOWN_LW/> turn cooldown.<br/><Bullet/> Holotargeting does not break concealment for your squad."
 
 [RapidTargeting_Passive X2AbilityTemplate]
 LocFriendlyName="Rapid Targeting"
@@ -508,11 +515,11 @@ LocFlyOverText="HiDef Holo"
 LocPromotionPopupText="<Bullet/> The critical hit bonus is +<Ability:HDHOLO_CV_CRIT_BONUS_LW/> with the basic Holotargeter, but improves to +<Ability:HDHOLO_MG_CRIT_BONUS_LW/> and +<Ability:HDHOLO_BM_CRIT_BONUS_LW/> with advanced technology Holotargeting devices.<br/>"
 
 [IndependentTracking X2AbilityTemplate]
-LocFriendlyName="Predictive Algorithms"
-LocLongDescription="Holotargeted enemies will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and will stay revealed in the fog of war until the effect wears off."
-LocHelpText="Holotargeted enemies will remain so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s), and will stay revealed in the fog of war until the effect wears off."
+LocFriendlyName="Independent Tracking"
+LocLongDescription="Tag an enemy, permanently holotargeting them and revealing them in the fog of war. Has a number of charges that increase with Holotargeter tech level."
+LocHelpText="Tag an enemy, permanently holotargeting them and revealing them in the fog of war."
 LocFlyOverText="Independent Tracking"
-LocPromotionPopupText="<Bullet/> A Holotargeted enemy remains so for <Ability:INDEPENDENT_TRACKING_BONUS_TURNS_LW/> additional turn(s).<br/> Holotargeted enemies are also visible as outlines even when no soldier has direct vision on them, but they can't be targeted by squadsight.<Bullet/><br/><Bullet/> Additional uses of Holotargeting on the same target will not stack.<br/>"
+LocPromotionPopupText="<Bullet/> Independent Tracking allows you to mark high priority targets and tarck them in the fog of war.<br/><Bullet/> This works with both HiDef Holo and Vital Point Targeting.<br/><Bullet/> Tracked enemies are visible as outlines even when no soldier has direct vision on them, but they can't be targeted by squadsight.<Bullet/> Has two charges by default, and gains an extra charge with Advanced and Elite Holotargeters respectively. <br/><Bullet/> Additional uses of Holotargeting on the same target will not stack.<br/>"
 
 [VitalPointTargeting X2AbilityTemplate]
 LocFriendlyName="Vital Point Targeting"

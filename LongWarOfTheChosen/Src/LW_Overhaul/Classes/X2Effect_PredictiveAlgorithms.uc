@@ -71,8 +71,7 @@ simulated function AddX2ActionsForVisualization_Removed(XComGameState VisualizeG
 			{
 				if (XComGameState_Unit(ActionMetadata.StateObject_NewState) != none)
 				{
-					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));
-					OutlineAction.bEnableOutline = false;
+					OutlineAction = X2Action_TargetDefinition(class'X2Action_TargetDefinition'.static.AddToVisualizationTree(ActionMetadata, VisualizeGameState.GetContext(), false, ActionMetadata.LastActionAdded));;
 				}
 			}
 		}

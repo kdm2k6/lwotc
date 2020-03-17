@@ -6,12 +6,18 @@
 
 class X2Ability_LW_SharpshooterAbilitySet extends X2Ability config(LW_SoldierSkills);
 
+var config int HOLOTARGET_DURATION;
 var config int RAPID_TARGETING_COOLDOWN;
 var config int MULTI_TARGETING_COOLDOWN;
 var config int ALPHAMIKEFOXTROT_DAMAGE;
 var config int DOUBLE_TAP_2_COOLDOWN;
+var config int TRACKING_CV_CHARGES;
+var config int TRACKING_MG_CHARGES;
+var config int TRACKING_BM_CHARGES;
 
 var name DoubleTapActionPoint;
+
+var localized string TrackingEffectName;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -20,11 +26,12 @@ static function array<X2DataTemplate> CreateTemplates()
 	
 	//temporary common abilities so the UI will load
 	Templates.AddItem(AddHolotarget());
+	Templates.AddItem(AddIndependentTracking());
 	Templates.AddItem(AddRapidTargeting());
 	Templates.AddItem(AddMultiTargeting());
 
 	Templates.AddItem(PurePassive('HDHolo', "img:///UILibrary_LW_Overhaul.LW_AbilityHDHolo", true));
-	Templates.AddItem(PurePassive('IndependentTracking', "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true));
+	//Templates.AddItem(PurePassive('IndependentTracking', "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true));
 	Templates.AddItem(PurePassive('VitalPointTargeting', "img:///UILibrary_LW_Overhaul.LW_AbilityVitalPointTargeting", true));
 	Templates.AddItem(PurePassive('RapidTargeting_Passive', "img:///UILibrary_LW_Overhaul.LW_AbilityRapidTargeting", true));
 
@@ -42,7 +49,6 @@ static function X2AbilityTemplate AddHolotarget()
 	local X2AbilityCost_ActionPoints        ActionPointCost;
 	local X2Effect_LWHoloTarget				Effect;
 	local X2Effect_PredictiveAlgorithms		TrackingEffect;
-	local XMBCondition_SourceAbilities		TrackingCondition;
 	local X2Condition_Visibility			TargetVisibilityCondition;
 	local X2Condition_UnitEffects			SuppressedCondition;
 
@@ -96,7 +102,7 @@ static function X2AbilityTemplate AddHolotarget()
 
 	// Holotarget Effect
 	Effect = new class'X2Effect_LWHoloTarget';
-	Effect.BuildPersistentEffect(1, false, false, false, eGameRule_PlayerTurnBegin);
+	Effect.BuildPersistentEffect(default.HOLOTARGET_DURATION, false, false, false, eGameRule_PlayerTurnBegin);
 	Effect.SetDisplayInfo(ePerkBuff_Penalty, class'X2Effect_LWHolotarget'.default.HoloTargetEffectName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Effect.bRemoveWhenTargetDies = true;
 	Effect.bUseSourcePlayerState = true;
@@ -104,9 +110,104 @@ static function X2AbilityTemplate AddHolotarget()
 	Effect.bApplyOnMiss = true;
 	Template.AddTargetEffect(Effect);
 
+	/* Doesnt work, the outline always lasts forever. Used for the new active instead
 	TrackingEffect = new class'X2Effect_PredictiveAlgorithms'; //The effect checks whether the soldier has the ability
 	TrackingEffect.BuildPersistentEffect(default.TRACKING_DURATION, false, false, false, eGameRule_PlayerTurnBegin);
-	TrackingEffect.SetDisplayInfo(ePerkBuff_Penalty, class'X2Effect_PredictiveAlgorithms'.default.TrackingEffectName, Template.GetMyLongDescription(), "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true, Template.AbilitySourceName);
+	TrackingEffect.SetDisplayInfo(ePerkBuff_Penalty, class'X2Effect_PredictiveAlgorithms'.default.TrackingEffectName, Template.GetMyLongDescription(), "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true,,Template.AbilitySourceName);
+	TrackingEffect.bRemoveWhenTargetDies = true;
+	TrackingEffect.bUseSourcePlayerState = true;
+	TrackingEffect.bApplyOnHit = true;
+	TrackingEffect.bApplyOnMiss = true;
+	Template.AddTargetEffect(TrackingEffect); */
+
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+
+	return Template;
+}
+
+static function X2AbilityTemplate AddIndependentTracking()
+{
+	local X2AbilityTemplate                 Template;
+	local X2AbilityCost_ActionPoints        ActionPointCost;
+	local X2AbilityCost_Charges				ChargeCost;
+	local X2AbilityCharges_TierBased		Charges;
+	local X2Effect_LWHoloTarget				Effect;
+	local X2Effect_TargetDefinition			TrackingEffect;
+	local X2Condition_Visibility			TargetVisibilityCondition;
+	local X2Condition_UnitEffects			SuppressedCondition;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'IndependentTracking');
+
+	Template.AbilitySourceName = 'eAbilitySource_Standard';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_AlwaysShow;
+	Template.IconImage = "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking";
+	Template.bHideOnClassUnlock = false;
+	Template.ShotHUDPriority = class'UIUtilities_Tactical'.const.CLASS_SERGEANT_PRIORITY;
+	//Template.AbilityConfirmSound = "TacticalUI_SwordConfirm";
+	Template.Hostility = eHostility_Neutral;
+
+	Template.bDisplayInUITooltip = true;
+    Template.bDisplayInUITacticalText = true;
+    Template.DisplayTargetHitChance = true;
+	Template.bShowActivation = false;
+	Template.bSkipFireAction = false;
+	Template.ConcealmentRule = eConceal_Always;
+	Template.ActivationSpeech = 'TracerBeams';
+
+	ActionPointCost = new class'X2AbilityCost_ActionPoints';
+	ActionPointCost.iNumPoints = 1;
+	ActionPointCost.bConsumeAllPoints = true;
+	ActionPointCost.DoNotConsumeAllSoldierAbilities.AddItem('RapidTargeting');
+	Template.AbilityCosts.AddItem(ActionPointCost);
+	
+	Charges = new class 'X2AbilityCharges_TierBased';
+	Charges.CV_Charges = default.TRACKING_CV_CHARGES;
+	Charges.MG_Charges = default.TRACKING_MG_CHARGES;
+	Charges.BM_Charges = default.TRACKING_BM_CHARGES;
+	Template.AbilityCharges = Charges;
+
+	ChargeCost = new class'X2AbilityCost_Charges';
+	ChargeCost.NumCharges = 1;
+	Template.AbilityCosts.AddItem(ChargeCost);
+
+	Template.AbilityToHitCalc = default.DeadEye;
+
+	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
+	Template.AddShooterEffectExclusions();
+
+	// Can only shoot visible enemies
+	TargetVisibilityCondition = new class'X2Condition_Visibility';
+    TargetVisibilityCondition.bRequireGameplayVisible = true;
+    TargetVisibilityCondition.bAllowSquadsight = true;
+	Template.AbilityTargetConditions.AddItem(TargetVisibilityCondition);
+
+	// Can't target dead; Can't target friendlies, can't target inanimate objects
+	Template.AbilityTargetConditions.AddItem(default.LivingHostileUnitOnlyProperty);
+	// Can't shoot while dead
+	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
+	// Only at single targets that are in range.
+	Template.AbilityTargetStyle = default.SimpleSingleTarget;
+		
+	SuppressedCondition = new class'X2Condition_UnitEffects';
+	SuppressedCondition.AddExcludeEffect(class'X2Effect_Suppression'.default.EffectName, 'AA_UnitIsSuppressed');
+	SuppressedCondition.AddExcludeEffect(class'X2Effect_AreaSuppression'.default.EffectName, 'AA_UnitIsSuppressed');
+	Template.AbilityShooterConditions.AddItem(SuppressedCondition);
+
+	// Holotarget Effect
+	Effect = new class'X2Effect_LWHoloTarget';
+	Effect.BuildPersistentEffect(0, true, false, false, eGameRule_PlayerTurnBegin); //Infinite duration
+	Effect.SetDisplayInfo(ePerkBuff_Penalty, class'X2Effect_LWHolotarget'.default.HoloTargetEffectName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
+	Effect.bRemoveWhenTargetDies = true;
+	Effect.bUseSourcePlayerState = true;
+	Effect.bApplyOnHit = true;
+	Effect.bApplyOnMiss = true;
+	Template.AddTargetEffect(Effect);
+
+	TrackingEffect = new class'X2Effect_TargetDefinition'; 
+	TrackingEffect.BuildPersistentEffect(0, true, false, false, eGameRule_PlayerTurnBegin); //Infinite duration
+	TrackingEffect.SetDisplayInfo(ePerkBuff_Penalty, default.TrackingEffectName, Template.GetMyLongDescription(), "img:///UILibrary_LW_Overhaul.LW_AbilityIndependentTracking", true,,Template.AbilitySourceName);
 	TrackingEffect.bRemoveWhenTargetDies = true;
 	TrackingEffect.bUseSourcePlayerState = true;
 	TrackingEffect.bApplyOnHit = true;

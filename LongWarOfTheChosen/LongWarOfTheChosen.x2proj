@@ -522,6 +522,9 @@
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCharges_BonusCharges.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCharges_RescueProtocol.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCharges_TakeThisCharge.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2AbilityCharges_TierBased.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCooldown_AllInstances.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityCooldown_LWFlamethrower.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2AbilityToHitCalc_StatCheck_LWFlamethrower.uc" />
@@ -587,11 +590,23 @@
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_MaybeApplyDirectionalWorldDamage.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_ModifyNonReactionFire.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_Phosphorus.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_PredictiveAlgorithms.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_PreventDetection.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_Quickburn.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_ReflexShotModifier.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_RemoveItemWeight.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_RestoreTakedownCharges.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_RoustDamage.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_SerialCritReduction.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_SilentTakedownDamage.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_StilettoRounds.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_StreetSweeper.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2Effect_StunGunner.uc" />

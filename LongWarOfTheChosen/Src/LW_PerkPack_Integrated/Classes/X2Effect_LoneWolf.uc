@@ -39,7 +39,7 @@ function bool NearestAllyBeyondRange (XComGameState_Unit LWUnit)
 				{
 					if (LWUnit.GetTeam() == TestAlly.GetTeam())
 					{						
-						if (LWUnit.TileDistanceBetween(TestAlly) < default.LONEWOLF_MIN_DIST_TILES + 1)								
+						if (LWUnit.TileDistanceBetween(TestAlly) < default.MIN_DIST_TILES + 1)								
 							return false;						
 					}
 				}
