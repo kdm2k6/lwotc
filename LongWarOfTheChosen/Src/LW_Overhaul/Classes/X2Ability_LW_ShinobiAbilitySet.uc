@@ -312,16 +312,8 @@ static function X2AbilityTemplate AddSilentTakedown()
 	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
 	Template.AddShooterEffectExclusions();
 
-	ConcealmentCondition = new class'X2Condition_RequireConcealed';
-	Template.AbilityShooterConditions.AddItem(ConcealmentCondition);
-
-	// No detection radius effect
-	NoDetectionRadiusEffect = new class'X2Effect_PreventDetection';
-	NoDetectionRadiusEffect.EffectName = 'MusashiTakedownNoDetectionRadius';
-	NoDetectionRadiusEffect.BuildPersistentEffect(default.SILENT_TAKEDOWN_DURATION, false, true, false, eGameRule_PlayerTurnEnd);
-	NoDetectionRadiusEffect.bRemoveWhenTargetConcealmentBroken = true;
-	NoDetectionRadiusEffect.DuplicateResponse = eDupe_Refresh;
-	Template.AddShooterEffect(NoDetectionRadiusEffect);
+	//ConcealmentCondition = new class'X2Condition_RequireConcealed';
+	//Template.AbilityShooterConditions.AddItem(ConcealmentCondition);
 
 	// Damage Effect
 	WeaponDamageEffect = new class'X2Effect_ApplyWeaponDamage';
@@ -341,7 +333,7 @@ static function X2AbilityTemplate AddSilentTakedown()
 	// Voice events
 	Template.SourceMissSpeech = 'SwordMiss';
 
-	Template.BuildNewGameStateFn = TypicalMoveEndAbility_BuildGameState;
+	Template.BuildNewGameStateFn = SilentTakedown_BuildGameState;
 	Template.BuildInterruptGameStateFn = TypicalMoveEndAbility_BuildInterruptGameState;
 
 	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
@@ -412,4 +404,71 @@ static function X2AbilityTemplate AddSilentTakedownCharges()
     Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 
 	return Template;
+}
+
+//Used by charging melee attacks to perform a move and an attack.
+static function XComGameState SilentTakedown_BuildGameState(XComGameStateContext Context)
+{
+	local XComGameState NewGameState;
+	local XComGameStateHistory History;
+	local XComGameStateContext_Ability AbilityContext;
+	local XComGameState_Unit SourceObject_OriginalState;
+	local XComGameState_Unit SourceObject_NewState;
+	local XComGameState_Ability AbilityState;
+	local EffectResults EffectResults;
+	local X2Effect_PreventDetection DetectionEffect;
+	local EffectAppliedData ApplyData;
+	local StateObjectReference NoWeapon;
+	local X2AbilityTemplate AbilityTemplate;
+	local name Result;
+
+	local float OldValue;
+
+	History = `XCOMHISTORY;	
+	NewGameState = History.CreateNewGameState(true, Context);
+	
+	AbilityContext = XComGameStateContext_Ability(NewGameState.GetContext());
+	`assert(AbilityContext != None);
+
+	AbilityState = XComGameState_Ability(History.GetGameStateForObjectID(AbilityContext.InputContext.AbilityRef.ObjectID));
+	AbilityTemplate = AbilityState.GetMyTemplate();
+
+	SourceObject_OriginalState = History.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID);	
+	SourceObject_NewState = NewGameState.ModifyStateObject(SourceObject_OriginalState.Class, AbilityContext.InputContext.SourceObject.ObjectID);
+	
+	/*ApplyData.AbilityInputContext = AbilityContext.InputContext;
+	ApplyData.AbilityResultContext = AbilityContext.ResultContext;
+	ApplyData.AbilityResultContext.HitResult = AbilityContext.ResultContext.HitResult; 
+	ApplyData.AbilityResultContext.ArmorMitigation = AbilityContext.ResultContext.ArmorMitigation;
+	ApplyData.AbilityStateObjectRef = AbilityState.GetReference();
+	ApplyData.SourceStateObjectRef = SourceObject_OriginalState.GetReference();
+	ApplyData.TargetStateObjectRef = SourceObject_OriginalState.GetReference();	
+	ApplyData.ItemStateObjectRef = AbilityState.GetSourceWeapon() == none ? NoWeapon : AbilityState.GetSourceWeapon().GetReference();	
+	ApplyData.EffectRef.SourceTemplateName = AbilityTemplate.DataName;
+	ApplyData.EffectRef.LookupType = TELT_AbilityShooterEffects;
+
+	// No detection radius effect
+	DetectionEffect = new class'X2Effect_PreventDetection';
+	DetectionEffect.EffectName = 'NoDetectionRadius';
+	DetectionEffect.BuildPersistentEffect(default.SILENT_TAKEDOWN_DURATION, false, true, false, eGameRule_PlayerTurnEnd);
+	DetectionEffect.bRemoveWhenTargetConcealmentBroken = true;
+	DetectionEffect.DuplicateResponse = eDupe_Refresh;
+	
+	//Apply the effect that prevents detection
+	Result = DetectionEffect.ApplyEffect(ApplyData, SourceObject_NewState, NewGameState);
+	`LOG("Applying Silent Takedown Effect with result" @ Result);
+	EffectResults.ApplyResults.AddItem(Result);*/
+
+	OldValue = SourceObject_NewState.GetCurrentStat(eStat_DetectionModifier);
+	SourceObject_NewState.SetCurrentStat(eStat_DetectionModifier, 0);
+
+	// finalize the movement portion of the ability
+	class'X2Ability_DefaultAbilitySet'.static.MoveAbility_FillOutGameState(NewGameState, false); //Do not apply costs at this time.
+
+	// build the "fire" animation for the slash
+	class'X2Ability'.static.TypicalAbility_FillOutGameState(NewGameState); //Costs applied here.
+
+	SourceObject_NewState.SetCurrentStat(eStat_DetectionModifier, OldValue);
+
+	return NewGameState;
 }

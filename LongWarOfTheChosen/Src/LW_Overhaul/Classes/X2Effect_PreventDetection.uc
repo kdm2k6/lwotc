@@ -11,8 +11,10 @@ simulated protected function OnEffectAdded(const out EffectAppliedData ApplyEffe
 	DiffToMaxDetectionModifier = 1 - CurrentDetectionModifier;
 	
 	NewChange.StatType = eStat_DetectionModifier;
-	NewChange.StatAmount = DiffToMaxDetectionModifier;
+	NewChange.StatAmount = -100;
 	NewChange.ModOp = MODOP_Addition;
+
+	`LOG("Silent Takedown: Added detection modifier " @ DiffToMaxDetectionModifier @ " to unit " @ TargetUnit.GetFullName());
 
 	NewEffectState.StatChanges.AddItem(NewChange);
 	super.OnEffectAdded(ApplyEffectParameters, kNewTargetState, NewGameState, NewEffectState);
