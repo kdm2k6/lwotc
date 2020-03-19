@@ -34,6 +34,7 @@
     <Folder Include="Localization\LW_PerkPack_Integrated\" />
     <Folder Include="Localization\LW_SMGPack_Integrated\" />
     <Folder Include="Localization\LW_Toolbox_Integrated\" />
+    <Folder Include="Localization\LWOTC_ClassRework" />
     <Folder Include="Localization\Parcels\" />
     <Folder Include="Src\" />
     <Folder Include="Src\DetailedSoldierListWOTC_Integrated\Classes\" />
@@ -155,6 +156,9 @@
     <Content Include="Content\Plots\Plot_ALB_AlienBase_02_LW.umap" />
     <Content Include="Content\Plots\Plot_ALB_AlienBase_03_LW.umap" />
     <Content Include="Content\UILibrary_robojumperSquadSelect.upk">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Localization\LWOTC_ClassRework\XComGame.int">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Localization\LWSoundSpeechTacticalCentral.chn" />
