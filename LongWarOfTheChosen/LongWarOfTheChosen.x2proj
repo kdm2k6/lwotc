@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Guid>7a03fe19-6291-4b95-ba1c-3ec505fa8c0b</Guid>
@@ -11,8 +11,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Config\" />
+    <Folder Include="Config\ClassRework" />
     <Folder Include="Content\" />
     <Folder Include="Content\LW_AlienPack_Integrated\" />
+    <Folder Include="Content\LW_FactionBalance\" />
     <Folder Include="Content\LW_LaserPack_Integrated\" />
     <Folder Include="Content\LW_OfficerPack_Integrated\" />
     <Folder Include="Content\LW_PerkPack_Integrated\" />
@@ -35,6 +37,7 @@
     <Folder Include="Localization\Parcels\" />
     <Folder Include="Src\" />
     <Folder Include="Src\DetailedSoldierListWOTC_Integrated\Classes\" />
+    <Folder Include="Src\LWOTC_ClassRework\Classes" />
     <Folder Include="Src\LWUtilities\" />
     <Folder Include="Src\LW_AlienPack_Integrated\" />
     <Folder Include="Src\LW_FactionBalance\Classes\" />
@@ -68,6 +71,7 @@
     <Folder Include="Content\ShellMaps\" />
     <Folder Include="Src\LW_WeaponsAndArmor\" />
     <Folder Include="Localization\NewPromotionScreenByDefault_Integrated\" />
+    <Folder Include="Src\LWOTC_ClassRework" />
     <Folder Include="Src\NewPromotionScreenByDefault_Integrated\" />
     <Folder Include="Localization\PI_Integrated\" />
     <Folder Include="Src\NewPromotionScreenByDefault_Integrated\Classes\" />
@@ -79,9 +83,17 @@
     <Folder Include="Src\WallClimbOverride\Classes\" />
     <Folder Include="Content\BaseGameMissionAssets\" />
     <Folder Include="Src\XModBase_Core_2_0_1\" />
+    <Folder Include="Src\XModBase_Core_2_0_1\Classes\" />
     <Folder Include="Src\XModBase_Interfaces\" />
+    <Folder Include="Src\XModBase_Interfaces\Classes\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Config\ClassRework\XComClassData.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\ClassRework\XComGame.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComAI.ini" />
     <Content Include="Config\XComAIJobs.ini" />
     <Content Include="Config\XComAnimation.ini" />
@@ -142,6 +154,9 @@
     <Content Include="Content\Plots\Plot_ALB_AlienBase_01_LW.umap" />
     <Content Include="Content\Plots\Plot_ALB_AlienBase_02_LW.umap" />
     <Content Include="Content\Plots\Plot_ALB_AlienBase_03_LW.umap" />
+    <Content Include="Content\UILibrary_robojumperSquadSelect.upk">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Localization\LWSoundSpeechTacticalCentral.chn" />
     <Content Include="Localization\LWSoundSpeechTacticalCentral.cht" />
     <Content Include="Localization\LWSoundSpeechTacticalCentral.deu" />
@@ -363,6 +378,12 @@
     <Content Include="Localization\Parcels\md_geneclinic_01_LW.pol" />
     <Content Include="Localization\Parcels\md_geneclinic_01_LW.rus" />
     <Content Include="Src\extra_globals.uci" />
+    <Content Include="Src\LWOTC_ClassRework\Classes\UIScreenListener_DisableClassesLWOTC.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\LWOTC_ClassRework\Classes\X2DownloadableContentInfo_LWOTC_ClassRework.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\LWUtilities\Classes\Helpers_LW.uc" />
     <Content Include="Src\LWUtilities\Classes\X2DownloadableContentInfo_LWUtilities.uc" />
     <Content Include="Src\LW_AlienPack_Integrated\LW_AlienPack.uci" />
