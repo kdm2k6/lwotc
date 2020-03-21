@@ -6,8 +6,9 @@
 
 class X2Effect_Executioner_LW extends X2Effect_Persistent config (LW_SoldierSkills);
 
-var config int EXECUTIONER_AIM_BONUS;
-var config int EXECUTIONER_CRIT_BONUS;
+var int AimBonus;
+var int CritBonus;
+var float HealthPerc; 
 
 function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit Attacker, XComGameState_Unit Target, XComGameState_Ability AbilityState, class<X2AbilityToHitCalc> ToHitType, bool bMelee, bool bFlanking, bool bIndirectFire, out array<ShotModifierInfo> ShotModifiers)
 {
@@ -17,16 +18,16 @@ function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit 
     SourceWeapon = AbilityState.GetSourceWeapon();    
     if ((SourceWeapon != none) && (Target != none))
     {
-		if (Target.GetCurrentStat(eStat_HP) <= (Target.GetMaxStat(eStat_HP) / 2))
+		if (Target.GetCurrentStat(eStat_HP) <= (Target.GetMaxStat(eStat_HP) / (1 / HealthPerc)))
 		{
 		    ShotInfo.ModType = eHit_Success;
             ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.EXECUTIONER_AIM_BONUS;
+			ShotInfo.Value = AimBonus;
             ShotModifiers.AddItem(ShotInfo);
 
 			ShotInfo.ModType = eHit_Crit;
             ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.EXECUTIONER_CRIT_BONUS;
+			ShotInfo.Value = CritBonus;
             ShotModifiers.AddItem(ShotInfo);
         }
     }    
