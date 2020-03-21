@@ -6,8 +6,8 @@
 
 class X2Effect_DamnGoodGround extends X2Effect_Persistent config (LW_SoldierSkills);
 
-var config int DGG_AIM_BONUS;
-var config int DGG_DEF_BONUS;
+var int AimBonus;
+var int DefenseBonus;
 
 function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit Attacker, XComGameState_Unit Target, XComGameState_Ability AbilityState, class<X2AbilityToHitCalc> ToHitType, bool bMelee, bool bFlanking, bool bIndirectFire, out array<ShotModifierInfo> ShotModifiers)
 {
@@ -24,7 +24,7 @@ function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit 
 		{
 		    ShotInfo.ModType = eHit_Success;
             ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.DGG_AIM_BONUS;
+			ShotInfo.Value = default.AimBonus;
             ShotModifiers.AddItem(ShotInfo);
         }
     }    
@@ -41,7 +41,7 @@ function GetToHitAsTargetModifiers(XComGameState_Effect EffectState, XComGameSta
 	{
 		ShotInfo.ModType = eHit_Success;
 		ShotInfo.Reason = FriendlyName;
-		ShotInfo.Value = -default.DGG_DEF_BONUS;
+		ShotInfo.Value = -default.DefenseBonus;
 		ShotModifiers.AddItem(ShotInfo);
 	}
 }

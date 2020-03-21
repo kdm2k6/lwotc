@@ -13,6 +13,8 @@ var config array<name> HNR_ABILITY_NAMES;
 var config int HNR_USES_PER_TURN;
 var config int HIT_AND_SLITHER_FULL_ACTION;
 var config array<int> CLOSE_AND_PERSONAL_CRIT;
+var config int DGG_AIM_BONUS;
+var config int DGG_DEF_BONUS;
 var config int DOUBLE_TAP_1ST_SHOT_AIM;
 var config int DOUBLE_TAP_2ND_SHOT_AIM;
 var config int DOUBLE_TAP_COOLDOWN;
@@ -521,6 +523,8 @@ static function X2AbilityTemplate AddDamnGoodGroundAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	AimandDefModifiers = new class 'X2Effect_DamnGoodGround';
+	AimandDefModifiers.AimBonus = default.DGG_AIM_BONUS;
+	AimandDefModifiers.DefenseBonus = default.DGG_DEF_BONUS;
 	AimandDefModifiers.BuildPersistentEffect (1, true, true);
 	AimandDefModifiers.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect (AimandDefModifiers);
