@@ -6,9 +6,9 @@
 
 class X2Effect_HitandRun extends X2Effect_Persistent config (LW_SoldierSkills);
 
-var bool HITANDRUN_FULLACTION;
-var config array<name> HNR_ABILITYNAMES;
-var config int HNR_USES_PER_TURN;
+var bool FullAction;
+var array<name> AbilityNames;
+var int UsesPerTurn;
 
 function RegisterForEvents(XComGameState_Effect EffectGameState)
 {
@@ -41,7 +41,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 	SourceUnit.GetUnitValue ('HitandRunUses', HnRUsesThisTurn);
 	iUsesThisTurn = int(HnRUsesThisTurn.fValue);
 
-	if (iUsesThisTurn >= default.HNR_USES_PER_TURN)
+	if (iUsesThisTurn >= default.UsesPerTurn)
 		return false;
 
 
@@ -56,7 +56,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 			{
 				if (TargetUnit.IsEnemyUnit(SourceUnit) && SourceUnit.CanFlank() && TargetUnit.GetMyTemplate().bCanTakeCover && (VisInfo.TargetCover == CT_None || TargetUnit.GetCurrentStat(eStat_AlertLevel) == 0))
 				{
-					if (default.HNR_ABILITYNAMES.Find(kAbility.GetMyTemplateName()) != -1)
+					if (default.AbilityNames.Find(kAbility.GetMyTemplateName()) != -1)
 					{
 						if (SourceUnit.NumActionPoints() < 2 && PreCostActionPoints.Length > 0)
 						{
@@ -64,7 +64,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 							if (AbilityState != none)
 							{
 								SourceUnit.SetUnitFloatValue ('HitandRunUses', iUsesThisTurn + 1.0, eCleanup_BeginTurn);
-								if (!HITANDRUN_FULLACTION)
+								if (!FullAction)
 								{
 									SourceUnit.ActionPoints.AddItem(class'X2CharacterTemplateManager'.default.MoveActionPoint);
 								}

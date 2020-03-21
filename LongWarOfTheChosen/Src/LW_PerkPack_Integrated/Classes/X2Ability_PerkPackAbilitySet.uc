@@ -8,6 +8,9 @@ class X2Ability_PerkPackAbilitySet extends X2Ability config (LW_SoldierSkills);
 
 var config int CENTERMASS_DAMAGE;
 var config int LETHAL_DAMAGE;
+var config bool HNR_FULL_ACTION;
+var config array<name> HNR_ABILITY_NAMES;
+var config int HNR_USES_PER_TURN;
 var config int DOUBLE_TAP_1ST_SHOT_AIM;
 var config int DOUBLE_TAP_2ND_SHOT_AIM;
 var config int DOUBLE_TAP_COOLDOWN;
@@ -286,7 +289,9 @@ static function X2AbilityTemplate AddHitandRunAbility()
 	HitandRunEffect.BuildPersistentEffect(1, true, false, false);
 	HitandRunEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
 	HitandRunEffect.DuplicateResponse = eDupe_Ignore;
-	HitandRunEffect.HITANDRUN_FULLACTION = true;
+	HitandRunEffect.FullAction = default.HNR_FULL_ACTION;
+	HitandRunEffect.AbilityNames = default.HNR_ABILITY_NAMES;
+	HitandRunEffect.UsesPerTurn = default.HNR_USES_PER_TURN;
 	Template.AddTargetEffect(HitandRunEffect);
 	Template.bCrossClassEligible = false;
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
