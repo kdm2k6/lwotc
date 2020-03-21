@@ -41,7 +41,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 	SourceUnit.GetUnitValue ('HitandRunUses', HnRUsesThisTurn);
 	iUsesThisTurn = int(HnRUsesThisTurn.fValue);
 
-	if (iUsesThisTurn >= default.UsesPerTurn)
+	if (iUsesThisTurn >= UsesPerTurn)
 		return false;
 
 
@@ -56,7 +56,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 			{
 				if (TargetUnit.IsEnemyUnit(SourceUnit) && SourceUnit.CanFlank() && TargetUnit.GetMyTemplate().bCanTakeCover && (VisInfo.TargetCover == CT_None || TargetUnit.GetCurrentStat(eStat_AlertLevel) == 0))
 				{
-					if (default.AbilityNames.Find(kAbility.GetMyTemplateName()) != -1)
+					if (AbilityNames.Find(kAbility.GetMyTemplateName()) != -1)
 					{
 						if (SourceUnit.NumActionPoints() < 2 && PreCostActionPoints.Length > 0)
 						{

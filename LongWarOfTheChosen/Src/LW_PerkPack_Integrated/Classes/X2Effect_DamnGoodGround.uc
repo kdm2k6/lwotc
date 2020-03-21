@@ -24,7 +24,7 @@ function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit 
 		{
 		    ShotInfo.ModType = eHit_Success;
             ShotInfo.Reason = FriendlyName;
-			ShotInfo.Value = default.AimBonus;
+			ShotInfo.Value = AimBonus;
             ShotModifiers.AddItem(ShotInfo);
         }
     }    
@@ -41,7 +41,7 @@ function GetToHitAsTargetModifiers(XComGameState_Effect EffectState, XComGameSta
 	{
 		ShotInfo.ModType = eHit_Success;
 		ShotInfo.Reason = FriendlyName;
-		ShotInfo.Value = -default.DefenseBonus;
+		ShotInfo.Value = -DefenseBonus;
 		ShotModifiers.AddItem(ShotInfo);
 	}
 }
