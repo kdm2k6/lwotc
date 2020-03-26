@@ -112,6 +112,9 @@ var config int WILLTOSURVIVE_WILLBONUS;
 var config int CUTTHROAT_BONUS_CRIT_CHANCE;
 var config int CUTTHROAT_BONUS_CRIT_DAMAGE;
 var config int MAX_ABLATIVE_FROM_SOULSTEAL;
+var config int SOULSTEAL_BASE_SHIELD_GAIN;
+var config int SOULSTEAL_AMP_MG_SHIELD_HP_BONUS;
+var config int SOULSTEAL_AMP_BM_SHIELD_HP_BONUS;
 var config int CCS_AMMO_PER_SHOT;
 var config int COVERING_FIRE_OFFENSE_MALUS;
 var localized string LocCoveringFire;
@@ -4106,8 +4109,11 @@ static function X2AbilityTemplate AddSoulStealTriggered2()
 	Template.AbilityTriggers.AddItem(EventListener);
 
 	StealEffect = new class'X2Effect_SoulSteal_LW';
+	StealEffect.BaseShieldHPIncrease=default.SOULSTEAL_BASE_SHIELD_GAIN;
+	StealEffect.AmpMGShieldHPBonus=default.SOULSTEAL_AMP_MG_SHIELD_HP_BONUS;
+	StealEffect.AmpBMShieldHPBonus=default.SOULSTEAL_AMP_BM_SHIELD_HP_BONUS;
+
 	StealEffect.BuildPersistentEffect (1, true, false);
-	StealEffect.AddPersistentStatChange (eStat_ShieldHP, 1);
 	Template.AddShooterEffect(StealEffect);
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;

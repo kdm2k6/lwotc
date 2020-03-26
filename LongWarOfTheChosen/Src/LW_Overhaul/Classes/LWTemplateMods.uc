@@ -1440,6 +1440,12 @@ function ModifyAbilitiesGeneral(X2AbilityTemplate Template, int Difficulty)
 		Template.AdditionalAbilities.AddItem('SoulStealTriggered2');
 	}
 
+	if (Template.DataName == 'SoulSteal')
+	{
+		Cooldown = new class 'X2AbilityCooldown_Soulfire';
+		Template.AbilityCooldown = Cooldown;
+	}
+	
 	// When completeing a control robot hack remove any previous disorient effects as is done for dominate.
 	if (Template.DataName == 'HackRewardControlRobot' || Template.DataName == 'HackRewardControlRobotWithStatBoost')
 	{
