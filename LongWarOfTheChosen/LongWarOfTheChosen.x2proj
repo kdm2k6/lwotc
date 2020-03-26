@@ -1184,7 +1184,11 @@
     <Content Include="Src\LW_Overhaul\Classes\X2StrategyElement_DefaultCovertActions_LW.uc" />
     <Content Include="Config\XComSniperDefense.ini" />
     <Content Include="Src\LW_Overhaul\Classes\SniperDefense_UIScreenListener.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2AbilityCooldown_Soulfire.uc" />
     <Content Include="Src\LW_Overhaul\Classes\X2LWStaffSlotsModTemplate.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Action_LW_PsiPinion.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_LW_SoulStorm.uc" />
+    <Content Include="Src\LW_Overhaul\Classes\X2Effect_NullWard.uc" />
   </ItemGroup>
   <!-- Everything below is borrowed from the https://github.com/WOTCStrategyOverhaul/CovertInfiltration project -->
   <!-- The weird stuff below (until Target) is required or otherwise ModBuddy project breaks ¯\_(ツ)_/¯ P.S. Also don't try to make it more sane -->
