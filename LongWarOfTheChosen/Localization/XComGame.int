@@ -5347,4 +5347,23 @@ ActionPostNarrative="Your soldier is better now."
 ActionName="Undertake Hard Training (Cost: 5 AP)"
 ActionPreNarrative="Time to put in some effort and improve yourself. Get training, soldier!"
 ActionPostNarrative="Your soldier is better now."
+
+[LW_PhaseWalk X2AbilityTemplate]
+LocFriendlyName="Phase Walk"
+LocLongDescription="Temporarily phase out of existence to teleport to a nearby location."
+LocHelpText="Temporarily phase out of existence to teleport to a nearby location."
+LocFlyOverText="Phase Walk"
+
+[LW_NullWard X2AbilityTemplate]
+LocFriendlyName="Null Ward"
+LocLongDescription="Project psionic shields around the soldier and nearby allies. The shields will collapse if this soldier is killed."
+LocHelpText="Project psionic shields around nearby allies and yourself."
+LocFlyOverText="Null Ward"
+
+[LW_SoulStorm X2AbilityTemplate]
+LocFriendlyName="Soul Storm"
+LocLongDescription="Summon meteors of psionic energy to deal damage to enemies inside a target area, and destroy their cover."
+LocHelpText="Summon meteors of psionic energy to deal damage to enemies inside a target area, and destroy their cover."
+LocFlyOverText="Soul Storm"
+LocPromotionPopupText="Cannot destroy floors or ceilings."
 ; End Translation
