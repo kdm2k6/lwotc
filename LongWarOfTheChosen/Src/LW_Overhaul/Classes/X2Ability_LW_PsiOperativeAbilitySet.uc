@@ -56,6 +56,9 @@ static function array<X2DataTemplate> CreateTemplates()
 
 	Templates.AddItem(Create_NullWard());
 	Templates.AddItem(Create_AnimSet_Passive('LW_NullWard_Anim', "LW_PsiOverhaul.Anims.AS_NullWard"));
+
+	Templates.AddItem(Create_SoulStorm());
+
 	return Templates;
 }
 
@@ -341,7 +344,7 @@ static function X2DataTemplate Create_NullWard()
 	return Template;
 }
 
-	static function X2AbilityTemplate Create_SoulStorm()
+static function X2AbilityTemplate Create_SoulStorm()
 {
 	local X2AbilityTemplate                 Template;	
 	local X2AbilityCost_ActionPoints		ActionPointCost;

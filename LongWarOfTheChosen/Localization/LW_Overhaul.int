@@ -689,6 +689,26 @@ HeavyDazedEffectLostString="<XGParam:StrValue0/!UnitName/> is no longer heavy da
 HeavyDazedPerActionFriendlyName="Heavy Dazed: <Ability:STUNNEDACTIONPOINTS>"
 HeavyDazedTitle="Dazed"
 HeavyDazedName="Heavy Dazed"
+
+[LW_PhaseWalk X2AbilityTemplate]
+LocFriendlyName="Phase Walk"
+LocLongDescription="Temporarily phase out of existence to teleport to a nearby location."
+LocHelpText="Temporarily phase out of existence to teleport to a nearby location."
+LocFlyOverText="Phase Walk"
+
+[LW_NullWard X2AbilityTemplate]
+LocFriendlyName="Null Ward"
+LocLongDescription="Project psionic shields around the soldier and nearby allies. The shields will collapse if this soldier is killed."
+LocHelpText="Project psionic shields around nearby allies and yourself."
+LocFlyOverText="Null Ward"
+
+[LW_SoulStorm X2AbilityTemplate]
+LocFriendlyName="Soul Storm"
+LocLongDescription="Summon meteors of psionic energy to deal damage to enemies inside a target area, and destroy their cover."
+LocHelpText="Summon meteors of psionic energy to deal damage to enemies inside a target area, and destroy their cover."
+LocFlyOverText="Soul Storm"
+LocPromotionPopupText="Cannot destroy floors or ceilings."
+
 ; End Translation
 
 [UICovertActionReport_LW]
