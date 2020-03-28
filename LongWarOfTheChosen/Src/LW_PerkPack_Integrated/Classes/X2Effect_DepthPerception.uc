@@ -6,8 +6,8 @@
 
 class X2Effect_DepthPerception extends X2Effect_Persistent config (LW_SoldierSkills);
 
-var config int DP_AIM_BONUS;
-var config int DP_ANTIDODGE_BONUS;
+var int AimBonus;
+var int AntiDodgeBonus;
 
 function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit Attacker, XComGameState_Unit Target, XComGameState_Ability AbilityState, class<X2AbilityToHitCalc> ToHitType, bool bMelee, bool bFlanking, bool bIndirectFire, out array<ShotModifierInfo> ShotModifiers)
 {
@@ -22,10 +22,10 @@ function GetToHitModifiers(XComGameState_Effect EffectState, XComGameState_Unit 
 		{
 		    ShotInfo1.ModType = eHit_Success;
             ShotInfo1.Reason = FriendlyName;
-			ShotInfo1.Value = default.DP_AIM_BONUS;
+			ShotInfo1.Value = AimBonus;
             ShotModifiers.AddItem(ShotInfo1);
 
-			DodgeReduction = Min (default.DP_ANTIDODGE_BONUS, Target.GetCurrentStat(eStat_Dodge));
+			DodgeReduction = Min (AntiDodgeBonus, Target.GetCurrentStat(eStat_Dodge));
 
 			ShotInfo2.ModType = eHit_Graze;
 			ShotInfo2.Reason = FriendlyName;

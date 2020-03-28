@@ -12,12 +12,39 @@ var config bool HNR_FULL_ACTION;
 var config array<name> HNR_ABILITY_NAMES;
 var config int HNR_USES_PER_TURN;
 var config int HIT_AND_SLITHER_FULL_ACTION;
+var config int CCS_MAX_TILES;
+var config bool CCS_PROC_ON_OWN_TURN;
+var config int CCS_AMMO_PER_SHOT;
 var config array<int> CLOSE_AND_PERSONAL_CRIT;
 var config int DGG_AIM_BONUS;
 var config int DGG_DEF_BONUS;
 var config int EXECUTIONER_AIM_BONUS;
 var config int EXECUTIONER_CRIT_BONUS;
 var config float EXECUTIONER_HEALTH_PERC;
+var config int TAC_SENSE_DEF_PER_ENEMY;
+var config int TAC_SENSE_MAX_DEF_BONUS;
+var config bool TAC_SENSE_APPLY_SQUADSIGHT;
+var config int AGGRESSION_CRIT_PER_ENEMY;
+var config int AGGRESSION_MAX_CRIT_BONUS;
+var config bool AGGRESSION_APPLY_SQUADSIGHT;
+var config float BEO_CRIT_DMG_PER_ENEMY;
+var config int BEO_MAX_CRIT_DMG_BONUS;
+var config bool BEO_APPLY_SQUADSIGHT;
+var config bool BEO_APPLY_TO_EXPLOSIVES;
+var config int HARD_TARGET_DODGE_PER_ENEMY;
+var config int HARD_TARGET_MAX_DODGE_BONUS;
+var config bool HARD_TARGET_APPLY_SQUADSIGHT;
+var config int INFIGHTER_DODGE;
+var config int INFIGHTER_MAX_TILES;
+var config int DEPTH_PERCEPTION_AIM;
+var config int DEPTH_PERCEPTION_ANTI_DODGE;
+var config int W2S_LOW_COVER_ARMOR;
+var config int W2S_HIGH_COVER_ARMOR;
+var config int W2S_WILL_BONUS;
+var config int CE_USES_PER_TURN;
+var config array<name> CE_ABILITY_NAMES;
+var config int CE_MAX_TILES;
+var config int CE_MAX_ACTIONS;
 var config int DOUBLE_TAP_1ST_SHOT_AIM;
 var config int DOUBLE_TAP_2ND_SHOT_AIM;
 var config int DOUBLE_TAP_COOLDOWN;
@@ -118,11 +145,9 @@ var config float SOUL_MERGE_AMP_BM_CRIT_BONUS;
 var config float FORMIDABLE_EXPLOSIVES_DR;
 var config int FORMIDABLE_ARMOR_MITIGATION;
 var config int FORMIDABLE_ABLATIVE_HP;
-var config int WILLTOSURVIVE_WILLBONUS;
 var config int CUTTHROAT_BONUS_CRIT_CHANCE;
 var config int CUTTHROAT_BONUS_CRIT_DAMAGE;
 var config int MAX_ABLATIVE_FROM_SOULSTEAL;
-var config int CCS_AMMO_PER_SHOT;
 var config int COVERING_FIRE_OFFENSE_MALUS;
 var localized string LocCoveringFire;
 var localized string LocCoveringFireMalus;
@@ -424,6 +449,8 @@ static function X2AbilityTemplate CloseCombatSpecialistAttack()
 	Template.AbilityShooterConditions.AddItem(SuppressedCondition);
 
 	SingleTarget = new class 'X2AbilityTarget_Single_CCS';
+	SingleTarget.MaxTiles = default.CCS_MAX_TILES;
+	SingleTarget.ProcOnOwnTurn = default.CCS_PROC_ON_OWN_TURN;
 	//SingleTarget.OnlyIncludeTargetsInsideWeaponRange = true;
 	Template.AbilityTargetStyle = SingleTarget;
 
@@ -603,6 +630,9 @@ static function X2AbilityTemplate AddTacticalSenseAbility()
 	Template.bIsPassive = true;
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	MyDefModifier = new class 'X2Effect_TacticalSense';
+	MyDefModifier.DefBonusPerEnemy = default.TAC_SENSE_DEF_PER_ENEMY;
+	MyDefModifier.MaxDefBonus = default.TAC_SENSE_MAX_DEF_BONUS;
+	MyDefModifier.ApplySquadsight = default.TAC_SENSE_APPLY_SQUADSIGHT;
 	MyDefModifier.BuildPersistentEffect (1, true, false);
 	MyDefModifier.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect (MyDefModifier);
@@ -627,6 +657,9 @@ static function X2AbilityTemplate AddAggressionAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	MyCritModifier = new class 'X2Effect_Aggression';
+	MyCritModifier.DefBonusPerEnemy = default.AGGRESSION_CRIT_PER_ENEMY;
+	MyCritModifier.MaxDefBonus = default.AGGRESSION_MAX_CRIT_BONUS;
+	MyCritModifier.ApplySquadsight = default.AGGRESSION_APPLY_SQUADSIGHT;
 	MyCritModifier.BuildPersistentEffect (1, true, false);
 	MyCritModifier.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect (MyCritModifier);
@@ -651,6 +684,10 @@ static function X2AbilityTemplate AddBringEmOnAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	DamageEffect = new class'X2Effect_BringEmOn';
+	DamageEffect.CritDmgPerEnemy = default.BEO_CRIT_DMG_PER_ENEMY;
+	DamageEffect.MaxCritDmgBonus = default.BEO_MAX_CRIT_DMG_BONUS;
+	DamageEffect.ApplySquadsight = default.BEO_APPLY_SQUADSIGHT;
+	DamageEffect.ApplyToExplosives = default.BEO_APPLY_TO_EXPLOSIVES;
 	DamageEffect.BuildPersistentEffect(1, true, false, false);
 	DamageEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect(DamageEffect);
@@ -676,6 +713,9 @@ static function X2AbilityTemplate AddHardTargetAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	DodgeBonus = new class 'X2Effect_HardTarget';
+	DodgeBonus.DodgePerEnemy = default.HARD_TARGET_DODGE_PER_ENEMY;
+	DodgeBonus.MaxDodgeBonus = default.HARD_TARGET_MAX_DODGE_BONUS;
+	DodgeBonus.ApplySquadsight = default.HARD_TARGET_SQUADSIGHT;
 	DodgeBonus.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	DodgeBonus.BuildPersistentEffect(1, true, false);
 	Template.AddTargetEffect(DodgeBonus);
@@ -689,7 +729,7 @@ static function X2AbilityTemplate AddHardTargetAbility()
 static function X2AbilityTemplate AddInfighterAbility()
 {
 	local X2AbilityTemplate						Template;
-	local X2Effect_Infighter					DodgeBonus;
+	local X2Effect_Infighter					CloseRangeDodgeEffect;
 
 	`CREATE_X2ABILITY_TEMPLATE (Template, 'Infighter');
 	Template.IconImage = "img:///UILibrary_LW_PerkPack.LW_AbilityInfighter";
@@ -700,10 +740,12 @@ static function X2AbilityTemplate AddInfighterAbility()
 	Template.AbilityTargetStyle = default.SelfTarget;
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
-	DodgeBonus = new class 'X2Effect_Infighter';
-	DodgeBonus.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
-	DodgeBonus.BuildPersistentEffect(1, true, false);
-	Template.AddTargetEffect(DodgeBonus);
+	CloseRangeDodgeEffect = new class 'X2Effect_Infighter';
+	CloseRangeDodgeEffect.DodgeBonus = default.INFIGHTER_DODGE;
+	CloseRangeDodgeEffect.MaxTiles = default.INFIGHTER_MAX_TILES;
+	CloseRangeDodgeEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
+	CloseRangeDodgeEffect.BuildPersistentEffect(1, true, false);
+	Template.AddTargetEffect(CloseRangeDodgeEffect);
 	Template.bCrossClassEligible = true;
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	//  No visualization
@@ -725,6 +767,8 @@ static function X2AbilityTemplate AddDepthPerceptionAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	//Template.bIsPassive = true;
 	AttackBonus = new class 'X2Effect_DepthPerception';
+	AttackBonus.AimBonus = default.DEPTH_PERCEPTION_AIM;
+	AttackBonus.AntiDodgeBonus = default.DEPTH_PERCEPTION_ANTI_DODGE;
 	AttackBonus.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	AttackBonus.BuildPersistentEffect(1, true, false);
 	Template.AddTargetEffect(AttackBonus);
@@ -749,12 +793,14 @@ static function X2AbilityTemplate AddWilltoSurviveAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	Template.bIsPassive = true;
 	ArmorBonus = new class 'X2Effect_WilltoSurvive';
+	ArmorBonus.LowCoverArmor = default.W2S_LOW_COVER_ARMOR;
+	ArmorBonus.HighCoverArmor = default.W2S_HIGH_COVER_ARMOR;
 	ArmorBonus.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	ArmorBonus.BuildPersistentEffect(1, true, false);
 	Template.AddTargetEffect(ArmorBonus);
 
 	WillBonus = new class'X2Effect_PersistentStatChange';
-	WillBonus.AddPersistentStatChange(eStat_Will, float(default.WILLTOSURVIVE_WILLBONUS));
+	WillBonus.AddPersistentStatChange(eStat_Will, float(default.W2S_WILL_BONUS));
 	WillBonus.BuildPersistentEffect (1, true, false, false, 7);
 	Template.AddTargetEffect(WillBonus);
 	Template.SetUIStatMarkup(class'XLocalizedData'.default.WillLabel, eStat_Will, default.WILLTOSURVIVE_WILLBONUS);
@@ -879,6 +925,10 @@ static function X2AbilityTemplate AddCloseEncountersAbility()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 	//Template.bIsPassive = true;  // needs to be off to allow perks
 	ActionEffect = new class 'X2Effect_CloseEncounters';
+	ActionEffect.UsesPerTurn = default.CE_USES_PER_TURN;
+	ActionEffect.AbilityNames = default.CE_ABILITY_NAMES;
+	ActionEffect.MaxTiles = default.CE_MAX_TILES;
+	ActionEffect.MaxActionPoints = default.CE_MAX_ACTIONS;
 	ActionEffect.SetDisplayInfo (ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	ActionEffect.BuildPersistentEffect(1, true, false);
 	Template.AddTargetEffect(ActionEffect);

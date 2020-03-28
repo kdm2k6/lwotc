@@ -6,8 +6,8 @@
 
 class X2Effect_WilltoSurvive extends X2Effect_BonusArmor config (LW_SoldierSkills);
 
-var config int W2S_HIGH_COVER_ARMOR_BONUS;
-var config int W2S_LOW_COVER_ARMOR_BONUS;
+var int HighCoverArmor;
+var int LowCoverArmor;
 
 function int GetDefendingDamageModifier(XComGameState_Effect EffectState, XComGameState_Unit Attacker, Damageable TargetDamageable, XComGameState_Ability AbilityState, const out EffectAppliedData AppliedData, const int CurrentDamage, X2Effect_ApplyWeaponDamage WeaponDamageEffect, optional XComGameState NewGameState)
 {
@@ -47,9 +47,9 @@ function int GetDefendingDamageModifier(XComGameState_Effect EffectState, XComGa
 		if (MyVisInfo.TargetCover == CT_None)
 			return 0;
 		if (MyVisInfo.TargetCover == CT_Midlevel)
-			return -W2S_LOW_COVER_ARMOR_BONUS;
+			return -LowCoverArmor;
 		if (MyVisInfo.TargetCover == CT_Standing)
-			return -W2S_HIGH_COVER_ARMOR_BONUS;
+			return -HighCoverArmor;
 	}
 	else
 	{
@@ -58,9 +58,9 @@ function int GetDefendingDamageModifier(XComGameState_Effect EffectState, XComGa
 			if (MyVisInfo.TargetCover == CT_None) 
 				return 0;
 			if (MyVisInfo.TargetCover == CT_Midlevel)
-				return -W2S_LOW_COVER_ARMOR_BONUS;
+				return -LowCoverArmor;
 			if (MyVisInfo.TargetCover == CT_Standing)
-				return -W2S_HIGH_COVER_ARMOR_BONUS;				
+				return -HighCoverArmor;				
 		}
 	}
     return 0;     

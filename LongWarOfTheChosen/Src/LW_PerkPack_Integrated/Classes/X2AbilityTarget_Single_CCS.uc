@@ -6,8 +6,8 @@
 
 class X2AbilityTarget_Single_CCS extends X2AbilityTarget_Single config (LW_SoldierSkills);
 
-var config int CCS_RANGE;
-var config bool CCS_PROC_ON_OWN_TURN;
+var int MaxTiles;
+var bool ProcOnOwnTurn;
 
 simulated function name GetPrimaryTargetOptions(const XComGameState_Ability Ability, out array<AvailableTarget> Targets)
 {
@@ -21,7 +21,7 @@ simulated function name GetPrimaryTargetOptions(const XComGameState_Ability Abil
 	for (i = Targets.Length - 1; i >= 0; --i)
 	{
 		TargetUnit = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(Targets[i].PrimaryTarget.ObjectID));
-		if (CCS_ShooterUnit.TileDistanceBetween(TargetUnit) > default.CCS_RANGE)
+		if (CCS_ShooterUnit.TileDistanceBetween(TargetUnit) > MaxTiles)
 		{
 			Targets.Remove(i,1);
 		}								
@@ -45,12 +45,12 @@ simulated function bool ValidatePrimaryTargetOption(const XComGameState_Ability 
 	if (b_valid)
 	{
 		//`LOG ("CCS Target" @ TargetUnit.GetMyTemplateName() @ "TDB:" @ string(SourceUnit.TileDistanceBetween(TargetUnit)));
-		if (SourceUnit.TileDistanceBetween(TargetUnit) > default.CCS_RANGE)
+		if (SourceUnit.TileDistanceBetween(TargetUnit) > MaxTiles)
 		{
 			//`LOG ("NO SHOT! CCS Target TDB:" @ string(SourceUnit.TileDistanceBetween(TargetUnit)));
 			return false;
 		}
-		if(!default.CCS_PROC_ON_OWN_TURN && X2TacticalGameRuleset(XComGameInfo(class'Engine'.static.GetCurrentWorldInfo().Game).GameRuleset).GetCachedUnitActionPlayerRef().ObjectID == SourceUnit.ControllingPlayer.ObjectID)
+		if(!ProcOnOwnTurn && X2TacticalGameRuleset(XComGameInfo(class'Engine'.static.GetCurrentWorldInfo().Game).GameRuleset).GetCachedUnitActionPlayerRef().ObjectID == SourceUnit.ControllingPlayer.ObjectID)
 		{
 			return false;
 		}

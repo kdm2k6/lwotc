@@ -6,9 +6,10 @@
 
 class X2Effect_CloseEncounters extends X2Effect_Persistent config (LW_SoldierSkills);
 
-var config int CE_USES_PER_TURN;
-var config array<name> CE_ABILITYNAMES;
-var config int CE_MAX_TILES;
+var int UsesPerTurn;
+var array<name> AbilityNames;
+var int MaxTiles;
+var int MaxActionPoints;
 
 function RegisterForEvents(XComGameState_Effect EffectGameState)
 {
@@ -47,7 +48,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 	SourceUnit.GetUnitValue ('CloseEncountersUses', CEUsesThisTurn);
 	iUsesThisTurn = int(CEUsesThisTurn.fValue);
 
-	if (iUsesThisTurn >= default.CE_USES_PER_TURN)
+	if (iUsesThisTurn >= UsesPerTurn)
 		return false;
 
 	TargetUnit = XComGameState_Unit(NewGameState.GetGameStateForObjectID(AbilityContext.InputContext.PrimaryTarget.ObjectID));  	
@@ -58,7 +59,7 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 	//`LOG (string (SourceUnit.TileDistanceBetween(TargetUnit)));
 	//`LOG (string (default.CE_MAX_TILES));
 
-	if (SourceUnit.TileDistanceBetween(TargetUnit) > default.CE_MAX_TILES + 1)
+	if (SourceUnit.TileDistanceBetween(TargetUnit) > MaxTiles + 1)
 		return false;
 
 	//`LOG ("CE7");
@@ -72,11 +73,11 @@ function bool PostAbilityCostPaid(XComGameState_Effect EffectState, XComGameStat
 
 	if (AbilityState != none)
 	{
-		if (default.CE_ABILITYNAMES.Find(kAbility.GetMyTemplateName()) != -1)
+		if (AbilityNames.Find(kAbility.GetMyTemplateName()) != -1)
 		{
 			//`LOG ("CE9");
 			
-			if (SourceUnit.NumActionPoints() < 2 && PreCostActionPoints.Length > 0)
+			if (SourceUnit.NumActionPoints() >= MaxActionPoints && PreCostActionPoints.Length > 0)
 			{
 				//`LOG ("CE10");
 				SourceUnit.ActionPoints.AddItem(class'X2CharacterTemplateManager'.default.StandardActionPoint);
