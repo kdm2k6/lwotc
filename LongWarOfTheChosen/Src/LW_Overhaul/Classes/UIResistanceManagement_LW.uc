@@ -15,7 +15,7 @@ enum EResistanceSortType
 };
 
 // KDM : Additional Variables Start
-var config int m_HeaderFontSize;
+var config int HEADER_FONT_SIZE;
 var localized string m_strFlyToHaven, m_strViewHaven;
 
 // KDM : Best to explain by way of an example :
@@ -220,7 +220,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     RegionHeaderButton.InitButton(, m_strRegionLabel);
 	RegionHeaderButton.SetPosition(0, 0);
 	RegionHeaderButton.SetSize(AvailableHeaderSpace * m_RegionHeaderPct, 30);
-	RegionHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	RegionHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     RegionHeaderButton.SetWarning(true);
     // KDM : Since the region column header can't be clicked, remove its hit testing so mouse events don't change its colour
 	// and make users think the button is active. The same is done for all of the column headers below.
@@ -234,7 +234,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RegionStatusButton.InitButton (, m_strSTrength);
 	RegionStatusButton.SetPosition(RegionHeaderButton.X + RegionHeaderButton.Width + 2, 0);
 	RegionStatusButton.SetSize(AvailableHeaderSpace * m_RegionStatusPct, 30);
-	RegionStatusButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	RegionStatusButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     RegionStatusButton.SetWarning(true);
     RegionStatusButton.SetHitTestDisabled(true);
 
@@ -246,7 +246,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     RebelCountHeaderButton.InitButton(, m_strRebelCountLabel);
     RebelCountHeaderButton.SetPosition(RegionStatusButton.X + RegionStatusButton.Width + 2, 0);
     RebelCountHeaderButton.SetSize(AvailableHeaderSpace * m_RebelCountPct, 30);
-	RebelCountHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	RebelCountHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     RebelCountHeaderButton.SetWarning(true);
     RebelCountHeaderButton.SetHitTestDisabled(true);
 
@@ -258,7 +258,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     AdviserHeaderButton.InitButton(, m_strAdviserLabel);
     AdviserHeaderButton.SetPosition(RebelCountHeaderButton.X + RebelCountHeaderButton.Width + 2, 0);
     AdviserHeaderButton.SetSize(AvailableHeaderSpace * m_AdviserHeaderPct, 30);
-	AdviserHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	AdviserHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     AdviserHeaderButton.SetWarning(true);
 	AdviserHeaderButton.SetHitTestDisabled(true);
 
@@ -270,7 +270,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     IncomeHeaderButton.InitButton(, m_strIncomeLabel);
     IncomeHeaderButton.SetPosition(AdviserHeaderButton.X + AdviserHeaderButton.Width + 2, 0);
     IncomeHeaderButton.SetSize(AvailableHeaderSpace * m_IncomeHeaderPct, 30);
-	IncomeHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	IncomeHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
 	IncomeHeaderButton.SetWarning(true);
 	IncomeHeaderButton.SetHitTestDisabled(true);
 

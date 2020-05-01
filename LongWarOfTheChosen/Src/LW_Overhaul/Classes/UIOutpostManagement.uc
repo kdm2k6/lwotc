@@ -9,8 +9,8 @@ class UIOutpostManagement extends UIScreen
     config(LW_UI) dependson(XComGameState_LWOutpost);
 
 // KDM : Additional Variables Start
-var config bool m_bUseFancyVersion;
-var config int m_AdviserFontSize, m_HeaderFontSize;
+var config bool USE_FANCY_VERSION;
+var config int ADVISER_FONT_SIZE, HEADER_FONT_SIZE;
 
 var localized string m_strChangeJob, m_strChangeAllJobs, m_strHavenAdviser, m_strRadioRelay, m_strPerks;
 
@@ -113,7 +113,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	m_ItemPadding = 10;
 	
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		m_NameHeaderPct = 0.45f;
 		m_PerksHeaderPct = 0.25f;
@@ -242,7 +242,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     LiaisonTitle.InitText('', "");
     LiaisonTitle.SetPosition(m_BorderPadding + LiaisonButton.Width + 5, NextY);
 	// KDM : IMPORTANT : Originally, SetSubTitle() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
-	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, m_AdviserFontSize));
+	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, ADVISER_FONT_SIZE));
     
 	// KDM : Haven adviser name
 	LiaisonName = Spawn(class'UIText', MainPanel);
@@ -274,7 +274,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 
 	// KDM : Available space = total header width - 2 pixels between each column header.
 	// The normal UI has 2 column headers, while the fancy UI has 3 columns headers.
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		AvailableSpace = HeaderPanel.Width - 2 * 2;
 	}
@@ -291,7 +291,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     NameHeaderButton.InitButton(, CAPS(m_strName));
 	NameHeaderButton.SetPosition(0, 0);
     NameHeaderButton.SetSize(AvailableSpace * m_NameHeaderPct, 30);
-	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     NameHeaderButton.SetWarning(true);
 	// KDM : Since the name column header can't be clicked, remove its hit testing so mouse events don't change its colour
 	// and make users think the button is active. The same is done for the perks column header below.
@@ -300,7 +300,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	NextX = NameHeaderButton.X + NameHeaderButton.Width + 2;
 
 	// KDM : Rebel perks column header used in the fancy UI
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		PerksHeaderButton = Spawn(class'UIButton', HeaderPanel);
 		PerksHeaderButton.bAnimateOnInit = false;
@@ -310,7 +310,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		PerksHeaderButton.InitButton(, m_strPerks);
 		PerksHeaderButton.SetPosition(NextX, 0);
 		PerksHeaderButton.SetSize(AvailableSpace * m_PerksHeaderPct, 30);
-		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
 		PerksHeaderButton.SetWarning(true);
 		PerksHeaderButton.SetHitTestDisabled(true);
 	
@@ -325,7 +325,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
     JobHeaderButton.InitButton(, CAPS(m_strMission), OnJobHeaderButtonClicked);
     JobHeaderButton.SetPosition(NextX, 0);
 	JobHeaderButton.SetSize(AvailableSpace * m_JobHeaderPct, 30);
-	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, m_HeaderFontSize);
+	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
     JobHeaderButton.SetWarning(true);
 	JobHeaderButton.ProcessMouseEvents(OnJobHeaderMouseEvent);
 
@@ -352,7 +352,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		// Therefore, to make things easier, I chose manual positioning rather than positioning through the use of an anchor and origin.
 		RadioTowerUpgradeButton.SetPosition(811, 21);
 		RadioTowerUpgradeButton.SetHeight(30);
-		RadioTowerUpgradeButton.SetFontSize(m_HeaderFontSize);
+		RadioTowerUpgradeButton.SetFontSize(HEADER_FONT_SIZE);
 	}
 
     // LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
@@ -566,7 +566,7 @@ simulated function UpdateLiaison()
         }
         
 		// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
-		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, m_AdviserFontSize));
+		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, ADVISER_FONT_SIZE));
    
 		LiaisonPicture = class'UIUtilities_LW'.static.TakeUnitPicture(CachedLiaison, OnPictureTaken);
         if (LiaisonPicture != none)

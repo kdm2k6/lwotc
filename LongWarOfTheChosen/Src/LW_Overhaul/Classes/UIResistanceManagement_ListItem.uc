@@ -9,7 +9,7 @@ class UIResistanceManagement_ListItem extends UIPanel
 	config(LW_UI);
 
 // KDM : Additional Variables Start
-var config int m_ListItemFontSize;
+var config int LIST_ITEM_FONT_SIZE;
 // KDM : Additional Variables End
 
 var StateObjectReference OutpostRef;
@@ -130,7 +130,7 @@ simulated function UpdateData(bool Focused = false)
 	}
 
 	// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option
-	RegionLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRegion, Focused ? -1 : eUIState_Normal, m_ListItemFontSize));
+	RegionLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRegion, Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE));
 
 	// KDM : Advent strength and vigilance; dislays liberated status if liberated
 	if (RegionalAI.bLiberated)
@@ -144,11 +144,11 @@ simulated function UpdateData(bool Focused = false)
 		strStatus = `XEXPAND.ExpandString(class'UIResistanceManagement_LW'.default.m_strResistanceManagementLevels);
 	}
 
-	RegionStatusLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strStatus, Focused ? -1: eUIState_Normal, m_ListItemFontSize));
+	RegionStatusLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strStatus, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
 
 	// KDM : Number of rebels in the haven and number of rebels on : [1] supply [2] intel [3] recruit [4] hiding.
     strCount = class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetRebelCount()),
-        Focused ? -1 : eUIState_Normal, m_ListItemFontSize);
+        Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
     strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Resistance", IconSize, IconSize, IconOffset);
 	strCount $= "  ";
 
@@ -160,12 +160,12 @@ simulated function UpdateData(bool Focused = false)
 	ParamTag.IntValue0 = Outpost.GetNumRebelsOnJob('Hiding');
 	strJobDetail = strJobDetail @ `XEXPAND.ExpandString(class'UIStrategyMapItem_Region_LW'.default.m_strStaffingPinTextMore);
 
-	strCount $= class'UIUtilities_Text'.static.GetColoredText(strJobDetail, Focused ? -1: eUIState_Normal, m_ListItemFontSize);
+	strCount $= class'UIUtilities_Text'.static.GetColoredText(strJobDetail, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE);
 
     if (Outpost.GetResistanceMecCount() > 0)
     {
         strCount $= "  ";
-        strCount $= class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetResistanceMecCount()), Focused ? -1 : eUIState_Normal, m_ListItemFontSize);
+        strCount $= class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetResistanceMecCount()), Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
         strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_LW_Overhaul.Resistance_Mec_icon", IconSize, IconSize, IconOffset);
     }
 
@@ -192,14 +192,14 @@ simulated function UpdateData(bool Focused = false)
 	{
 		// KDM : IMPORTANT : If you have a string which only contains an injected image, and then center it, the image is doubled.
 		// Get around this apparent bug by placing empty spaces on each side of the injected image.
-		AdviserLabel.SetCenteredText (class'UIUtilities_Text'.static.GetColoredText(" " $ strAdviser $ " ", Focused ? -1: eUIState_Normal, m_ListItemFontSize));
+		AdviserLabel.SetCenteredText (class'UIUtilities_Text'.static.GetColoredText(" " $ strAdviser $ " ", Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
     }
 
 	// KDM : Real and projected haven income
 	ParamTag.IntValue0 = int(Outpost.GetIncomePoolForJob('Resupply'));
     ParamTag.IntValue1 = int(Outpost.GetProjectedMonthlyIncomeForJob('Resupply'));
 	strMoolah = `XEXPAND.ExpandString(class'UIStrategyMapItem_Region_LW'.default.m_strMonthlyRegionalIncome);
-	IncomeLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strMoolah, Focused ? -1: eUIState_Normal, m_ListItemFontSize));
+	IncomeLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strMoolah, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
 }
 
 simulated function OnReceiveFocus()

@@ -13,9 +13,9 @@ const ABILITY_ICON_Y=32;
 const ABILITY_ICON_GAP=30;
 
 // KDM : Additional Variables Start
-var config int m_ListItemFontSize_Ctrl, m_ListItemFontSize_Fancy_Ctrl, m_ListItemFontSize_Mk, m_ListItemFontSize_Fancy_Mk;
+var config int LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
 
-var bool m_bUseFancyVersion;
+var bool USE_FANCY_VERSION;
 var int m_FontSize;
 
 var UIButton ButtonBG;
@@ -44,17 +44,17 @@ simulated function BuildItem()
 
     List = UIList(GetParent(class'UIList'));
     OutpostUI = UIOutpostManagement(Screen);
-	m_bUseFancyVersion = UIOutpostManagement(Screen).m_bUseFancyVersion;
+	USE_FANCY_VERSION = UIOutpostManagement(Screen).USE_FANCY_VERSION;
 
 	// KDM : Get the font size for the rebel name and rebel job; this depends upon 2 factors : 
 	// [1] Input method - controller vs. mouse & keyboard [2] UI mode - normal vs. fancy
 	if (`ISCONTROLLERACTIVE)
 	{
-		m_FontSize = (m_bUseFancyVersion) ? m_ListItemFontSize_Fancy_Ctrl : m_ListItemFontSize_Ctrl;
+		m_FontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_CTRL : LIST_ITEM_FONT_SIZE_CTRL;
 	}
 	else
 	{
-		m_FontSize = (m_bUseFancyVersion) ? m_ListItemFontSize_Fancy_Mk : m_ListItemFontSize_Mk;
+		m_FontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
 	}
 
     Width = List.Width;
@@ -84,7 +84,7 @@ simulated function BuildItem()
 	// KDM : Rebel name
     NameLabel = Spawn(class'UIText', self);
 	NameLabel.InitText();
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		NameLabel.SetPosition(MugShot.X + MugShotSize + 27, 18);
 	}
@@ -97,7 +97,7 @@ simulated function BuildItem()
     LevelLabel = Spawn(class'UIText', self);
 	LevelLabel.InitText();
 
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		// KDM : When using the fancy UI, rank 2 rebels have their level icons placed on top of each other.
 		if (RebelLevel == 2)
@@ -138,7 +138,7 @@ simulated function BuildItem()
 	// KDM : Rebel job
     SpinnerLabel = Spawn(class'UIText', self);
 	SpinnerLabel.InitText();
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		 SpinnerLabel.SetPosition(OutpostUI.JobHeaderButton.X + BorderPadding, (Height / 2) - 18);
 	}
@@ -193,7 +193,7 @@ simulated function UpdateStaticData()
 	
 	// KDM : Rebel level icons
 	RebelLevel = OutpostUI.CachedRebels[ListItemIndex].Level;
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, 0);
 		if (RebelLevel == 2)
@@ -233,7 +233,7 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 
 	// KDM : When using the fancy UI, ability buttons are centered within the perks column; therefore,
 	// we can't position them until we know how many perks are going to be visible.
-	if (m_bUseFancyVersion)
+	if (USE_FANCY_VERSION)
 	{
 		IconSize = 32;
 		IconPadding = 3;
@@ -269,7 +269,7 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 
 	// KDM : Determine the ability icons placement for the fancy UI.
 	DisplayedIcons = AbilityIcons.length;
-	if (m_bUseFancyVersion && DisplayedIcons > 0)
+	if (USE_FANCY_VERSION && DisplayedIcons > 0)
 	{
 		// KDM : The total length of the icon strip.
 		TotalLength = (DisplayedIcons * IconSize) +  ((DisplayedIcons - 1) * IconPadding);
