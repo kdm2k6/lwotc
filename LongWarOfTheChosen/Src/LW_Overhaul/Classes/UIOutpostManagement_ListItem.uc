@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------------------
-//  FILE:    UIOutpostManagement_ListItem
-//  AUTHOR:  tracktwo / Pavonis Interactive
-//
-//  PURPOSE: List Item (one row) for UIOutpostManagement
+//	FILE:    UIOutpostManagement_ListItem
+//	AUTHOR:  tracktwo / Pavonis Interactive
+//	PURPOSE: List Item (one row) for UIOutpostManagement
 //--------------------------------------------------------------------------------------- 
 
 class UIOutpostManagement_ListItem extends UIPanel
@@ -42,8 +41,8 @@ simulated function BuildItem()
 {
 	local int ArrowSize, BorderPadding, MugShotSize, RebelLevel;
 
-    List = UIList(GetParent(class'UIList'));
-    OutpostUI = UIOutpostManagement(Screen);
+	List = UIList(GetParent(class'UIList'));
+	OutpostUI = UIOutpostManagement(Screen);
 	USE_FANCY_VERSION = UIOutpostManagement(Screen).USE_FANCY_VERSION;
 
 	// KDM : Get the font size for the rebel name and rebel job; this depends upon 2 factors : 
@@ -56,9 +55,9 @@ simulated function BuildItem()
 	{
 		m_FontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
 	}
-
-    Width = List.Width;
-
+	
+	Width = List.Width;
+	
 	ArrowSize = 24;
 	BorderPadding = 10;
 	MugShotSize = 64;
@@ -76,13 +75,13 @@ simulated function BuildItem()
 	}
 
 	// KDM : Rebel photo
-    MugShot = Spawn(class'UIImage', self);
+	MugShot = Spawn(class'UIImage', self);
 	MugShot.InitImage();
-    MugShot.SetPosition(OutpostUI.NameHeaderButton.X + BorderPadding, 3);
-    MugShot.SetSize(MugShotSize, MugShotSize);
+	MugShot.SetPosition(OutpostUI.NameHeaderButton.X + BorderPadding, 3);
+	MugShot.SetSize(MugShotSize, MugShotSize);
 
 	// KDM : Rebel name
-    NameLabel = Spawn(class'UIText', self);
+	NameLabel = Spawn(class'UIText', self);
 	NameLabel.InitText();
 	if (USE_FANCY_VERSION)
 	{
@@ -94,7 +93,7 @@ simulated function BuildItem()
 	}
 
 	// KDM : Icons representing rebel level; basically you will see 0, 1, or 2 stars.
-    LevelLabel = Spawn(class'UIText', self);
+	LevelLabel = Spawn(class'UIText', self);
 	LevelLabel.InitText();
 
 	if (USE_FANCY_VERSION)
@@ -117,7 +116,7 @@ simulated function BuildItem()
 	{
 		LevelLabel.SetPosition(MugShot.X + MugShotSize + 6, 36);
 	}
-	
+
 	// KDM : Arrows are only displayed when using a mouse & keyboard; controllers use the D-Pad instead.
 	if (!`ISCONTROLLERACTIVE)
 	{
@@ -126,7 +125,7 @@ simulated function BuildItem()
 		LeftButton.InitImage(,"img:///gfxComponents.PC_arrowLEFT", OnClick);
 		LeftButton.SetPosition(OutpostUI.JobHeaderButton.X + BorderPadding, ((Height - ArrowSize) / 2) - 1);
 		LeftButton.SetSize(ArrowSize, ArrowSize);
-	
+
 		// KDM : Right arrow
 		RightButton = Spawn(class'UIImage', self);
 		RightButton.InitImage(,"img:///gfxComponents.PC_arrowRIGHT", OnClick);
@@ -134,32 +133,32 @@ simulated function BuildItem()
 			((Height - ArrowSize) / 2) - 1);
 		RightButton.SetSize(ArrowSize, ArrowSize);
 	}
-    
+
 	// KDM : Rebel job
-    SpinnerLabel = Spawn(class'UIText', self);
+	SpinnerLabel = Spawn(class'UIText', self);
 	SpinnerLabel.InitText();
 	if (USE_FANCY_VERSION)
 	{
-		 SpinnerLabel.SetPosition(OutpostUI.JobHeaderButton.X + BorderPadding, (Height / 2) - 18);
+		SpinnerLabel.SetPosition(OutpostUI.JobHeaderButton.X + BorderPadding, (Height / 2) - 18);
 	}
 	else
 	{
 		SpinnerLabel.SetPosition(OutpostUI.JobHeaderButton.X + BorderPadding, (Height / 2) - 16);
 	}
-    SpinnerLabel.SetWidth(OutpostUI.JobHeaderButton.Width - BorderPadding * 2);
+	SpinnerLabel.SetWidth(OutpostUI.JobHeaderButton.Width - BorderPadding * 2);
 }
 
 simulated function UIOutpostManagement_ListItem InitListItem()
 {	
 	InitPanel();
-    BuildItem();
-	
+	BuildItem();
+
 	// KDM : Static data only needs to be set once, when the list item is first created.
 	UpdateStaticData();
 	// KDM : Dynamic data needs to be updated when the list item : [1] is first created [2] receives focus [3] loses focus.
 	// For example, a rebel's job text is considered dynamic because it is blue when the rebel is unselected, and black when selected.
 	UpdateDynamicData(bIsFocused);
-    
+
 	return self;
 }
 
@@ -176,21 +175,21 @@ simulated function UpdateStaticData()
 	History = `XCOMHISTORY;
 
 	Unit = XComGameState_Unit(History.GetGameStateForObjectID(OutpostUI.CachedRebels[ListItemIndex].Unit.ObjectID));
-	
+
 	// KDM : Rebel photo
 	SetMugShot(Unit.GetReference());
-	
+
 	// KDM : Rebel name
 	if (OutpostUI.ShowFaceless && OutpostUI.CachedRebels[ListItemIndex].IsFaceless)
-    {
+	{
 		strRebelName = "* " $ Unit.GetFullName();
-    }
-    else
-    {
+	}
+	else
+	{
 		strRebelName = Unit.GetFullName();
-    }
+	}
 	NameLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRebelName, eUIState_Normal, m_FontSize));
-	
+
 	// KDM : Rebel level icons
 	RebelLevel = OutpostUI.CachedRebels[ListItemIndex].Level;
 	if (USE_FANCY_VERSION)
@@ -215,7 +214,7 @@ simulated function UpdateStaticData()
 		}
 		LevelLabel.SetHtmlText(strRebelLevel);
 	}
-	
+
 	// KDM : Rebel abilities
 	AbilityIcons.length = 0;
 	AddAbilityIcons(Unit, self);
@@ -226,9 +225,9 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 	local int i, DisplayedIcons, IconX, IconY, IconPadding, IconSize, StartX, TotalLength;
 	local UIIcon AbilityIcon;
 	local array<SoldierClassAbilityType> Abilities;
-    local X2AbilityTemplate AbilityTemplate;
-    local X2AbilityTemplateManager AbilityTemplateManager;
-    
+	local X2AbilityTemplate AbilityTemplate;
+	local X2AbilityTemplateManager AbilityTemplateManager;
+
 	DisplayedIcons = 0;
 
 	// KDM : When using the fancy UI, ability buttons are centered within the perks column; therefore,
@@ -247,13 +246,13 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 	}
 
 	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
-    Abilities = Unit.GetEarnedSoldierAbilities();
-    
-    for (i = 0; i < Abilities.Length; ++i)
-    {
-        AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(Abilities[i].AbilityName);
-        if (!AbilityTemplate.bDontDisplayInAbilitySummary)
-        {
+	Abilities = Unit.GetEarnedSoldierAbilities();
+
+	for (i = 0; i < Abilities.Length; ++i)
+	{
+		AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(Abilities[i].AbilityName);
+		if (!AbilityTemplate.bDontDisplayInAbilitySummary)
+		{
 			AbilityIcon = Spawn(class'UIIcon', self);
 			AbilityIcon.bDisableSelectionBrackets = true;
 			// KDM : Icons should not be navigable
@@ -264,8 +263,8 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 			AbilityIcon.SetSize(IconSize, IconSize);
 			AbilityIcons.AddItem(AbilityIcon);
 			AbilityIcon.SetTooltipText(AbilityTemplate.LocHelpText, AbilityTemplate.LocFriendlyName,,,true, class'UIUtilities'.const.ANCHOR_BOTTOM_LEFT, false, 0.5);
-        }
-    }
+		}
+	}
 
 	// KDM : Determine the ability icons placement for the fancy UI.
 	DisplayedIcons = AbilityIcons.length;
@@ -275,7 +274,7 @@ simulated function AddAbilityIcons(XComGameState_Unit Unit, UIOutpostManagement_
 		TotalLength = (DisplayedIcons * IconSize) +  ((DisplayedIcons - 1) * IconPadding);
 		StartX = OutpostUI.PerksHeaderButton.X + 
 			(OutpostUI.PerksHeaderButton.Width / 2.0) - (TotalLength / 2.0);
-		
+	
 		for (i = 0; i < DisplayedIcons; i++)
 		{
 			AbilityIcon = AbilityIcons[i];
@@ -313,36 +312,36 @@ simulated function UpdateDynamicData(bool Focused = false)
 simulated function SetMugShot(StateObjectReference InRebel)
 {
 	local Texture2D RebelPicture;
-    // Remember which rebel we are taking a picture for
-    RebelRef = InRebel;
+	// Remember which rebel we are taking a picture for
+	RebelRef = InRebel;
 
-    RebelPicture = class'UIUtilities_LW'.static.TakeUnitPicture(RebelRef, UpdateMugShot);
-    if (RebelPicture != none)
-    {
-        MugShot.LoadImage(PathName(RebelPicture));
-    }
-    else
-    {
-        MugShot.Hide();
-    }
+	RebelPicture = class'UIUtilities_LW'.static.TakeUnitPicture(RebelRef, UpdateMugShot);
+	if (RebelPicture != none)
+	{
+		MugShot.LoadImage(PathName(RebelPicture));
+	}
+	else
+	{
+		MugShot.Hide();
+	}
 }
 
 simulated function UpdateMugShot(StateObjectReference UnitRef)
 {
-    local Texture2D RebelPicture;
-	
-    RebelPicture = class'UIUtilities_LW'.static.FinishUnitPicture(UnitRef);
+	local Texture2D RebelPicture;
 
-    if (RebelPicture != none)
-    {
-        MugShot.LoadImage(PathName(RebelPicture));
-        MugShot.Show();
-    }
+	RebelPicture = class'UIUtilities_LW'.static.FinishUnitPicture(UnitRef);
+
+	if (RebelPicture != none)
+	{
+		MugShot.LoadImage(PathName(RebelPicture));
+		MugShot.Show();
+	}
 }
 
 simulated function SetRebelName(String RebelName)
 {
-    NameLabel.SetText(RebelName);
+	NameLabel.SetText(RebelName);
 }
 
 simulated function SetJobName(String JobName)
@@ -365,39 +364,39 @@ simulated function SetJobName(String JobName)
 
 simulated function SetLevel(int Level)
 {
-    local String text;
-    while(Level > 0)
-    {
-        text = text $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, 20, 20, 0);
-        --Level;
-    }
+	local String text;
+	while(Level > 0)
+	{
+		text = text $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, 20, 20, 0);
+		--Level;
+	}
 
-    LevelLabel.SetHtmlText(text);
+	LevelLabel.SetHtmlText(text);
 }
 
 simulated function AddAbility(X2AbilityTemplate Ability)
 {
-    local UIIcon Icon;
+	local UIIcon Icon;
 
-    Icon = Spawn(class'UIIcon', self).InitIcon(,Ability.IconImage, true, true, 24);
-    Icon.SetSize(24, 24);
-    Icon.bDisableSelectionBrackets = true;
-    Icon.bShouldPlayGenericUIAudioEvents = false;
-    Icon.SetPosition(ABILITY_ICON_X + ABILITY_ICON_GAP * AbilityIcons.Length, ABILITY_ICON_Y);
-    AbilityIcons.AddItem(Icon);
-    Icon.SetTooltipText(Ability.LocHelpText, Ability.LocFriendlyName,,,true, class'UIUtilities'.const.ANCHOR_BOTTOM_LEFT, false, 0.5);
+	Icon = Spawn(class'UIIcon', self).InitIcon(,Ability.IconImage, true, true, 24);
+	Icon.SetSize(24, 24);
+	Icon.bDisableSelectionBrackets = true;
+	Icon.bShouldPlayGenericUIAudioEvents = false;
+	Icon.SetPosition(ABILITY_ICON_X + ABILITY_ICON_GAP * AbilityIcons.Length, ABILITY_ICON_Y);
+	AbilityIcons.AddItem(Icon);
+	Icon.SetTooltipText(Ability.LocHelpText, Ability.LocFriendlyName,,,true, class'UIUtilities'.const.ANCHOR_BOTTOM_LEFT, false, 0.5);
 }
 
 simulated function OnClick(UIImage Btn)
 {
-    if (Btn == LeftButton)
-    {
-        OutpostUI.OnJobChanged(self, -1);
-    }
-    else if (Btn == RightButton)
-    {
-        OutpostUI.OnJobChanged(self, 1);
-    }
+	if (Btn == LeftButton)
+	{
+		OutpostUI.OnJobChanged(self, -1);
+	}
+	else if (Btn == RightButton)
+	{
+		OutpostUI.OnJobChanged(self, 1);
+	}
 }
 
 simulated function OnReceiveFocus()
@@ -425,7 +424,7 @@ simulated function OnLoseFocus()
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	local bool bHandled;
-	
+
 	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
 	{
 		return false;
@@ -461,7 +460,6 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 
 defaultproperties
 {
-    Height = 72;
+	Height = 72;
 	bIsNavigable = true;
 }
-
