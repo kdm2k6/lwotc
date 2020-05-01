@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------------------
-//  FILE:    UIResistanceManagement_ListItem
-//  AUTHOR:  tracktwo / Pavonis Interactive
-//
-//  PURPOSE: List Item (one row) for UIResistanceManagement
+//	FILE:    UIResistanceManagement_ListItem
+//	AUTHOR:  tracktwo / Pavonis Interactive
+//	PURPOSE: List Item (one row) for UIResistanceManagement
 //---------------------------------------------------------------------------------------
 
 class UIResistanceManagement_ListItem extends UIPanel
@@ -21,81 +20,81 @@ var UIList List;
 simulated function BuildItem()
 {
 	local int BorderPadding;
-    local UIResistanceManagement_LW ParentScreen;
+	local UIResistanceManagement_LW ParentScreen;
 
-    ParentScreen = UIResistanceManagement_LW(Screen);
+	ParentScreen = UIResistanceManagement_LW(Screen);
 	List = ParentScreen.List;
-   
-    Width = List.Width;
+
+	Width = List.Width;
 	BorderPadding = 10;
-    
+
 	// KDM : Background button which highlights when focused. 
 	// The style is now always set to eUIButtonStyle_NONE else hot links, little button icons, will appear when using a controller.
 	ButtonBG = Spawn(class'UIButton', self);
 	ButtonBG.bIsNavigable = false;
 	ButtonBG.InitButton(, , , eUIButtonStyle_NONE);
-    ButtonBG.SetResizeToText(false);
+	ButtonBG.SetResizeToText(false);
 	ButtonBG.SetPosition(0, 0);
-    ButtonBG.SetSize(Width, Height - 4);
+	ButtonBG.SetSize(Width, Height - 4);
 
 	// KDM : Region name
-    RegionLabel = Spawn(class'UIScrollingText', self);
+	RegionLabel = Spawn(class'UIScrollingText', self);
 	RegionLabel.InitScrollingText(, , ParentScreen.RegionHeaderButton.Width - BorderPadding * 2,
 		ParentScreen.RegionHeaderButton.X + BorderPadding, 7, true);
-	
+
 	// KDM : Advent strength and vigilance
 	RegionStatusLabel = Spawn(class'UIText', self);
 	RegionStatusLabel.InitText(, , true);
 	RegionStatusLabel.SetPosition(ParentScreen.RegionStatusButton.X + BorderPadding, 7);
 	RegionStatusLabel.SetSize(ParentScreen.RegionStatusButton.Width - BorderPadding * 2, Height);
-    
+
 	// KDM : Rebel number and rebels per job header
 	RebelCount = Spawn(class'UIText', self);
 	RebelCount.InitText(, , true);
 	RebelCount.SetPosition(ParentScreen.RebelCountHeaderButton.X + BorderPadding, 7);
-    RebelCount.SetSize(ParentScreen.RebelCountHeaderButton.Width - BorderPadding * 2, Height);
-    
+	RebelCount.SetSize(ParentScreen.RebelCountHeaderButton.Width - BorderPadding * 2, Height);
+
 	// KDM : Haven adviser
 	AdviserLabel = Spawn(class'UIText', self);
 	AdviserLabel.InitText(, , true);
-    AdviserLabel.SetPosition(ParentScreen.AdviserHeaderButton.X + BorderPadding, 7);
-    AdviserLabel.SetSize(ParentScreen.AdviserHeaderButton.Width - BorderPadding * 2, Height);
+	AdviserLabel.SetPosition(ParentScreen.AdviserHeaderButton.X + BorderPadding, 7);
+	AdviserLabel.SetSize(ParentScreen.AdviserHeaderButton.Width - BorderPadding * 2, Height);
 
 	// KDM : Haven income
 	IncomeLabel = Spawn(class'UIText', self);
 	IncomeLabel.InitText(, , true);
 	IncomeLabel.SetPosition(ParentScreen.IncomeHeaderButton.X + BorderPadding, 7);
-    IncomeLabel.SetSize(ParentScreen.IncomeHeaderButton.Width - BorderPadding * 2, Height);
+	IncomeLabel.SetSize(ParentScreen.IncomeHeaderButton.Width - BorderPadding * 2, Height);
 }
 
 simulated function UIResistanceManagement_ListItem InitListItem(StateObjectReference Ref)
 {
-    OutpostRef = Ref;
-    InitPanel();
+	OutpostRef = Ref;
+	InitPanel();
 
-    BuildItem();
-    UpdateData();
-    return self;
+	BuildItem();
+	UpdateData();
+	return self;
 }
 
 simulated function UpdateData(bool Focused = false)
 {
 	local int IconOffset, IconSize;
 	local String strRegion, strCount, strStatus, strJobDetail, strAdviser, strMoolah;
-	
+
 	local StateObjectReference LiaisonRef;
-    local XComGameState_LWOutpost Outpost;
-    local XComGameState_Unit Liaison;
+	local XComGameState_LWOutpost Outpost;
+	local XComGameState_Unit Liaison;
 	local XComGameState_WorldRegion Region;
 	local XComGameState_WorldRegion_LWStrategyAI RegionalAI;
-    local XGParamTag ParamTag;
-	
+	local XGParamTag ParamTag;
+
 	IconSize = 32;
 	IconOffset = -15;
 
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
-    Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
-    Region = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(Outpost.Region.ObjectID));
+	Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
+	Region = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(Outpost.Region.ObjectID));
 	RegionalAI = class'XComGameState_WorldRegion_LWStrategyAI'.static.GetRegionalAI(Region);
 
 	// KDM : Region name
@@ -147,9 +146,9 @@ simulated function UpdateData(bool Focused = false)
 	RegionStatusLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strStatus, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
 
 	// KDM : Number of rebels in the haven and number of rebels on : [1] supply [2] intel [3] recruit [4] hiding.
-    strCount = class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetRebelCount()),
-        Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
-    strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Resistance", IconSize, IconSize, IconOffset);
+	strCount = class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetRebelCount()),
+		Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
+	strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Resistance", IconSize, IconSize, IconOffset);
 	strCount $= "  ";
 
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
@@ -162,20 +161,20 @@ simulated function UpdateData(bool Focused = false)
 
 	strCount $= class'UIUtilities_Text'.static.GetColoredText(strJobDetail, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE);
 
-    if (Outpost.GetResistanceMecCount() > 0)
-    {
-        strCount $= "  ";
-        strCount $= class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetResistanceMecCount()), Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
-        strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_LW_Overhaul.Resistance_Mec_icon", IconSize, IconSize, IconOffset);
-    }
+	if (Outpost.GetResistanceMecCount() > 0)
+	{
+		strCount $= "  ";
+		strCount $= class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetResistanceMecCount()), Focused ? -1 : eUIState_Normal, LIST_ITEM_FONT_SIZE);
+		strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_LW_Overhaul.Resistance_Mec_icon", IconSize, IconSize, IconOffset);
+	}
 
-    RebelCount.SetCenteredText(strCount);
+	RebelCount.SetCenteredText(strCount);
 
 	// KDM : Haven adviser icon, if a haven adviser exists
 	if (OutPost.HasLiaisonOfKind ('Soldier'))
-    {
+	{
 		LiaisonRef = OutPost.GetLiaison();
-        Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(LiaisonRef.ObjectID));
+		Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(LiaisonRef.ObjectID));
 		strAdviser = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, IconSize, IconSize, IconOffset);
 		strAdviser $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), IconSize, IconSize, IconOffset);
 	}
@@ -193,11 +192,11 @@ simulated function UpdateData(bool Focused = false)
 		// KDM : IMPORTANT : If you have a string which only contains an injected image, and then center it, the image is doubled.
 		// Get around this apparent bug by placing empty spaces on each side of the injected image.
 		AdviserLabel.SetCenteredText (class'UIUtilities_Text'.static.GetColoredText(" " $ strAdviser $ " ", Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
-    }
+	}
 
 	// KDM : Real and projected haven income
 	ParamTag.IntValue0 = int(Outpost.GetIncomePoolForJob('Resupply'));
-    ParamTag.IntValue1 = int(Outpost.GetProjectedMonthlyIncomeForJob('Resupply'));
+	ParamTag.IntValue1 = int(Outpost.GetProjectedMonthlyIncomeForJob('Resupply'));
 	strMoolah = `XEXPAND.ExpandString(class'UIStrategyMapItem_Region_LW'.default.m_strMonthlyRegionalIncome);
 	IncomeLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strMoolah, Focused ? -1: eUIState_Normal, LIST_ITEM_FONT_SIZE));
 }
@@ -205,14 +204,14 @@ simulated function UpdateData(bool Focused = false)
 simulated function OnReceiveFocus()
 {
 	super.OnReceiveFocus();
-    ButtonBG.MC.FunctionVoid("mouseIn");
+	ButtonBG.MC.FunctionVoid("mouseIn");
 	UpdateData(true);
 }
 
 simulated function OnLoseFocus()
 {
 	super.OnLoseFocus();
-    ButtonBG.MC.FunctionVoid("mouseOut");
+	ButtonBG.MC.FunctionVoid("mouseOut");
 	UpdateData();
 }
 
@@ -220,7 +219,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	local bool bHandled;
 	local int index;
-	
+
 	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
 	{
 		return false;
@@ -237,7 +236,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 			index = List.GetItemIndex(self);
 			UIResistanceManagement_LW(Screen).OnRegionSelectedCallback(List, index);
 			break;
-		
+
 		default:
 			bHandled = false;
 			break;
@@ -254,7 +253,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 
 defaultproperties
 {
-    Height = 52;
-    bProcessesMouseEvents = true;
+	Height = 52;
+	bProcessesMouseEvents = true;
 	bIsNavigable = true;
 }

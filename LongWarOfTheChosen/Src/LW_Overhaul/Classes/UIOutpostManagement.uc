@@ -74,13 +74,13 @@ simulated function bool ShowRadioTowerUpgradeButton()
 
 simulated function XComGameState_WorldRegion GetRegion()
 {
-    local XComGameState_WorldRegion Region;
-    local XComGameState_LWOutpost Outpost;
-    local XComGameStateHistory History;
+	local XComGameState_WorldRegion Region;
+	local XComGameState_LWOutpost Outpost;
+	local XComGameStateHistory History;
 
-    History = `XCOMHISTORY;
+	History = `XCOMHISTORY;
 	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
-    Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
+	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
 	return Region;
 }
 
