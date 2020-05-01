@@ -1,14 +1,12 @@
 //---------------------------------------------------------------------------------------
-//  FILE:    UIOutpostManagement
-//  AUTHOR:  tracktwo / Pavonis Interactive
-//
-//  PURPOSE: UI for managing a single outpost
+//	FILE:    UIOutpostManagement
+//	AUTHOR:  tracktwo / Pavonis Interactive
+//	PURPOSE: UI for managing a single outpost
 //--------------------------------------------------------------------------------------- 
 
 class UIOutpostManagement extends UIScreen
-    config(LW_UI) dependson(XComGameState_LWOutpost);
+	config(LW_UI) dependson(XComGameState_LWOutpost);
 
-// KDM : Additional Variables Start
 var config bool USE_FANCY_VERSION;
 var config int ADVISER_FONT_SIZE, HEADER_FONT_SIZE;
 
@@ -17,7 +15,6 @@ var localized string m_strChangeJob, m_strChangeAllJobs, m_strHavenAdviser, m_st
 var int m_BorderPadding, m_ItemPadding;
 var float m_NameHeaderPct, m_JobHeaderPct, m_PerksHeaderPct;
 var UIButton PerksHeaderButton;
-// KDM : Additional Variables End
 
 var name DisplayTag;
 var name CameraTag;
@@ -97,21 +94,21 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	local bool IntelProhibited, SupplyProhibited, RecruitProhibited;
 	local int AvailableSpace, i, AdviserIconSize, AdviserBorderPadding, ScrollbarPadding;
 
-    local int NextX, NextY;
+	local int NextX, NextY;
 	local XComGameState_LWOutpost Outpost;
 	local XComGameState_WorldRegion Region;
-    local XComGameStateHistory History;
-	
+	local XComGameStateHistory History;
+
 	History = `XCOMHISTORY;
-    Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
-    Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
-	
+	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
+	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
+
 	DisplayTag = 'UIDisplay_Council';
 	CameraTag = 'UIDisplayCam_ResistanceScreen';
 
 	m_BorderPadding = 15;
 	m_ItemPadding = 10;
-	
+
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
 	if (USE_FANCY_VERSION)
 	{
@@ -130,13 +127,13 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	AdviserIconSize = 64;
 	AdviserBorderPadding = 4;
 	ScrollbarPadding = 10;
-	
+
 	super.InitScreen(InitController, InitMovie, InitName);
 
 	// KDM : The Haven screen is centered horizontally and vertically when viewed via the strategy map.
 	// When viewed via the Avenger; however, its vertical position must be set manually in order to fit a fancy 3D background.
 	panelW = 1000;
-    panelH = 830;
+	panelH = 830;
 	if (class'Utilities_LW'.static.IsOnStrategyMap())
 	{
 		panelY = (Movie.UI_RES_Y / 2) - (panelH / 2);
@@ -154,18 +151,18 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	}
 
 	// KDM : Container which will hold our UI components : it's invisible
-    MainPanel = Spawn(class 'UIPanel', self);
+	MainPanel = Spawn(class 'UIPanel', self);
 	MainPanel.bAnimateOnInit = false;
 	MainPanel.bIsNavigable = false;
-    MainPanel.InitPanel('ListContainer');
+	MainPanel.InitPanel('ListContainer');
 	MainPanel.SetPosition((Movie.UI_RES_X / 2) - (panelW / 2), panelY);
-    
+
 	// KDM : Background rectangle
 	ListBG = Spawn(class'UIBGBox', MainPanel);
 	ListBG.bAnimateOnInit = false;
 	ListBG.LibID = class'UIUtilities_Controls'.const.MC_X2Background;
 	ListBG.InitBG('ListBG', 0, 0, panelW, panelH);
-    
+
 	// KDM : Header (includes title, and region sub-title) 
 	ListTitle = Spawn(class'UIX2PanelHeader', MainPanel);
 	ListTitle.bAnimateOnInit = false;
@@ -173,25 +170,25 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListTitle.InitPanelHeader('TitleHeader', m_strTitle, Region.GetDisplayName());
 	ListTitle.SetPosition(m_BorderPadding, m_BorderPadding);
 	ListTitle.SetHeaderWidth(panelW - m_BorderPadding * 2);
-    
-    NextY = ListTitle.Y + ListTitle.Height;
 
-    // KDM : Advent strength in the region
+	NextY = ListTitle.Y + ListTitle.Height;
+
+	// KDM : Advent strength in the region
 	RegionalInfo = Spawn(class'UIScrollingText', MainPanel);
 	RegionalInfo.bAnimateOnInit = false;
 	RegionalInfo.InitScrollingText('Outpost_RegionalInfo_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, ListBG.Y + 46.75 + 6);
 	RegionalInfo.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ GetAdventStrengthString(Region) $ "</font></p>");
 	RegionalInfo.SetAlpha(67.1875);
 
-    // Resistance MECs
-    if (Outpost.GetResistanceMecCount() > 0)
-    {
+	// Resistance MECs
+	if (Outpost.GetResistanceMecCount() > 0)
+	{
 		ResistanceMecs = Spawn(class'UIScrollingText', MainPanel);
 		ResistanceMecs.bAnimateOnInit = false;
 		ResistanceMecs.InitScrollingText('Outpost_ResistanceMecs_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, RegionalInfo.Y + RegionalInfo.Height);
-        ResistanceMecs.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ GetResistanceMecString(Outpost) $ "</font></p>");
-        ResistanceMecs.SetAlpha(67.1875);
-    }
+		ResistanceMecs.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ GetResistanceMecString(Outpost) $ "</font></p>");
+		ResistanceMecs.SetAlpha(67.1875);
+	}
 
 	for (i=0; i < Outpost.prohibitedjobs.length; i++)	
 	{
@@ -212,63 +209,63 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	// KDM : Job prohibitions for the region
 	if (IntelProhibited || SupplyProhibited || RecruitProhibited)
 	{
-	    JobDetail = Spawn(class'UIScrollingText', MainPanel);
+		JobDetail = Spawn(class'UIScrollingText', MainPanel);
 		JobDetail.bAnimateOnInit = false;
 		JobDetail.InitScrollingText('OutPost_JobDetail_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, 
 			RegionalInfo.Y + RegionalInfo.Height + (OutPost.GetResistanceMecCount() > 0) ? ResistanceMECs.Height : 0.0f);
-	    JobDetail.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ 
+		JobDetail.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ 
 			GetJobProhibitedString(Outpost, IntelProhibited, SupplyProhibited, RecruitProhibited) $ "</font></p>");
 		JobDetail.SetAlpha(67.1875);
 	}
 
 	// KDM : Haven adviser background
-    LiaisonButton = Spawn(class'UIButton', MainPanel);
+	LiaisonButton = Spawn(class'UIButton', MainPanel);
 	LiaisonButton.bAnimateOnInit = false;
-    LiaisonButton.bIsNavigable = false;
+	LiaisonButton.bIsNavigable = false;
 	LiaisonButton.InitButton(, , OnLiaisonClicked);
-    LiaisonButton.SetPosition(m_BorderPadding, NextY);
+	LiaisonButton.SetPosition(m_BorderPadding, NextY);
 	LiaisonButton.SetSize(AdviserIconSize + AdviserBorderPadding * 2, AdviserIconSize + AdviserBorderPadding * 2);
 
 	// KDM : Haven adviser photo
 	LiaisonImage = Spawn(class'UIImage', LiaisonButton);
 	LiaisonImage.bAnimateOnInit = false;
 	LiaisonImage.InitImage();
-    LiaisonImage.SetPosition(AdviserBorderPadding, AdviserBorderPadding);
-    LiaisonImage.SetSize(AdviserIconSize, AdviserIconSize);
+	LiaisonImage.SetPosition(AdviserBorderPadding, AdviserBorderPadding);
+	LiaisonImage.SetSize(AdviserIconSize, AdviserIconSize);
 
 	// KDM : Haven adviser label
-    LiaisonTitle = Spawn(class'UIText', MainPanel);
+	LiaisonTitle = Spawn(class'UIText', MainPanel);
 	LiaisonTitle.bAnimateOnInit = false;
-    LiaisonTitle.InitText('', "");
-    LiaisonTitle.SetPosition(m_BorderPadding + LiaisonButton.Width + 5, NextY);
+	LiaisonTitle.InitText('', "");
+	LiaisonTitle.SetPosition(m_BorderPadding + LiaisonButton.Width + 5, NextY);
 	// KDM : IMPORTANT : Originally, SetSubTitle() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
 	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, ADVISER_FONT_SIZE));
-    
+
 	// KDM : Haven adviser name
 	LiaisonName = Spawn(class'UIText', MainPanel);
 	LiaisonName.bAnimateOnInit = false;
-    LiaisonName.InitText('',"");
-    LiaisonName.SetPosition(LiaisonTitle.X, NextY + LiaisonTitle.Height);
+	LiaisonName.InitText('',"");
+	LiaisonName.SetPosition(LiaisonTitle.X, NextY + LiaisonTitle.Height);
 
-    NextY += 81;
+	NextY += 81;
 
 	// KDM : Dividing line
-    DividerLine = Spawn(class'UIPanel', MainPanel);
+	DividerLine = Spawn(class'UIPanel', MainPanel);
 	DividerLine.bAnimateOnInit = false;
 	DividerLine.bIsNavigable = false;
 	DividerLine.LibID = class'UIUtilities_Controls'.const.MC_GenericPixel;
 	DividerLine.InitPanel('DividerLine');
 	DividerLine.SetPosition(m_BorderPadding, NextY);
 	DividerLine.SetWidth(panelW - m_BorderPadding * 2);
-    DividerLine.SetAlpha(20);
+	DividerLine.SetAlpha(20);
 
-    NextY += DividerLine.Height + 8;
+	NextY += DividerLine.Height + 8;
 
 	// KDM : Container for column headers : it's invisible
 	HeaderPanel = Spawn(class'UIPanel', MainPanel);
 	HeaderPanel.bAnimateOnInit = false;
 	HeaderPanel.bIsNavigable = false;
-    HeaderPanel.InitPanel('Header');
+	HeaderPanel.InitPanel('Header');
 	HeaderPanel.SetPosition(m_BorderPadding, NextY);
 	HeaderPanel.SetSize(panelW - m_BorderPadding * 2 - ScrollbarPadding, 32);
 
@@ -284,15 +281,15 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	}
 
 	// KDM : Rebel name column header
-    NameHeaderButton = Spawn(class'UIButton', HeaderPanel);
+	NameHeaderButton = Spawn(class'UIButton', HeaderPanel);
 	NameHeaderButton.bAnimateOnInit = false;
 	NameHeaderButton.bIsNavigable = false;
 	NameHeaderButton.ResizeToText = false;
-    NameHeaderButton.InitButton(, CAPS(m_strName));
+	NameHeaderButton.InitButton(, CAPS(m_strName));
 	NameHeaderButton.SetPosition(0, 0);
-    NameHeaderButton.SetSize(AvailableSpace * m_NameHeaderPct, 30);
+	NameHeaderButton.SetSize(AvailableSpace * m_NameHeaderPct, 30);
 	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
-    NameHeaderButton.SetWarning(true);
+	NameHeaderButton.SetWarning(true);
 	// KDM : Since the name column header can't be clicked, remove its hit testing so mouse events don't change its colour
 	// and make users think the button is active. The same is done for the perks column header below.
 	NameHeaderButton.SetHitTestDisabled(true);
@@ -313,23 +310,23 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
 		PerksHeaderButton.SetWarning(true);
 		PerksHeaderButton.SetHitTestDisabled(true);
-	
+
 		NextX += PerksHeaderButton.Width + 2;	
 	}
 
 	// KDM : Rebel job column header
-    JobHeaderButton = Spawn(class'UIButton', HeaderPanel);
+	JobHeaderButton = Spawn(class'UIButton', HeaderPanel);
 	JobHeaderButton.bAnimateOnInit = false;
 	JobHeaderButton.bIsNavigable = false;
 	JobHeaderButton.ResizeToText = false;
-    JobHeaderButton.InitButton(, CAPS(m_strMission), OnJobHeaderButtonClicked);
-    JobHeaderButton.SetPosition(NextX, 0);
+	JobHeaderButton.InitButton(, CAPS(m_strMission), OnJobHeaderButtonClicked);
+	JobHeaderButton.SetPosition(NextX, 0);
 	JobHeaderButton.SetSize(AvailableSpace * m_JobHeaderPct, 30);
 	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
-    JobHeaderButton.SetWarning(true);
+	JobHeaderButton.SetWarning(true);
 	JobHeaderButton.ProcessMouseEvents(OnJobHeaderMouseEvent);
 
-    NextY += 32 + 5;
+	NextY += 32 + 5;
 
 	// KDM : List container which will hold rows of rebels
 	List = Spawn(class'UIList', MainPanel);
@@ -355,14 +352,14 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		RadioTowerUpgradeButton.SetFontSize(HEADER_FONT_SIZE);
 	}
 
-    // LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
+	// LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
 	ListBG.ProcessMouseEvents(List.OnChildMouseEvent);
 
-    InitJobNameCache();
-    RefreshNavHelp();
-    GetData();
-    RefreshData();
-   
+	InitJobNameCache();
+	RefreshNavHelp();
+	GetData();
+	RefreshData();
+
 	// KDM : Automatically select the 1st rebel row when using a controller.
 	if (`ISCONTROLLERACTIVE)
 	{
@@ -383,7 +380,7 @@ simulated function string GetAdventStrengthString(XComGameState_WorldRegion Regi
 {
 	local XComGameState_WorldRegion_LWStrategyAI RegionalAIState;
 	local XGParamTag kTag;
-	
+
 	kTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 	RegionalAIState = class'XComGameState_WorldRegion_LWStrategyAI'.static.GetRegionalAI(Region);
 	if (!RegionalAIState.bLiberated)
@@ -440,7 +437,7 @@ simulated function bool ControllerCanBuildRelay()
 function OnJobHeaderButtonClicked(UIButton Button)
 {
 	local int i, j, k;
-    local XComGameState_LWOutpost Outpost;
+	local XComGameState_LWOutpost Outpost;
 	local bool GoodJobFound;
 	local UIOutpostManagement_ListItem ListItem;
 
@@ -483,153 +480,153 @@ function OnJobHeaderButtonClicked(UIButton Button)
 
 simulated function InitJobNameCache()
 {
-    local X2StrategyElementTemplateManager StrategyTemplateMgr;
-    local array<X2StrategyElementTemplate> Templates;
-    local LWRebelJobTemplate JobTemplate;
-    local int idx;
+	local X2StrategyElementTemplateManager StrategyTemplateMgr;
+	local array<X2StrategyElementTemplate> Templates;
+	local LWRebelJobTemplate JobTemplate;
+	local int idx;
 
-    StrategyTemplateMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
-    Templates = StrategyTemplateMgr.GetAllTemplatesOfClass(class'LWRebelJobTemplate');
+	StrategyTemplateMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	Templates = StrategyTemplateMgr.GetAllTemplatesOfClass(class'LWRebelJobTemplate');
 
-    for (idx = 0; idx < Templates.Length; ++idx)
-    {
-        JobTemplate = LWRebelJobTemplate(Templates[idx]);
-        CachedJobNames.AddItem(JobTemplate.DataName);
-    }
+	for (idx = 0; idx < Templates.Length; ++idx)
+	{
+		JobTemplate = LWRebelJobTemplate(Templates[idx]);
+		CachedJobNames.AddItem(JobTemplate.DataName);
+	}
 }
 
 simulated function SetOutpost(StateObjectReference Ref)
 {
-    OutpostRef = Ref;
+	OutpostRef = Ref;
 }
 
 simulated function RefreshData()
 {
-    //SortData();
-    UpdateLiaison();
-    UpdateList();
-	if( ShowRadioTowerUpgradeButton() )
+	//SortData();
+	UpdateLiaison();
+	UpdateList();
+	if (ShowRadioTowerUpgradeButton())
 		RadioTowerUpgradeButton.Show();
 	else
-		RadioTowerUpgradeButton.Hide();
+	RadioTowerUpgradeButton.Hide();
 }
 
 simulated function GetData()
 {
-    local int i;
-    local XComGameStateHistory History;
-    local XComGameState_LWOutpost Outpost;
+	local int i;
+	local XComGameStateHistory History;
+	local XComGameState_LWOutpost Outpost;
 
 	History = `XCOMHISTORY;
-    Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
-    CachedRebels.Length = 0;
+	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
+	CachedRebels.Length = 0;
 
-    for (i = 0; i < Outpost.Rebels.Length; ++i)
-    {
-        CachedRebels.AddItem(Outpost.Rebels[i]);
-    }
+	for (i = 0; i < Outpost.Rebels.Length; ++i)
+	{
+		CachedRebels.AddItem(Outpost.Rebels[i]);
+	}
 
-    CachedLiaison = Outpost.GetLiaison();
+	CachedLiaison = Outpost.GetLiaison();
 }
 
 simulated function UpdateLiaison()
 {
 	local String Str;
-    local Texture2D LiaisonPicture;
+	local Texture2D LiaisonPicture;
 	local XComGameState_Unit Liaison;
 
-    if (CachedLiaison.ObjectID == 0)
-    {
-        LiaisonName.SetHtmlText("");
-        LiaisonImage.Hide();
-    }
-    else
-    {
-        Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(CachedLiaison.ObjectID));
-        if (Liaison.IsSoldier())
-        {
+	if (CachedLiaison.ObjectID == 0)
+	{
+		LiaisonName.SetHtmlText("");
+		LiaisonImage.Hide();
+	}
+	else
+	{
+		Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(CachedLiaison.ObjectID));
+		if (Liaison.IsSoldier())
+		{
 			Str = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, 40, 40, -18);
-            Str $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), 40, 40, -18);
-            Str $= Liaison.GetName(eNameType_FullNick);
-        }
-        else
-        {
-            if (Liaison.IsEngineer())
+			Str $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), 40, 40, -18);
+			Str $= Liaison.GetName(eNameType_FullNick);
+		}
+		else
+		{
+			if (Liaison.IsEngineer())
 			{
-                Str = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, 32, 32, -6);
-            }
+				Str = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, 32, 32, -6);
+			}
 			else if (Liaison.IsScientist())
 			{
-                Str = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, 32, 32, -6);
-            }
+				Str = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, 32, 32, -6);
+			}
 			Str $= Liaison.GetFullName();
-        }
-        
+		}
+
 		// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
 		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, ADVISER_FONT_SIZE));
-   
+
 		LiaisonPicture = class'UIUtilities_LW'.static.TakeUnitPicture(CachedLiaison, OnPictureTaken);
-        if (LiaisonPicture != none)
-        {
-            LiaisonImage.LoadImage(PathName(LiaisonPicture));
-            LiaisonImage.Show();
-        }
-    }
+		if (LiaisonPicture != none)
+		{
+			LiaisonImage.LoadImage(PathName(LiaisonPicture));
+			LiaisonImage.Show();
+		}
+	}
 }
 
 simulated function UpdateList()
 {
 	local int i;
-	
+
 	List.ClearItems();
-	
+
 	for (i = 0; i < CachedRebels.Length; ++i)
-    {
+	{
 		UIOutpostManagement_ListItem(List.CreateItem(class'UIOutpostManagement_ListItem')).InitListItem();
 	}
 }
 
 simulated function AddAbilities(XComGameState_Unit Unit, UIOutpostManagement_ListItem ListItem)
 {
-    local array<SoldierClassAbilityType> Abilities;
-    local X2AbilityTemplate AbilityTemplate;
-    local X2AbilityTemplateManager AbilityTemplateManager;
-    local int i;
+	local array<SoldierClassAbilityType> Abilities;
+	local X2AbilityTemplate AbilityTemplate;
+	local X2AbilityTemplateManager AbilityTemplateManager;
+	local int i;
 
-    Abilities = Unit.GetEarnedSoldierAbilities();
-    AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
-
-    for (i = 0; i < Abilities.Length; ++i)
-    {
-        AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(Abilities[i].AbilityName);
-        if (!AbilityTemplate.bDontDisplayInAbilitySummary)
-        {
-            ListItem.AddAbility(AbilityTemplate);
-        }
-    }
+	Abilities = Unit.GetEarnedSoldierAbilities();
+	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	
+	for (i = 0; i < Abilities.Length; ++i)
+	{
+		AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(Abilities[i].AbilityName);
+		if (!AbilityTemplate.bDontDisplayInAbilitySummary)
+		{
+			ListItem.AddAbility(AbilityTemplate);
+		}
+	}
 }
 
 simulated function RefreshNavHelp()
 {
 	local UINavigationHelp NavHelp;
-	
+
 	NavHelp = `HQPRES.m_kAvengerHUD.NavHelp;
 	NavHelp.ClearButtonHelp();
 	NavHelp.bIsVerticalHelp = `ISCONTROLLERACTIVE;
 	NavHelp.AddBackButton(OnCancel);
-	
+
 	// KDM : Controller specific navigation help
 	if (`ISCONTROLLERACTIVE)
 	{
 		// KDM : D-Pad left/right changes the selected rebels job.
 		NavHelp.AddLeftHelp(m_strChangeJob, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_DPAD_HORIZONTAL);
-		
+
 		// KDM : Bumper left/right changes all rebel jobs.
 		NavHelp.AddLeftHelp(m_strChangeAllJobs, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RB_R1);
-		
+
 		// KDM : Right stick click changes the haven's adviser.
 		NavHelp.AddLeftHelp(CAPS(m_strLiaisonTitle), class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
-		
+
 		// KDM : Y button brings up the option to build a haven relay, if certain conditions are met.
 		if (ControllerCanBuildRelay())
 		{
@@ -644,30 +641,30 @@ simulated function RefreshNavHelp()
 
 simulated function OnCancel()
 {
-    if (IsDirty)
-        SaveOutpost();
+	if (IsDirty)
+		SaveOutpost();
 
-    Movie.Stack.Pop(self);
-
+	Movie.Stack.Pop(self);
+	
 	`XEVENTMGR.TriggerEvent('OnLeaveOutpost', self, self); // this is needed to advance objective LW_T2_M0_S1_ReviewOutpost
 }
 
 simulated function OnAccept()
 {
-    if (IsDirty)
-        SaveOutpost();
+	if (IsDirty)
+		SaveOutpost();
 
 	`XEVENTMGR.TriggerEvent('OnLeaveOutpost', self, self); // this is needed to advance objective LW_T2_M0_S1_ReviewOutpost
 }
 
 simulated function OnReceiveFocus()
 {
-    super.OnReceiveFocus();
+	super.OnReceiveFocus();
 
 	// KDM : Removed the following LWS code :
 	// [1] A call to JobHeaderButton.SetWidth() which was unnecessary.
 	// [2] A call to Show() since bHideOnLoseFocus causes the screen to automatically Show() upon receiving focus.
-    RefreshNavHelp();
+	RefreshNavHelp();
 	RefreshData();
 
 	// KDM : Automatically select the 1st rebel row when using a controller.
@@ -686,13 +683,13 @@ simulated function OnLoseFocus()
 
 simulated function SetDirty()
 {
-    IsDirty = true;
+	IsDirty = true;
 }
 
 simulated function OnJobHeaderMouseEvent(UIPanel Panel, int cmd)
 {
 	local UIButton JobHeader;
-	
+
 	JobHeader = UIButton(Panel);
 
 	// KDM : In Long War 2, mousing over a header button results in black text over a dull yellow background. What we really
@@ -729,7 +726,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 	{
 		return false;
 	}
-	
+
 	bHandled = true;
 
 	switch (cmd)
@@ -739,7 +736,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		case class'UIUtilities_Input'.const.FXS_KEY_SPACEBAR:
 			OnAccept();
 			break;
-		
+
 		case class'UIUtilities_Input'.const.FXS_BUTTON_B:
 		case class'UIUtilities_Input'.const.FXS_KEY_ESCAPE:
 		case class'UIUtilities_Input'.const.FXS_R_MOUSE_DOWN:
@@ -780,7 +777,6 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 			{
 				bHandled = List.Navigator.OnUnrealCommand(cmd, arg);
 			}
-
 			break;
 	}
 
@@ -794,36 +790,36 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 
 function int CountNonHidingRebels()
 {
-    local int NumNonHidingRebels;
-    local int i;
+	local int NumNonHidingRebels;
+	local int i;
 
-    // Count the number of non-hiding rebels, and if it's at the cap we can't change this one.
-    for (i = 0; i < CachedRebels.Length; ++i)
-    {
-        if (CachedRebels[i].Job != class'LWRebelJob_DefaultJobSet'.const.HIDING_JOB)
-            ++NumNonHidingRebels;
-    }
+	// Count the number of non-hiding rebels, and if it's at the cap we can't change this one.
+	for (i = 0; i < CachedRebels.Length; ++i)
+	{
+		if (CachedRebels[i].Job != class'LWRebelJob_DefaultJobSet'.const.HIDING_JOB)
+			++NumNonHidingRebels;
+	}
 
-    return NumNonHidingRebels;
+	return NumNonHidingRebels;
 }
 
 function OnJobChanged(UIOutpostManagement_ListItem ListItem, int Direction)
 {
-    local int RebelIdx;
-    local int i, k;
+	local int RebelIdx;
+	local int i, k;
 	local XComGameState_LWOutpost Outpost;
 	local bool GoodJobFound;
 
-    RebelIdx = List.GetItemIndex(ListItem);
+	RebelIdx = List.GetItemIndex(ListItem);
 	Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
-    i = CachedJobNames.Find(CachedRebels[RebelIdx].Job);
+	i = CachedJobNames.Find(CachedRebels[RebelIdx].Job);
 
 	GoodJobFound = false;
 	while (!GoodJobFound)
 	{
 		GoodJobFound = true;
-	    i += Direction;
-	    if (i >= CachedJobNames.Length)
+		i += Direction;
+		if (i >= CachedJobNames.Length)
 			i = 0;
 		else if (i < 0)
 			i = CachedJobNames.Length - 1;
@@ -839,109 +835,108 @@ function OnJobChanged(UIOutpostManagement_ListItem ListItem, int Direction)
 		}
 	}
 
-    // Special logic needed if this rebel is hiding - it's possible the outpost is already at max
-    // and we shouldn't be able to set them to a real job. If they aren't hiding then they can always
-    // be adjusted.
+	// Special logic needed if this rebel is hiding - it's possible the outpost is already at max
+	// and we shouldn't be able to set them to a real job. If they aren't hiding then they can always
+	// be adjusted.
 	if (CachedRebels[RebelIdx].Job == class'LWRebelJob_DefaultJobSet'.const.HIDING_JOB)
 	{
-        if (CountNonHidingRebels() >= Outpost.MaxRebels)
-        {
-            // Too many rebels on the job. Return without changing anything.
-		    `SOUNDMGR.PlaySoundEvent("Play_MenuClickNegative");
-            return;
-        }
+		if (CountNonHidingRebels() >= Outpost.MaxRebels)
+		{
+			// Too many rebels on the job. Return without changing anything.
+			`SOUNDMGR.PlaySoundEvent("Play_MenuClickNegative");
+			return;
+		}
 	}
-   
-    CachedRebels[RebelIdx].Job = CachedJobNames[i];
+
+	CachedRebels[RebelIdx].Job = CachedJobNames[i];
 	IsDirty = true;
-		 // Tell the list item to refresh itself.
+	// Tell the list item to refresh itself.
 	ListItem.SetJobName(class'XComGameState_LWOutpost'.static.GetJobName(CachedRebels[RebelIdx].Job));
 }
 
-
 function SaveOutpost()
 {
-    local XComGameState_LWOutpost Outpost;
-    local XComGameStateHistory History;
-    local XComGameState NewGameState;
-    local int I;
+	local XComGameState_LWOutpost Outpost;
+	local XComGameStateHistory History;
+	local XComGameState NewGameState;
+	local int I;
 
-    History = `XCOMHISTORY;
-    Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
-    NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Saving Outpost Changes");
-    Outpost = XComGameState_LWOutpost(NewGameState.CreateStateObject(class'XComGameState_LWOutpost', Outpost.ObjectID));
-	
-    for (I = 0; I < CachedRebels.Length; ++I)
-    {
-        Outpost.SetRebelJob(CachedRebels[I].Unit, CachedRebels[I].Job);
-    }
-    Outpost.UpdateJobs(NewGameState);
+	History = `XCOMHISTORY;
+	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Saving Outpost Changes");
+	Outpost = XComGameState_LWOutpost(NewGameState.CreateStateObject(class'XComGameState_LWOutpost', Outpost.ObjectID));
 
-    // This should be redundant because liaison changes are saved immediately.
-    SaveLiaison();
+	for (I = 0; I < CachedRebels.Length; ++I)
+	{
+		Outpost.SetRebelJob(CachedRebels[I].Unit, CachedRebels[I].Job);
+	}
+	Outpost.UpdateJobs(NewGameState);
+
+	// This should be redundant because liaison changes are saved immediately.
+	SaveLiaison();
 
 	NewGameState.AddStateObject(Outpost);
 	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-    `HQPRES.m_kAvengerHUD.UpdateResources();
+	`HQPRES.m_kAvengerHUD.UpdateResources();
 }
 
 // Debug: Show or hide faceless
 function ToggleShowFaceless()
 {
-    if (ShowFaceless)
-    {
-        ShowFaceless = false;
-    }
-    else
-    {
-        ShowFaceless = true;
-    }
+	if (ShowFaceless)
+	{
+		ShowFaceless = false;
+	}
+	else
+	{
+		ShowFaceless = true;
+	}
 
-    RefreshData();
+	RefreshData();
 }
 
 simulated function OnLiaisonClicked(UIButton theButton)
 {
-    local TDialogueBoxData DialogData;
-    local XComGameState_LWOutpost Outpost;
+	local TDialogueBoxData DialogData;
+	local XComGameState_LWOutpost Outpost;
 
-    Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
+	Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
 
-    if (!Outpost.CanLiaisonBeMoved())
-    {
-        DialogData.eType = eDialog_Normal;
-        DialogData.strTitle = m_strCannotChangeLiaisonTitle;
-        DialogData.strText = m_strCannotChangeLiaison;
-        DialogData.strAccept = class'UIDialogueBox'.default.m_strDefaultAcceptLabel;
-        Movie.Pres.UIRaiseDialog(DialogData);
-        return;
-    }
+	if (!Outpost.CanLiaisonBeMoved())
+	{
+		DialogData.eType = eDialog_Normal;
+		DialogData.strTitle = m_strCannotChangeLiaisonTitle;
+		DialogData.strText = m_strCannotChangeLiaison;
+		DialogData.strAccept = class'UIDialogueBox'.default.m_strDefaultAcceptLabel;
+		Movie.Pres.UIRaiseDialog(DialogData);
+		return;
+	}
 
-    if (CachedLiaison.ObjectID != 0)
-    {
-        // Clear the existing liaison
-        CachedLiaison.ObjectID = 0;
-        SetDirty();
-        UpdateLiaison();
-        SaveLiaison();
-    }
-    else
-    {
-        //`HQPRES.UIPersonnel(eUIPersonnel_All, OnPersonnelSelected);
-        LiaisonScreen = Spawn( class'UIPersonnel_Liaison', self );
+	if (CachedLiaison.ObjectID != 0)
+	{
+		// Clear the existing liaison
+		CachedLiaison.ObjectID = 0;
+		SetDirty();
+		UpdateLiaison();
+		SaveLiaison();
+	}
+	else
+	{
+		//`HQPRES.UIPersonnel(eUIPersonnel_All, OnPersonnelSelected);
+		LiaisonScreen = Spawn( class'UIPersonnel_Liaison', self );
 		LiaisonScreen.m_eListType = eUIPersonnel_All;
 		LiaisonScreen.onSelectedDelegate = OnPersonnelSelected;
 		LiaisonScreen.m_bRemoveWhenUnitSelected = true;
-        Movie.Stack.Push(LiaisonScreen);
-    }
+		Movie.Stack.Push(LiaisonScreen);
+	}
 }
 
 simulated function OnPersonnelSelected(StateObjectReference SelectedUnitRef)
 {
-    CachedLiaison = SelectedUnitRef;
-    UpdateLiaison();
-    SaveLiaison();
-    SetDirty();
+	CachedLiaison = SelectedUnitRef;
+	UpdateLiaison();
+	SaveLiaison();
+	SetDirty();
 }
 
 // We need to update the outpost liaison state immediately in order to display the unit
@@ -950,71 +945,70 @@ simulated function OnPersonnelSelected(StateObjectReference SelectedUnitRef)
 // previously the liaison as available.
 simulated function SaveLiaison()
 {
-    local XComGameState_LWOutpost Outpost;
-    local XComGameStateHistory History;
-    local XComGameState NewGameState;
-    local XComGameState_Unit Unit;
-    local XComGameState_HeadquartersXCom XComHQ;
-    local StateObjectReference OldLiaison;
+	local XComGameState_LWOutpost Outpost;
+	local XComGameStateHistory History;
+	local XComGameState NewGameState;
+	local XComGameState_Unit Unit;
+	local XComGameState_HeadquartersXCom XComHQ;
+	local StateObjectReference OldLiaison;
 
-    History = `XCOMHISTORY;
-    Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
+	History = `XCOMHISTORY;
+	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
 
-    // Check for a new liaison
-    OldLiaison = Outpost.GetLiaison();
-    if (OldLiaison.ObjectID != CachedLiaison.ObjectID)
-    {
-        NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Saving Outpost Liaison Changes");
+	// Check for a new liaison
+	OldLiaison = Outpost.GetLiaison();
+	if (OldLiaison.ObjectID != CachedLiaison.ObjectID)
+	{
+		NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Saving Outpost Liaison Changes");
 
-        // Set up the new liaison in the outpost (does not require a new outpost state: it only affects the staff slot)
-        Outpost.SetLiaison(CachedLiaison, NewGameState);
+		// Set up the new liaison in the outpost (does not require a new outpost state: it only affects the staff slot)
+		Outpost.SetLiaison(CachedLiaison, NewGameState);
 
-        // For soldiers we need to set the on-mission status.
-        // Clear the "on mission" status from the old one and add it to the new.
-        if (OldLiaison.ObjectID != 0)
-        {
-            Unit = XComGameState_Unit(NewGameState.ModifyStateObject(class'XComGameState_Unit', OldLiaison.ObjectID));
-            Unit.SetStatus(eStatus_Active);
-            class'Helpers_LW'.static.UpdateUnitWillRecoveryProject(Unit);
-        }
-        
-        if (CachedLiaison.ObjectID != 0)
-        {
-            Unit = XComGameState_Unit(NewGameState.ModifyStateObject(class'XComGameState_Unit', CachedLiaison.ObjectID));
-            class'LWDLCHelpers'.static.SetOnMissionStatus(Unit, NewGameState);
-        }
+		// For soldiers we need to set the on-mission status.
+		// Clear the "on mission" status from the old one and add it to the new.
+		if (OldLiaison.ObjectID != 0)
+		{
+			Unit = XComGameState_Unit(NewGameState.ModifyStateObject(class'XComGameState_Unit', OldLiaison.ObjectID));
+			Unit.SetStatus(eStatus_Active);
+			class'Helpers_LW'.static.UpdateUnitWillRecoveryProject(Unit);
+		}
 
-        // Tell XComHQ that we have a potential staffing change to update any sci/eng jobs.
-        XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
-        `XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-        XComHQ.HandlePowerOrStaffingChange();
-    }
+		if (CachedLiaison.ObjectID != 0)
+		{
+			Unit = XComGameState_Unit(NewGameState.ModifyStateObject(class'XComGameState_Unit', CachedLiaison.ObjectID));
+			class'LWDLCHelpers'.static.SetOnMissionStatus(Unit, NewGameState);
+		}
+
+		// Tell XComHQ that we have a potential staffing change to update any sci/eng jobs.
+		XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
+		`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+		XComHQ.HandlePowerOrStaffingChange();
+	}
 }
 
 simulated function OnPictureTaken(StateObjectReference UnitRef)
 {
-    local Texture2D LiaisonPicture;
-	
-    LiaisonPicture = class'UIUtilities_LW'.static.FinishUnitPicture(UnitRef);
-    if (LiaisonPicture != none)
-    {
-        LiaisonImage.LoadImage(PathName(LiaisonPicture));
-        LiaisonImage.Show();
-    }
+	local Texture2D LiaisonPicture;
+
+	LiaisonPicture = class'UIUtilities_LW'.static.FinishUnitPicture(UnitRef);
+	if (LiaisonPicture != none)
+	{
+		LiaisonImage.LoadImage(PathName(LiaisonPicture));
+		LiaisonImage.Show();
+	}
 }
 
 defaultproperties
 {
-    bConsumeMouseEvents = true;
+	bConsumeMouseEvents = true;
 	InputState    = eInputState_Consume;
 
-    // Main panel positioning. Note X is not defined, it's set to centered
-    // based on the movie width and panel width.
-    panelY = 150;
-    panelW = 961;
-    panelH = 724;
+	// Main panel positioning. Note X is not defined, it's set to centered
+	// based on the movie width and panel width.
+	panelY = 150;
+	panelW = 961;
+	panelH = 724;
 
 	// KDM : See the comments in UIMouseGuard_Custom for more information.
 	MouseGuardClass = class'UIMouseGuard_LW';
 }
-
