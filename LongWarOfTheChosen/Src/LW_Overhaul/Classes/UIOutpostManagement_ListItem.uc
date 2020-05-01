@@ -12,7 +12,8 @@ const ABILITY_ICON_Y=32;
 const ABILITY_ICON_GAP=30;
 
 // KDM : Additional Variables Start
-var config int LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
+var config int LEVEL_ICON_OFFSET_MK, LEVEL_ICON_SIZE_MK, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
+var config int LEVEL_ICON_OFFSET_CTRL, LEVEL_ICON_SIZE_CTRL, LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL;
 
 var bool USE_FANCY_VERSION;
 var int TheFontSize;
@@ -53,7 +54,15 @@ simulated function BuildItem()
 	}
 	else
 	{
-		TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
+		// KDM : The font size for the rebel name and job is larger if viewed on a 3D screen like the Avenger.
+		if (class'Utilities_LW'.static.IsOnStrategyMap())
+		{
+			TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
+		}
+		else
+		{
+			TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK + 4 : LIST_ITEM_FONT_SIZE_MK + 4;
+		}
 	}
 	
 	Width = List.Width;
@@ -164,13 +173,23 @@ simulated function UIOutpostManagement_ListItem InitListItem()
 
 simulated function UpdateStaticData()
 {
-	local int ListItemIndex, RebelLevel, LevelIconSize;
+	local int ListItemIndex, RebelLevel, LevelIconOffset, LevelIconSize;
 	local string strRebelName, strRebelLevel;
 	local XComGameState_Unit Unit;
 	local XComGameStateHistory History;
 
 	ListItemIndex = List.GetItemIndex(self);
-	LevelIconSize = 24;
+	
+	if (`ISCONTROLLERACTIVE)
+	{
+		LevelIconOffset = LEVEL_ICON_OFFSET_CTRL;
+		LevelIconSize = LEVEL_ICON_SIZE_CTRL;
+	}
+	else
+	{
+		LevelIconOffset = LEVEL_ICON_OFFSET_MK;
+		LevelIconSize = LEVEL_ICON_SIZE_MK;
+	}
 
 	History = `XCOMHISTORY;
 
@@ -194,7 +213,7 @@ simulated function UpdateStaticData()
 	RebelLevel = OutpostUI.CachedRebels[ListItemIndex].Level;
 	if (USE_FANCY_VERSION)
 	{
-		strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, 0);
+		strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, LevelIconOffset);
 		if (RebelLevel == 2)
 		{
 			LevelLabel.SetHtmlText(strRebelLevel);
@@ -209,7 +228,7 @@ simulated function UpdateStaticData()
 	{
 		while (RebelLevel > 0)
 		{
-			strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, 0);
+			strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, LevelIconOffset);
 			--RebelLevel;
 		}
 		LevelLabel.SetHtmlText(strRebelLevel);
@@ -339,10 +358,10 @@ simulated function UpdateMugShot(StateObjectReference UnitRef)
 	}
 }
 
-simulated function SetRebelName(String RebelName)
+/*simulated function SetRebelName(String RebelName)
 {
 	NameLabel.SetText(RebelName);
-}
+}*/
 
 simulated function SetJobName(String JobName)
 {
@@ -362,7 +381,7 @@ simulated function SetJobName(String JobName)
 	SpinnerLabel.SetCenteredText(strRebelJob);
 }
 
-simulated function SetLevel(int Level)
+/*simulated function SetLevel(int Level)
 {
 	local String text;
 	while(Level > 0)
@@ -372,7 +391,7 @@ simulated function SetLevel(int Level)
 	}
 
 	LevelLabel.SetHtmlText(text);
-}
+}*/
 
 simulated function AddAbility(X2AbilityTemplate Ability)
 {

@@ -151,7 +151,6 @@ simulated function UpdateData(bool Focused = false)
 		}
 	}
 
-	// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option
 	RegionLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRegion, Focused ? -1 : eUIState_Normal, TheListItemFontSize));
 
 	// KDM : Advent strength and vigilance; dislays liberated status if liberated

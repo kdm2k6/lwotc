@@ -8,12 +8,10 @@ class UIOutpostManagement extends UIScreen
 	config(LW_UI) dependson(XComGameState_LWOutpost);
 
 var config bool USE_FANCY_VERSION;
-//var config int ADVISER_FONT_SIZE, HEADER_FONT_SIZE;
-var config int ADVISOR_FONT_SIZE_MK, ADVISOR_FONT_SIZE_CTRL;
-var config int HEADER_FONT_SIZE_MK, HEADER_FONT_SIZE_CTRL;
+var config int ADVISOR_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
+var config int ADVISOR_FONT_SIZE_CTRL, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
 var int TheAdviserFontSize, TheHeaderFontSize;
-var localized string m_strChangeJob, m_strChangeAllJobs, m_strHavenAdviser, m_strRadioRelay, m_strPerks;
 var int BorderPadding, ItemPadding;
 var float NameHeaderPct, JobHeaderPct, PerksHeaderPct;
 var UIButton PerksHeaderButton;
@@ -21,6 +19,7 @@ var UIButton PerksHeaderButton;
 var name DisplayTag;
 var name CameraTag;
 
+var localized string ChangeJobStr, ChangeAllJobsStr, PerksStr;
 var localized string m_strTitle;
 var localized string m_strLabel;
 var localized string m_strName;
@@ -61,7 +60,6 @@ var StateObjectReference CachedLiaison;
 
 var bool IsDirty;
 
-//var int panelX;
 var int panelY;
 var int panelH;
 var int panelW;
@@ -69,32 +67,10 @@ var int panelW;
 // Debug options
 var bool ShowFaceless;
 
-simulated function bool ShowRadioTowerUpgradeButton()
-{
-	return class'UIUtilities_Strategy'.static.GetXComHQ().IsOutpostResearched() && GetRegion().ResistanceLevel == eResLevel_Contact && !GetRegion().bCanScanForOutpost;
-}
-
-simulated function XComGameState_WorldRegion GetRegion()
-{
-	local XComGameState_WorldRegion Region;
-	local XComGameState_LWOutpost Outpost;
-	local XComGameStateHistory History;
-
-	History = `XCOMHISTORY;
-	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
-	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
-	return Region;
-}
-
-function OnRadioTowerUpgradeClicked(UIButton Button)
-{
-	`HQPRES.UIBuildOutpost(GetRegion());
-}
-
 simulated function InitScreen(XComPlayerController InitController, UIMovie InitMovie, optional name InitName)
 {
 	local bool IntelProhibited, SupplyProhibited, RecruitProhibited;
-	local int AvailableSpace, i, AdviserIconSize, AdviserBorderPadding, ScrollbarPadding;
+	local int AvailableSpace, i, AdviserIconSize, AdviserBorderPadding, TheHeaderButtonHeight, ScrollbarPadding;
 
 	local int NextX, NextY;
 	local XComGameState_LWOutpost Outpost;
@@ -130,15 +106,25 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	AdviserBorderPadding = 4;
 	ScrollbarPadding = 10;
 
-	// KDM TO DO - ALSO DEPENDS on 2D / 3D SCREEN + FANCY MODE
 	if (`ISCONTROLLERACTIVE)
 	{
 		TheAdviserFontSize = ADVISOR_FONT_SIZE_CTRL;
+		TheHeaderButtonHeight = HEADER_BUTTON_HEIGHT_CTRL;
 		TheHeaderFontSize = HEADER_FONT_SIZE_CTRL;
 	}
 	else
 	{
-		TheAdviserFontSize = ADVISOR_FONT_SIZE_MK;
+		// KDM : The font size for the adviser title and adviser name is larger if viewed on a 3D screen like the Avenger.
+		if (class'Utilities_LW'.static.IsOnStrategyMap())
+		{
+			TheAdviserFontSize = ADVISOR_FONT_SIZE_MK;
+		}
+		else
+		{
+			TheAdviserFontSize = ADVISOR_FONT_SIZE_MK + 4;
+		}
+		
+		TheHeaderButtonHeight = HEADER_BUTTON_HEIGHT_MK;
 		TheHeaderFontSize = HEADER_FONT_SIZE_MK;
 	}
 
@@ -252,7 +238,6 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	LiaisonTitle.bAnimateOnInit = false;
 	LiaisonTitle.InitText('', "");
 	LiaisonTitle.SetPosition(BorderPadding + LiaisonButton.Width + 5, NextY);
-	// KDM : IMPORTANT : Originally, SetSubTitle() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
 	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, TheAdviserFontSize));
 
 	// KDM : Haven adviser name
@@ -301,7 +286,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	NameHeaderButton.ResizeToText = false;
 	NameHeaderButton.InitButton(, CAPS(m_strName));
 	NameHeaderButton.SetPosition(0, 0);
-	NameHeaderButton.SetSize(AvailableSpace * NameHeaderPct, 30);
+	NameHeaderButton.SetSize(AvailableSpace * NameHeaderPct, TheHeaderButtonHeight);
 	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	NameHeaderButton.SetWarning(true);
 	// KDM : Since the name column header can't be clicked, remove its hit testing so mouse events don't change its colour
@@ -318,9 +303,9 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		PerksHeaderButton.bIsNavigable = false;
 		PerksHeaderButton.bProcessesMouseEvents = false;
 		PerksHeaderButton.ResizeToText = false;
-		PerksHeaderButton.InitButton(, m_strPerks);
+		PerksHeaderButton.InitButton(, PerksStr);
 		PerksHeaderButton.SetPosition(NextX, 0);
-		PerksHeaderButton.SetSize(AvailableSpace * PerksHeaderPct, 30);
+		PerksHeaderButton.SetSize(AvailableSpace * PerksHeaderPct, TheHeaderButtonHeight);
 		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 		PerksHeaderButton.SetWarning(true);
 		PerksHeaderButton.SetHitTestDisabled(true);
@@ -335,7 +320,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	JobHeaderButton.ResizeToText = false;
 	JobHeaderButton.InitButton(, CAPS(m_strMission), OnJobHeaderButtonClicked);
 	JobHeaderButton.SetPosition(NextX, 0);
-	JobHeaderButton.SetSize(AvailableSpace * JobHeaderPct, 30);
+	JobHeaderButton.SetSize(AvailableSpace * JobHeaderPct, TheHeaderButtonHeight);
 	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	JobHeaderButton.SetWarning(true);
 	JobHeaderButton.ProcessMouseEvents(OnJobHeaderMouseEvent);
@@ -448,6 +433,28 @@ simulated function bool ControllerCanBuildRelay()
 	return false;
 }
 
+simulated function bool ShowRadioTowerUpgradeButton()
+{
+	return class'UIUtilities_Strategy'.static.GetXComHQ().IsOutpostResearched() && GetRegion().ResistanceLevel == eResLevel_Contact && !GetRegion().bCanScanForOutpost;
+}
+
+simulated function XComGameState_WorldRegion GetRegion()
+{
+	local XComGameState_WorldRegion Region;
+	local XComGameState_LWOutpost Outpost;
+	local XComGameStateHistory History;
+
+	History = `XCOMHISTORY;
+	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
+	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
+	return Region;
+}
+
+function OnRadioTowerUpgradeClicked(UIButton Button)
+{
+	`HQPRES.UIBuildOutpost(GetRegion());
+}
+
 function OnJobHeaderButtonClicked(UIButton Button)
 {
 	local int i, j, k;
@@ -516,7 +523,6 @@ simulated function SetOutpost(StateObjectReference Ref)
 
 simulated function RefreshData()
 {
-	//SortData();
 	UpdateLiaison();
 	UpdateList();
 	if (ShowRadioTowerUpgradeButton())
@@ -576,7 +582,6 @@ simulated function UpdateLiaison()
 			Str $= Liaison.GetFullName();
 		}
 
-		// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
 		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, TheAdviserFontSize));
 
 		LiaisonPicture = class'UIUtilities_LW'.static.TakeUnitPicture(CachedLiaison, OnPictureTaken);
@@ -633,10 +638,10 @@ simulated function RefreshNavHelp()
 	if (`ISCONTROLLERACTIVE)
 	{
 		// KDM : D-Pad left/right changes the selected rebels job.
-		NavHelp.AddLeftHelp(m_strChangeJob, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_DPAD_HORIZONTAL);
+		NavHelp.AddLeftHelp(ChangeJobStr, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_DPAD_HORIZONTAL);
 
 		// KDM : Bumper left/right changes all rebel jobs.
-		NavHelp.AddLeftHelp(m_strChangeAllJobs, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RB_R1);
+		NavHelp.AddLeftHelp(ChangeAllJobsStr, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RB_R1);
 
 		// KDM : Right stick click changes the haven's adviser.
 		NavHelp.AddLeftHelp(CAPS(m_strLiaisonTitle), class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
