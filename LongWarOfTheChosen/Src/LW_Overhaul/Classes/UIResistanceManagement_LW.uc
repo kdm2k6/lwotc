@@ -15,17 +15,19 @@ enum EResistanceSortType
 };
 
 // KDM : Additional Variables Start
-var config int HEADER_FONT_SIZE;
+
+var config int HEADER_FONT_SIZE_MK, HEADER_FONT_SIZE_CTRL;
+//var config int HEADER_FONT_SIZE;
 var localized string m_strFlyToHaven, m_strViewHaven;
 
 // KDM : Best to explain by way of an example :
 // Assume a controller user is on the Resistance overview screen and clicks on 'Western Canada'; this will bring up the 
 // Haven screen for 'Western Canada'. Now, when we are done dealing with the haven, and re-enter the Resistance overview screen,
 // we want to make sure 'Western Canada' is still selected for consistency. 
-var int m_SelectedIndexOnFocusLost;
+var int SelectedIndexOnFocusLost;
 
-var int m_BorderPadding, m_ItemPadding;
-var float m_RegionHeaderPct, m_RegionStatusPct, m_RebelCountPct, m_AdviserHeaderPct, m_IncomeHeaderPct; 
+var int BorderPadding, ItemPadding, TheHeaderFontSize;
+var float RegionHeaderPct, RegionStatusPct, RebelCountPct, AdviserHeaderPct, IncomeHeaderPct; 
 // KDM : Additional Variables End
 
 var bool FlipSort;
@@ -122,19 +124,28 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	local int NextY, ScrollbarPadding;
 	local float AvailableHeaderSpace;
 
-	m_SelectedIndexOnFocusLost = INDEX_NONE;
+	SelectedIndexOnFocusLost = INDEX_NONE;
 
-	m_BorderPadding = 15;
-	m_ItemPadding = 10;
+	BorderPadding = 15;
+	ItemPadding = 10;
 
-	m_RegionHeaderPct = 0.25f;
-	m_RegionStatusPct = 0.17f;
-	m_RebelCountPct = 0.28f;
-	m_AdviserHeaderPct = 0.12f;
-	m_IncomeHeaderPct = 0.18f; 
+	RegionHeaderPct = 0.25f;
+	RegionStatusPct = 0.17f;
+	RebelCountPct = 0.28f;
+	AdviserHeaderPct = 0.12f;
+	IncomeHeaderPct = 0.18f; 
 
 	NextY = 0;
 	ScrollbarPadding = 10;
+
+	if (`ISCONTROLLERACTIVE)
+	{
+		TheHeaderFontSize = HEADER_FONT_SIZE_CTRL;
+	}
+	else
+	{
+		TheHeaderFontSize = HEADER_FONT_SIZE_MK;
+	}
 
 	super.InitScreen(InitController, InitMovie, InitName);
 
@@ -184,8 +195,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListTitle.bAnimateOnInit = false;
 	ListTitle.bIsNavigable = false;
 	ListTitle.InitPanelHeader('TitleHeader', m_strTitle, GetResistanceSummaryString());
-	ListTitle.SetPosition(m_BorderPadding, m_BorderPadding);
-	ListTitle.SetHeaderWidth(panelW - m_BorderPadding * 2);
+	ListTitle.SetPosition(BorderPadding, BorderPadding);
+	ListTitle.SetHeaderWidth(panelW - BorderPadding * 2);
 
 	NextY = ListTitle.Y + ListTitle.Height;
 
@@ -195,19 +206,19 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	DividerLine.bIsNavigable = false;
 	DividerLine.LibID = class'UIUtilities_Controls'.const.MC_GenericPixel;
 	DividerLine.InitPanel('DividerLine');
-	DividerLine.SetPosition(m_BorderPadding, NextY);
-	DividerLine.SetWidth(panelW - m_BorderPadding * 2);
+	DividerLine.SetPosition(BorderPadding, NextY);
+	DividerLine.SetWidth(panelW - BorderPadding * 2);
 	DividerLine.SetAlpha(20);
 
-	NextY += m_ItemPadding;
+	NextY += ItemPadding;
 
 	// KDM : Container for column headers : it's invisible
 	HeaderPanel = Spawn(class'UIPanel', MainPanel);
 	HeaderPanel.bAnimateOnInit = false;
 	HeaderPanel.bIsNavigable = false;
 	HeaderPanel.InitPanel('Header');
-	HeaderPanel.SetPosition(m_BorderPadding, NextY);
-	HeaderPanel.SetSize(panelW - m_BorderPadding * 2 - ScrollbarPadding, 32);
+	HeaderPanel.SetPosition(BorderPadding, NextY);
+	HeaderPanel.SetSize(panelW - BorderPadding * 2 - ScrollbarPadding, 32);
 
 	// KDM : Available header space = total header width - 2 pixels between each of the 5 column headers. 
 	AvailableHeaderSpace = HeaderPanel.Width - 4 * 2;
@@ -219,8 +230,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RegionHeaderButton.ResizeToText = false;
 	RegionHeaderButton.InitButton(, m_strRegionLabel);
 	RegionHeaderButton.SetPosition(0, 0);
-	RegionHeaderButton.SetSize(AvailableHeaderSpace * m_RegionHeaderPct, 30);
-	RegionHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	RegionHeaderButton.SetSize(AvailableHeaderSpace * RegionHeaderPct, 30);
+	RegionHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RegionHeaderButton.SetWarning(true);
 	// KDM : Since the region column header can't be clicked, remove its hit testing so mouse events don't change its colour
 	// and make users think the button is active. The same is done for all of the column headers below.
@@ -233,8 +244,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RegionStatusButton.ResizeToText = false;
 	RegionStatusButton.InitButton (, m_strSTrength);
 	RegionStatusButton.SetPosition(RegionHeaderButton.X + RegionHeaderButton.Width + 2, 0);
-	RegionStatusButton.SetSize(AvailableHeaderSpace * m_RegionStatusPct, 30);
-	RegionStatusButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	RegionStatusButton.SetSize(AvailableHeaderSpace * RegionStatusPct, 30);
+	RegionStatusButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RegionStatusButton.SetWarning(true);
 	RegionStatusButton.SetHitTestDisabled(true);
 
@@ -245,8 +256,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RebelCountHeaderButton.ResizeToText = false;
 	RebelCountHeaderButton.InitButton(, m_strRebelCountLabel);
 	RebelCountHeaderButton.SetPosition(RegionStatusButton.X + RegionStatusButton.Width + 2, 0);
-	RebelCountHeaderButton.SetSize(AvailableHeaderSpace * m_RebelCountPct, 30);
-	RebelCountHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	RebelCountHeaderButton.SetSize(AvailableHeaderSpace * RebelCountPct, 30);
+	RebelCountHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RebelCountHeaderButton.SetWarning(true);
 	RebelCountHeaderButton.SetHitTestDisabled(true);
 
@@ -257,8 +268,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	AdviserHeaderButton.ResizeToText = false;
 	AdviserHeaderButton.InitButton(, m_strAdviserLabel);
 	AdviserHeaderButton.SetPosition(RebelCountHeaderButton.X + RebelCountHeaderButton.Width + 2, 0);
-	AdviserHeaderButton.SetSize(AvailableHeaderSpace * m_AdviserHeaderPct, 30);
-	AdviserHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	AdviserHeaderButton.SetSize(AvailableHeaderSpace * AdviserHeaderPct, 30);
+	AdviserHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	AdviserHeaderButton.SetWarning(true);
 	AdviserHeaderButton.SetHitTestDisabled(true);
 
@@ -269,19 +280,19 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	IncomeHeaderButton.ResizeToText = false;
 	IncomeHeaderButton.InitButton(, m_strIncomeLabel);
 	IncomeHeaderButton.SetPosition(AdviserHeaderButton.X + AdviserHeaderButton.Width + 2, 0);
-	IncomeHeaderButton.SetSize(AvailableHeaderSpace * m_IncomeHeaderPct, 30);
-	IncomeHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	IncomeHeaderButton.SetSize(AvailableHeaderSpace * IncomeHeaderPct, 30);
+	IncomeHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	IncomeHeaderButton.SetWarning(true);
 	IncomeHeaderButton.SetHitTestDisabled(true);
 
-	NextY += 30 + m_ItemPadding;
+	NextY += 30 + ItemPadding;
 
 	// KDM : List container which will hold rows of haven information
 	List = Spawn(class'UIList', MainPanel);
 	List.bAnimateOnInit = false;
 	List.bIsNavigable = true;
 	List.bStickyHighlight = false;
-	List.InitList(, m_BorderPadding, NextY, HeaderPanel.Width, panelH - NextY - m_BorderPadding);
+	List.InitList(, BorderPadding, NextY, HeaderPanel.Width, panelH - NextY - BorderPadding);
 	List.OnItemClicked = OnRegionSelectedCallback;
 
 	// LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
@@ -453,7 +464,7 @@ simulated function OnReceiveFocus()
 
 	if (`ISCONTROLLERACTIVE)
 	{
-		if (m_SelectedIndexOnFocusLost == INDEX_NONE)
+		if (SelectedIndexOnFocusLost == INDEX_NONE)
 		{
 			// KDM : We don't know which list item was selected, so select the 1st one.
 			List.SetSelectedIndex(0, true);
@@ -461,7 +472,7 @@ simulated function OnReceiveFocus()
 		else
 		{
 			// KDM : Re-select the list item which was selected when we lost focus.
-			List.SetSelectedIndex(m_SelectedIndexOnFocusLost, true);
+			List.SetSelectedIndex(SelectedIndexOnFocusLost, true);
 		}
 	}
 }
@@ -472,7 +483,7 @@ simulated function OnLoseFocus()
 	// This is described in more detail at the top of the file.
 	if (`ISCONTROLLERACTIVE)
 	{
-		m_SelectedIndexOnFocusLost = List.SelectedIndex;
+		SelectedIndexOnFocusLost = List.SelectedIndex;
 	}
 
 	super.OnLoseFocus();

@@ -15,7 +15,7 @@ const ABILITY_ICON_GAP=30;
 var config int LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
 
 var bool USE_FANCY_VERSION;
-var int m_FontSize;
+var int TheFontSize;
 
 var UIButton ButtonBG;
 var UIText LevelLabel2;
@@ -49,11 +49,11 @@ simulated function BuildItem()
 	// [1] Input method - controller vs. mouse & keyboard [2] UI mode - normal vs. fancy
 	if (`ISCONTROLLERACTIVE)
 	{
-		m_FontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_CTRL : LIST_ITEM_FONT_SIZE_CTRL;
+		TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_CTRL : LIST_ITEM_FONT_SIZE_CTRL;
 	}
 	else
 	{
-		m_FontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
+		TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
 	}
 	
 	Width = List.Width;
@@ -188,7 +188,7 @@ simulated function UpdateStaticData()
 	{
 		strRebelName = Unit.GetFullName();
 	}
-	NameLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRebelName, eUIState_Normal, m_FontSize));
+	NameLabel.SetHTMLText(class'UIUtilities_Text'.static.GetColoredText(strRebelName, eUIState_Normal, TheFontSize));
 
 	// KDM : Rebel level icons
 	RebelLevel = OutpostUI.CachedRebels[ListItemIndex].Level;
@@ -306,7 +306,7 @@ simulated function UpdateDynamicData(bool Focused = false)
 
 	// KDM : Rebel job
 	strRebelJob = class'XComGameState_LWOutpost'.static.GetJobName(OutpostUI.CachedRebels[ListItemIndex].Job);
-	SpinnerLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strRebelJob, Focused ? -1: eUIState_Normal, m_FontSize));
+	SpinnerLabel.SetCenteredText(class'UIUtilities_Text'.static.GetColoredText(strRebelJob, Focused ? -1: eUIState_Normal, TheFontSize));
 }
 
 simulated function SetMugShot(StateObjectReference InRebel)
@@ -352,11 +352,11 @@ simulated function SetJobName(String JobName)
 	// If this rebel is not selected, no background button will be visible, so make his/her job text blue.
 	if (`ISCONTROLLERACTIVE)
 	{
-		strRebelJob = class'UIUtilities_Text'.static.GetColoredText(JobName, bIsFocused ? -1: eUIState_Normal, m_FontSize);
+		strRebelJob = class'UIUtilities_Text'.static.GetColoredText(JobName, bIsFocused ? -1: eUIState_Normal, TheFontSize);
 	}
 	else
 	{
-		strRebelJob = class'UIUtilities_Text'.static.GetColoredText(JobName, eUIState_Normal, m_FontSize);
+		strRebelJob = class'UIUtilities_Text'.static.GetColoredText(JobName, eUIState_Normal, TheFontSize);
 	}
 
 	SpinnerLabel.SetCenteredText(strRebelJob);

@@ -8,12 +8,14 @@ class UIOutpostManagement extends UIScreen
 	config(LW_UI) dependson(XComGameState_LWOutpost);
 
 var config bool USE_FANCY_VERSION;
-var config int ADVISER_FONT_SIZE, HEADER_FONT_SIZE;
+//var config int ADVISER_FONT_SIZE, HEADER_FONT_SIZE;
+var config int ADVISOR_FONT_SIZE_MK, ADVISOR_FONT_SIZE_CTRL;
+var config int HEADER_FONT_SIZE_MK, HEADER_FONT_SIZE_CTRL;
 
+var int TheAdviserFontSize, TheHeaderFontSize;
 var localized string m_strChangeJob, m_strChangeAllJobs, m_strHavenAdviser, m_strRadioRelay, m_strPerks;
-
-var int m_BorderPadding, m_ItemPadding;
-var float m_NameHeaderPct, m_JobHeaderPct, m_PerksHeaderPct;
+var int BorderPadding, ItemPadding;
+var float NameHeaderPct, JobHeaderPct, PerksHeaderPct;
 var UIButton PerksHeaderButton;
 
 var name DisplayTag;
@@ -106,20 +108,20 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	DisplayTag = 'UIDisplay_Council';
 	CameraTag = 'UIDisplayCam_ResistanceScreen';
 
-	m_BorderPadding = 15;
-	m_ItemPadding = 10;
+	BorderPadding = 15;
+	ItemPadding = 10;
 
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
 	if (USE_FANCY_VERSION)
 	{
-		m_NameHeaderPct = 0.45f;
-		m_PerksHeaderPct = 0.25f;
-		m_JobHeaderPct = 0.3f;
+		NameHeaderPct = 0.45f;
+		PerksHeaderPct = 0.25f;
+		JobHeaderPct = 0.3f;
 	}
 	else
 	{
-		m_NameHeaderPct = 0.7f;
-		m_JobHeaderPct = 0.3f;
+		NameHeaderPct = 0.7f;
+		JobHeaderPct = 0.3f;
 	}
 
 	NextX = 0;
@@ -127,6 +129,18 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	AdviserIconSize = 64;
 	AdviserBorderPadding = 4;
 	ScrollbarPadding = 10;
+
+	// KDM TO DO - ALSO DEPENDS on 2D / 3D SCREEN + FANCY MODE
+	if (`ISCONTROLLERACTIVE)
+	{
+		TheAdviserFontSize = ADVISOR_FONT_SIZE_CTRL;
+		TheHeaderFontSize = HEADER_FONT_SIZE_CTRL;
+	}
+	else
+	{
+		TheAdviserFontSize = ADVISOR_FONT_SIZE_MK;
+		TheHeaderFontSize = HEADER_FONT_SIZE_MK;
+	}
 
 	super.InitScreen(InitController, InitMovie, InitName);
 
@@ -168,15 +182,15 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListTitle.bAnimateOnInit = false;
 	ListTitle.bIsNavigable = false;
 	ListTitle.InitPanelHeader('TitleHeader', m_strTitle, Region.GetDisplayName());
-	ListTitle.SetPosition(m_BorderPadding, m_BorderPadding);
-	ListTitle.SetHeaderWidth(panelW - m_BorderPadding * 2);
+	ListTitle.SetPosition(BorderPadding, BorderPadding);
+	ListTitle.SetHeaderWidth(panelW - BorderPadding * 2);
 
 	NextY = ListTitle.Y + ListTitle.Height;
 
 	// KDM : Advent strength in the region
 	RegionalInfo = Spawn(class'UIScrollingText', MainPanel);
 	RegionalInfo.bAnimateOnInit = false;
-	RegionalInfo.InitScrollingText('Outpost_RegionalInfo_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, ListBG.Y + 46.75 + 6);
+	RegionalInfo.InitScrollingText('Outpost_RegionalInfo_LW', "", panelW - BorderPadding * 2, BorderPadding, ListBG.Y + 46.75 + 6);
 	RegionalInfo.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ GetAdventStrengthString(Region) $ "</font></p>");
 	RegionalInfo.SetAlpha(67.1875);
 
@@ -185,7 +199,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	{
 		ResistanceMecs = Spawn(class'UIScrollingText', MainPanel);
 		ResistanceMecs.bAnimateOnInit = false;
-		ResistanceMecs.InitScrollingText('Outpost_ResistanceMecs_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, RegionalInfo.Y + RegionalInfo.Height);
+		ResistanceMecs.InitScrollingText('Outpost_ResistanceMecs_LW', "", panelW - BorderPadding * 2, BorderPadding, RegionalInfo.Y + RegionalInfo.Height);
 		ResistanceMecs.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ GetResistanceMecString(Outpost) $ "</font></p>");
 		ResistanceMecs.SetAlpha(67.1875);
 	}
@@ -211,7 +225,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	{
 		JobDetail = Spawn(class'UIScrollingText', MainPanel);
 		JobDetail.bAnimateOnInit = false;
-		JobDetail.InitScrollingText('OutPost_JobDetail_LW', "", panelW - m_BorderPadding * 2, m_BorderPadding, 
+		JobDetail.InitScrollingText('OutPost_JobDetail_LW', "", panelW - BorderPadding * 2, BorderPadding, 
 			RegionalInfo.Y + RegionalInfo.Height + (OutPost.GetResistanceMecCount() > 0) ? ResistanceMECs.Height : 0.0f);
 		JobDetail.SetHTMLText("<p align=\'RIGHT\'><font size=\'24\' color=\'#fef4cb\'>" $ 
 			GetJobProhibitedString(Outpost, IntelProhibited, SupplyProhibited, RecruitProhibited) $ "</font></p>");
@@ -223,7 +237,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	LiaisonButton.bAnimateOnInit = false;
 	LiaisonButton.bIsNavigable = false;
 	LiaisonButton.InitButton(, , OnLiaisonClicked);
-	LiaisonButton.SetPosition(m_BorderPadding, NextY);
+	LiaisonButton.SetPosition(BorderPadding, NextY);
 	LiaisonButton.SetSize(AdviserIconSize + AdviserBorderPadding * 2, AdviserIconSize + AdviserBorderPadding * 2);
 
 	// KDM : Haven adviser photo
@@ -237,9 +251,9 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	LiaisonTitle = Spawn(class'UIText', MainPanel);
 	LiaisonTitle.bAnimateOnInit = false;
 	LiaisonTitle.InitText('', "");
-	LiaisonTitle.SetPosition(m_BorderPadding + LiaisonButton.Width + 5, NextY);
+	LiaisonTitle.SetPosition(BorderPadding + LiaisonButton.Width + 5, NextY);
 	// KDM : IMPORTANT : Originally, SetSubTitle() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
-	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, ADVISER_FONT_SIZE));
+	LiaisonTitle.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(m_strLiaisonTitle, eUIState_Normal, TheAdviserFontSize));
 
 	// KDM : Haven adviser name
 	LiaisonName = Spawn(class'UIText', MainPanel);
@@ -255,8 +269,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	DividerLine.bIsNavigable = false;
 	DividerLine.LibID = class'UIUtilities_Controls'.const.MC_GenericPixel;
 	DividerLine.InitPanel('DividerLine');
-	DividerLine.SetPosition(m_BorderPadding, NextY);
-	DividerLine.SetWidth(panelW - m_BorderPadding * 2);
+	DividerLine.SetPosition(BorderPadding, NextY);
+	DividerLine.SetWidth(panelW - BorderPadding * 2);
 	DividerLine.SetAlpha(20);
 
 	NextY += DividerLine.Height + 8;
@@ -266,8 +280,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	HeaderPanel.bAnimateOnInit = false;
 	HeaderPanel.bIsNavigable = false;
 	HeaderPanel.InitPanel('Header');
-	HeaderPanel.SetPosition(m_BorderPadding, NextY);
-	HeaderPanel.SetSize(panelW - m_BorderPadding * 2 - ScrollbarPadding, 32);
+	HeaderPanel.SetPosition(BorderPadding, NextY);
+	HeaderPanel.SetSize(panelW - BorderPadding * 2 - ScrollbarPadding, 32);
 
 	// KDM : Available space = total header width - 2 pixels between each column header.
 	// The normal UI has 2 column headers, while the fancy UI has 3 columns headers.
@@ -287,8 +301,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	NameHeaderButton.ResizeToText = false;
 	NameHeaderButton.InitButton(, CAPS(m_strName));
 	NameHeaderButton.SetPosition(0, 0);
-	NameHeaderButton.SetSize(AvailableSpace * m_NameHeaderPct, 30);
-	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	NameHeaderButton.SetSize(AvailableSpace * NameHeaderPct, 30);
+	NameHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	NameHeaderButton.SetWarning(true);
 	// KDM : Since the name column header can't be clicked, remove its hit testing so mouse events don't change its colour
 	// and make users think the button is active. The same is done for the perks column header below.
@@ -306,8 +320,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		PerksHeaderButton.ResizeToText = false;
 		PerksHeaderButton.InitButton(, m_strPerks);
 		PerksHeaderButton.SetPosition(NextX, 0);
-		PerksHeaderButton.SetSize(AvailableSpace * m_PerksHeaderPct, 30);
-		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+		PerksHeaderButton.SetSize(AvailableSpace * PerksHeaderPct, 30);
+		PerksHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 		PerksHeaderButton.SetWarning(true);
 		PerksHeaderButton.SetHitTestDisabled(true);
 
@@ -321,8 +335,8 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	JobHeaderButton.ResizeToText = false;
 	JobHeaderButton.InitButton(, CAPS(m_strMission), OnJobHeaderButtonClicked);
 	JobHeaderButton.SetPosition(NextX, 0);
-	JobHeaderButton.SetSize(AvailableSpace * m_JobHeaderPct, 30);
-	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, HEADER_FONT_SIZE);
+	JobHeaderButton.SetSize(AvailableSpace * JobHeaderPct, 30);
+	JobHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	JobHeaderButton.SetWarning(true);
 	JobHeaderButton.ProcessMouseEvents(OnJobHeaderMouseEvent);
 
@@ -333,7 +347,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	List.bAnimateOnInit = false;
 	List.bIsNavigable = true;
 	List.bStickyHighlight = false;
-	List.InitList(, m_BorderPadding, NextY, HeaderPanel.Width, panelH - NextY - m_BorderPadding);
+	List.InitList(, BorderPadding, NextY, HeaderPanel.Width, panelH - NextY - BorderPadding);
 
 	// KDM : As per Long War 2, radio relays can only be built via the strategy map, not via the Avenger.
 	if (!class'Utilities_LW'.static.IsOnStrategyMap())
@@ -349,7 +363,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		// Therefore, to make things easier, I chose manual positioning rather than positioning through the use of an anchor and origin.
 		RadioTowerUpgradeButton.SetPosition(811, 21);
 		RadioTowerUpgradeButton.SetHeight(30);
-		RadioTowerUpgradeButton.SetFontSize(HEADER_FONT_SIZE);
+		RadioTowerUpgradeButton.SetFontSize(TheHeaderFontSize);
 	}
 
 	// LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
@@ -563,7 +577,7 @@ simulated function UpdateLiaison()
 		}
 
 		// KDM : IMPORTANT : Originally, SetText() was called; however ImportantDiscoveries.txt explains why SetHTMLText() is the better option.
-		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, ADVISER_FONT_SIZE));
+		LiaisonName.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(Str, eUIState_Normal, TheAdviserFontSize));
 
 		LiaisonPicture = class'UIUtilities_LW'.static.TakeUnitPicture(CachedLiaison, OnPictureTaken);
 		if (LiaisonPicture != none)
