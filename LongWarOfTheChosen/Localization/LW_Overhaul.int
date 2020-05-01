@@ -505,8 +505,8 @@ m_strThreatHigh="High"
 m_strThreatVeryHigh="Severe"
 m_strLiberated="Liberated"
 m_strResistanceManagementLevels="<XGParam:IntValue0> (V:<XGParam:IntValue1>)"
-m_strViewHaven="VIEW HAVEN"
-m_strFlyToHaven="FLY TO HAVEN"
+ViewHavenStr="VIEW HAVEN"
+FlyToHavenStr="FLY TO HAVEN"
 
 [UIOutpostManagement]
 m_strTitle="HAVEN MANAGEMENT"

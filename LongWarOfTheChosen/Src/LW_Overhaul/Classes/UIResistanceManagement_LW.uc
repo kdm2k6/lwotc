@@ -14,21 +14,15 @@ enum EResistanceSortType
 	eResistanceSortType_RebelCount,
 };
 
-// KDM : Additional Variables Start
-
-var config int HEADER_FONT_SIZE_MK, HEADER_FONT_SIZE_CTRL;
-//var config int HEADER_FONT_SIZE;
-var localized string m_strFlyToHaven, m_strViewHaven;
+var config int HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
 // KDM : Best to explain by way of an example :
 // Assume a controller user is on the Resistance overview screen and clicks on 'Western Canada'; this will bring up the 
 // Haven screen for 'Western Canada'. Now, when we are done dealing with the haven, and re-enter the Resistance overview screen,
 // we want to make sure 'Western Canada' is still selected for consistency. 
 var int SelectedIndexOnFocusLost;
-
 var int BorderPadding, ItemPadding, TheHeaderFontSize;
 var float RegionHeaderPct, RegionStatusPct, RebelCountPct, AdviserHeaderPct, IncomeHeaderPct; 
-// KDM : Additional Variables End
 
 var bool FlipSort;
 var bool EnableCameraPan;
@@ -43,6 +37,7 @@ var UIBGBox m_ObjectiveHeaderBox;
 var name DisplayTag;
 var name CameraTag;
 
+var localized string FlyToHavenStr, ViewHavenStr;
 var localized string m_strTitle;
 var localized string m_strLabel;
 var localized string m_strRegionlabel;
@@ -72,62 +67,27 @@ var UIPanel MainPanel;
 var UIX2PanelHeader ListTitle;
 var UIPanel DividerLine;
 var UIPanel HeaderPanel;
-var UIButton RegionHeaderButton;
-var UIButton RegionStatusButton, IncomeHeaderButton, AdviserHeaderButton;
-var UIButton RebelCountHeaderButton;
+var UIButton RegionHeaderButton, RegionStatusButton, IncomeHeaderButton, AdviserHeaderButton, RebelCountHeaderButton;
 
 var int m_iMaskWidth;
 var int m_iMaskHeight;
 
-//var int panelX;
 var int panelY;
 var int panelH;
 var int panelW;
 
 var array<StateObjectReference> CachedOutposts;
 
-static function string GetThreatLevelStr(int netvig)
-{
-	if (NetVig < -10)
-	{
-		return default.m_strThreatVeryLow;
-	}
-	else
-	{
-		if (NetVig < 0)
-		{
-			return default.m_strThreatLow;
-		}
-		else
-		{
-			if (NetVig < 10)
-			{
-				return default.m_strThreatMedium;
-			}
-			else
-			{
-				if (NetVig < 20)
-				{
-					return default.m_strThreatHigh;
-				}
-				else
-				{
-					return default.m_strThreatVeryHigh;
-				}
-			}
-		}
-	}
-}
-
 simulated function InitScreen(XComPlayerController InitController, UIMovie InitMovie, optional name InitName)
 {
-	local int NextY, ScrollbarPadding;
+	local int NextY, ScrollbarPadding, TheHeaderButtonHeight;
 	local float AvailableHeaderSpace;
 
 	SelectedIndexOnFocusLost = INDEX_NONE;
 
 	BorderPadding = 15;
 	ItemPadding = 10;
+	ScrollbarPadding = 10;
 
 	RegionHeaderPct = 0.25f;
 	RegionStatusPct = 0.17f;
@@ -136,14 +96,15 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	IncomeHeaderPct = 0.18f; 
 
 	NextY = 0;
-	ScrollbarPadding = 10;
-
+	
 	if (`ISCONTROLLERACTIVE)
 	{
+		TheHeaderButtonHeight = HEADER_BUTTON_HEIGHT_CTRL;
 		TheHeaderFontSize = HEADER_FONT_SIZE_CTRL;
 	}
 	else
 	{
+		TheHeaderButtonHeight = HEADER_BUTTON_HEIGHT_MK;
 		TheHeaderFontSize = HEADER_FONT_SIZE_MK;
 	}
 
@@ -230,7 +191,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RegionHeaderButton.ResizeToText = false;
 	RegionHeaderButton.InitButton(, m_strRegionLabel);
 	RegionHeaderButton.SetPosition(0, 0);
-	RegionHeaderButton.SetSize(AvailableHeaderSpace * RegionHeaderPct, 30);
+	RegionHeaderButton.SetSize(AvailableHeaderSpace * RegionHeaderPct, TheHeaderButtonHeight);
 	RegionHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RegionHeaderButton.SetWarning(true);
 	// KDM : Since the region column header can't be clicked, remove its hit testing so mouse events don't change its colour
@@ -244,7 +205,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RegionStatusButton.ResizeToText = false;
 	RegionStatusButton.InitButton (, m_strSTrength);
 	RegionStatusButton.SetPosition(RegionHeaderButton.X + RegionHeaderButton.Width + 2, 0);
-	RegionStatusButton.SetSize(AvailableHeaderSpace * RegionStatusPct, 30);
+	RegionStatusButton.SetSize(AvailableHeaderSpace * RegionStatusPct, TheHeaderButtonHeight);
 	RegionStatusButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RegionStatusButton.SetWarning(true);
 	RegionStatusButton.SetHitTestDisabled(true);
@@ -256,7 +217,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	RebelCountHeaderButton.ResizeToText = false;
 	RebelCountHeaderButton.InitButton(, m_strRebelCountLabel);
 	RebelCountHeaderButton.SetPosition(RegionStatusButton.X + RegionStatusButton.Width + 2, 0);
-	RebelCountHeaderButton.SetSize(AvailableHeaderSpace * RebelCountPct, 30);
+	RebelCountHeaderButton.SetSize(AvailableHeaderSpace * RebelCountPct, TheHeaderButtonHeight);
 	RebelCountHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	RebelCountHeaderButton.SetWarning(true);
 	RebelCountHeaderButton.SetHitTestDisabled(true);
@@ -268,7 +229,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	AdviserHeaderButton.ResizeToText = false;
 	AdviserHeaderButton.InitButton(, m_strAdviserLabel);
 	AdviserHeaderButton.SetPosition(RebelCountHeaderButton.X + RebelCountHeaderButton.Width + 2, 0);
-	AdviserHeaderButton.SetSize(AvailableHeaderSpace * AdviserHeaderPct, 30);
+	AdviserHeaderButton.SetSize(AvailableHeaderSpace * AdviserHeaderPct, TheHeaderButtonHeight);
 	AdviserHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	AdviserHeaderButton.SetWarning(true);
 	AdviserHeaderButton.SetHitTestDisabled(true);
@@ -280,7 +241,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	IncomeHeaderButton.ResizeToText = false;
 	IncomeHeaderButton.InitButton(, m_strIncomeLabel);
 	IncomeHeaderButton.SetPosition(AdviserHeaderButton.X + AdviserHeaderButton.Width + 2, 0);
-	IncomeHeaderButton.SetSize(AvailableHeaderSpace * IncomeHeaderPct, 30);
+	IncomeHeaderButton.SetSize(AvailableHeaderSpace * IncomeHeaderPct, TheHeaderButtonHeight);
 	IncomeHeaderButton.SetStyle(eUIButtonStyle_NONE, TheHeaderFontSize);
 	IncomeHeaderButton.SetWarning(true);
 	IncomeHeaderButton.SetHitTestDisabled(true);
@@ -341,24 +302,56 @@ simulated function string GetResistanceSummaryString()
 	return m_strGlobalResistanceSummary;
 }
 
+static function string GetThreatLevelStr(int netvig)
+{
+	if (NetVig < -10)
+	{
+		return default.m_strThreatVeryLow;
+	}
+	else
+	{
+		if (NetVig < 0)
+		{
+			return default.m_strThreatLow;
+		}
+		else
+		{
+			if (NetVig < 10)
+			{
+				return default.m_strThreatMedium;
+			}
+			else
+			{
+				if (NetVig < 20)
+				{
+					return default.m_strThreatHigh;
+				}
+				else
+				{
+					return default.m_strThreatVeryHigh;
+				}
+			}
+		}
+	}
+}
+
 // Handle mouse events on the header buttons
 simulated function HeaderMouseEvent(UIPanel Control, int cmd)
 {
-	switch(cmd)
+	switch (cmd)
 	{
-	// De-select the button if we leave or drag-leave the button.
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_DRAG_OUT:
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_RELEASE_OUTSIDE:
-		Control.MC.FunctionVoid("mouseOut");
-		break;
+		// De-select the button if we leave or drag-leave the button.
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_DRAG_OUT:
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_RELEASE_OUTSIDE:
+			Control.MC.FunctionVoid("mouseOut");
+			break;
 	}
 }
 
 simulated function RefreshData()
 {
 	GetData();
-	//SortData();
 	UpdateList();
 }
 
@@ -429,12 +422,12 @@ simulated function RefreshNavHelp()
 	if (`ISCONTROLLERACTIVE)
 	{
 		// KDM : A button opens the Haven screen
-		NavHelp.AddLeftHelp(m_strViewHaven, class'UIUtilities_Input'.static.GetAdvanceButtonIcon());
+		NavHelp.AddLeftHelp(ViewHavenStr, class'UIUtilities_Input'.static.GetAdvanceButtonIcon());
 
 		// KDM : Right stick click sends the Avenger to the selected haven, if on the strategy map.
 		if (class'Utilities_LW'.static.IsOnStrategyMap())
 		{
-			NavHelp.AddLeftHelp(m_strFlyToHaven, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
+			NavHelp.AddLeftHelp(FlyToHavenStr, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
 		}
 	}
 	else
@@ -592,10 +585,10 @@ defaultproperties
 	bAnimateOnInit = false;
 	EnableCameraPan = true;
 	bConsumeMouseEvents = true;
-	InputState    = eInputState_Consume;
+	InputState = eInputState_Consume;
 
-	DisplayTag      = "UIDisplay_Council";
-	CameraTag       = "UIDisplayCam_ResistanceScreen";
+	DisplayTag = "UIDisplay_Council";
+	CameraTag = "UIDisplayCam_ResistanceScreen";
 
 	// Main panel positioning. Note X is not defined, it's set to centered
 	// based on the movie width and panel width.
@@ -603,6 +596,6 @@ defaultproperties
 	panelW = 961;
 	panelH = 781;
 
-	// KDM : See the comments in UIMouseGuard_Custom for more information.
+	// KDM : See the comments in UIMouseGuard_LW for more information.
 	MouseGuardClass = class'UIMouseGuard_LW';
 }

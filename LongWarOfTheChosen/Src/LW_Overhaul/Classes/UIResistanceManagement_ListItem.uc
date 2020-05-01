@@ -7,17 +7,36 @@
 class UIResistanceManagement_ListItem extends UIPanel
 	config(LW_UI);
 
-// KDM : Additional Variables Start
-//var config int LIST_ITEM_FONT_SIZE;
-var config int LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_CTRL;
+var config int LIST_ITEM_FONT_SIZE_MK, ICON_SIZE_MK, ICON_OFFSET_MK, ADVISER_ICON_SIZE_MK, ADVISER_ICON_OFFSET_MK;
+var config int LIST_ITEM_FONT_SIZE_CTRL, ICON_SIZE_CTRL, ICON_OFFSET_CTRL, ADVISER_ICON_SIZE_CTRL, ADVISER_ICON_OFFSET_CTRL;
+
 var int TheListItemFontSize;
-// KDM : Additional Variables End
 
 var StateObjectReference OutpostRef;
 var UIScrollingText RegionLabel;
 var UIText RebelCount, RegionStatusLabel, AdviserLabel, IncomeLabel;
 var UIButton ButtonBG;
 var UIList List;
+
+simulated function UIResistanceManagement_ListItem InitListItem(StateObjectReference Ref)
+{
+	OutpostRef = Ref;
+	
+	if (`ISCONTROLLERACTIVE)
+	{
+		TheListItemFontSize = LIST_ITEM_FONT_SIZE_CTRL;
+	}
+	else
+	{
+		TheListItemFontSize = LIST_ITEM_FONT_SIZE_MK;
+	}
+
+	InitPanel();
+	BuildItem();
+	UpdateData();
+
+	return self;
+}
 
 simulated function BuildItem()
 {
@@ -29,15 +48,6 @@ simulated function BuildItem()
 
 	Width = List.Width;
 	BorderPadding = 10;
-
-	if (`ISCONTROLLERACTIVE)
-	{
-		TheListItemFontSize = LIST_ITEM_FONT_SIZE_CTRL;
-	}
-	else
-	{
-		TheListItemFontSize = LIST_ITEM_FONT_SIZE_MK;
-	}
 
 	// KDM : Background button which highlights when focused. 
 	// The style is now always set to eUIButtonStyle_NONE else hot links, little button icons, will appear when using a controller.
@@ -78,20 +88,9 @@ simulated function BuildItem()
 	IncomeLabel.SetSize(ParentScreen.IncomeHeaderButton.Width - BorderPadding * 2, Height);
 }
 
-simulated function UIResistanceManagement_ListItem InitListItem(StateObjectReference Ref)
-{
-	OutpostRef = Ref;
-	
-	InitPanel();
-	BuildItem();
-	UpdateData();
-
-	return self;
-}
-
 simulated function UpdateData(bool Focused = false)
 {
-	local int IconOffset, IconSize;
+	local int TheAdviserIconSize, TheAdviserIconOffset, TheIconSize, TheIconOffset;
 	local String strRegion, strCount, strStatus, strJobDetail, strAdviser, strMoolah;
 
 	local StateObjectReference LiaisonRef;
@@ -101,8 +100,20 @@ simulated function UpdateData(bool Focused = false)
 	local XComGameState_WorldRegion_LWStrategyAI RegionalAI;
 	local XGParamTag ParamTag;
 
-	IconSize = 32;
-	IconOffset = -15;
+	if (`ISCONTROLLERACTIVE)
+	{
+		TheAdviserIconSize = ADVISER_ICON_SIZE_CTRL;
+		TheAdviserIconOffset = ADVISER_ICON_OFFSET_CTRL;
+		TheIconSize = ICON_SIZE_CTRL;
+		TheIconOffset = ICON_OFFSET_CTRL;
+	}
+	else
+	{
+		TheAdviserIconSize = ADVISER_ICON_SIZE_MK;
+		TheAdviserIconOffset = ADVISER_ICON_OFFSET_MK;
+		TheIconSize = ICON_SIZE_MK;
+		TheIconOffset = ICON_OFFSET_MK;
+	}
 
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 	Outpost = XComGameState_LWOutpost(`XCOMHISTORY.GetGameStateForObjectID(OutpostRef.ObjectID));
@@ -113,13 +124,13 @@ simulated function UpdateData(bool Focused = false)
 	// It also displays icons if it : [1] is the starting region [2] has a relay built [3] has been liberated to some extent.
 	if (Region.IsStartingRegion())
 	{
-		strRegion = class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_ResHQ", IconSize, IconSize, IconOffset);
+		strRegion = class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_ResHQ", TheIconSize, TheIconSize, TheIconOffset);
 	}
 	else
 	{
 		if (Region.ResistanceLevel >= eResLevel_Outpost)
 		{
-			strRegion = class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Outpost", IconSize, IconSize, IconOffset);
+			strRegion = class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Outpost", TheIconSize, TheIconSize, TheIconOffset);
 		}
 		else
 		{
@@ -160,7 +171,7 @@ simulated function UpdateData(bool Focused = false)
 	// KDM : Number of rebels in the haven and number of rebels on : [1] supply [2] intel [3] recruit [4] hiding.
 	strCount = class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetRebelCount()),
 		Focused ? -1 : eUIState_Normal, TheListItemFontSize);
-	strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Resistance", IconSize, IconSize, IconOffset);
+	strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_Resistance", TheIconSize, TheIconSize, TheIconOffset);
 	strCount $= "  ";
 
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
@@ -177,26 +188,26 @@ simulated function UpdateData(bool Focused = false)
 	{
 		strCount $= "  ";
 		strCount $= class'UIUtilities_Text'.static.GetColoredText(string(Outpost.GetResistanceMecCount()), Focused ? -1 : eUIState_Normal, TheListItemFontSize);
-		strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_LW_Overhaul.Resistance_Mec_icon", IconSize, IconSize, IconOffset);
+		strCount $= class'UIUtilities_Text'.static.InjectImage("img:///UILibrary_LW_Overhaul.Resistance_Mec_icon", TheIconSize, TheIconSize, TheIconOffset);
 	}
 
 	RebelCount.SetCenteredText(strCount);
 
 	// KDM : Haven adviser icon, if a haven adviser exists
-	if (OutPost.HasLiaisonOfKind ('Soldier'))
+	if (OutPost.HasLiaisonOfKind('Soldier'))
 	{
 		LiaisonRef = OutPost.GetLiaison();
 		Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(LiaisonRef.ObjectID));
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, IconSize, IconSize, IconOffset);
-		strAdviser $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), IconSize, IconSize, IconOffset);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset);
+		strAdviser $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset);
 	}
-	if (OutPost.HasLiaisonOfKind ('Engineer'))
+	if (OutPost.HasLiaisonOfKind('Engineer'))
 	{
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, IconSize, IconSize, IconOffset + 9);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset + 9);
 	}
-	if (OutPost.HasLiaisonOfKind ('Scientist'))
+	if (OutPost.HasLiaisonOfKind('Scientist'))
 	{
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, IconSize, IconSize, IconOffset + 9);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset + 9);
 	}
 
 	if (strAdviser != "")
