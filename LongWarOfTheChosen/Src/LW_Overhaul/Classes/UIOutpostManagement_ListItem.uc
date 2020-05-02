@@ -11,6 +11,7 @@ const ABILITY_ICON_X=148;
 const ABILITY_ICON_Y=32;
 const ABILITY_ICON_GAP=30;
 
+var config bool FONT_SIZE_2D_3D_SAME_MK;
 var config int LEVEL_ICON_OFFSET_MK, LEVEL_ICON_SIZE_MK, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
 var config int LEVEL_ICON_OFFSET_CTRL, LEVEL_ICON_SIZE_CTRL, LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL;
 
@@ -53,13 +54,21 @@ simulated function BuildItem()
 	else
 	{
 		// KDM : The font size for the rebel name and job is larger if viewed on a 3D screen like the Avenger.
+		// This is ignored, however, if FONT_SIZE_2D_3D_SAME_MK is true.
 		if (class'Utilities_LW'.static.IsOnStrategyMap())
 		{
 			TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_MK;
 		}
 		else
 		{
-			TheFontSize = (USE_FANCY_VERSION) ? LIST_ITEM_FONT_SIZE_FANCY_MK + 4 : LIST_ITEM_FONT_SIZE_MK + 4;
+			if (USE_FANCY_VERSION)
+			{
+				TheFontSize = (FONT_SIZE_2D_3D_SAME_MK) ? LIST_ITEM_FONT_SIZE_FANCY_MK : LIST_ITEM_FONT_SIZE_FANCY_MK + 4;
+			}
+			else
+			{
+				TheFontSize = (FONT_SIZE_2D_3D_SAME_MK) ? LIST_ITEM_FONT_SIZE_MK : LIST_ITEM_FONT_SIZE_MK + 4;
+			}
 		}
 	}
 	

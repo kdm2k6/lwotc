@@ -14,6 +14,7 @@ enum EResistanceSortType
 	eResistanceSortType_RebelCount,
 };
 
+var config bool USE_LARGE_VERSION;
 var config int HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
 var config int HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
@@ -112,11 +113,22 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 
 	super.InitScreen(InitController, InitMovie, InitName);
 
-	// KDM : The Resistance overview screen is centered horizontally and vertically when viewed via the strategy map.
-	// When viewed via the Avenger; however, its vertical position must be set manually in order to fit a fancy 3D background.
 	panelW = 1150;
-	panelH = 830;
-	if (class'Utilities_LW'.static.IsOnStrategyMap())
+
+	// KDM : We need to make the Resistance management screen taller if it is to show all havens without scrollbars.
+	if (USE_LARGE_VERSION)
+	{
+		panelH = 1000;
+	}
+	else
+	{
+		panelH = 830;
+	}
+
+	// KDM : The Resistance overview screen is centered horizontally and vertically when viewed via the strategy map.
+	// Normally, when viewed via the Avenger, its vertical position is set manually in order to fit a fancy 3D background; however,
+	// if we are going to use the large version, we will center it vertically since it won't really fit the fancy 3D background anyways.
+	if (class'Utilities_LW'.static.IsOnStrategyMap() || USE_LARGE_VERSION)
 	{
 		panelY = (Movie.UI_RES_Y / 2) - (panelH / 2);
 	}
@@ -152,7 +164,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListBG.bAnimateOnInit = false;
 	ListBG.LibID = class'UIUtilities_Controls'.const.MC_X2Background;
 	ListBG.InitBG('ListBG', 0, 0, panelW, panelH);
-
+	
 	// KDM : Header (includes title, resistance summary sub-title, and background image) 
 	ListTitle = Spawn(class'UIX2PanelHeader', MainPanel);
 	ListTitle.bAnimateOnInit = false;
@@ -160,7 +172,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListTitle.InitPanelHeader('TitleHeader', m_strTitle, GetResistanceSummaryString());
 	ListTitle.SetPosition(BorderPadding, BorderPadding);
 	ListTitle.SetHeaderWidth(panelW - BorderPadding * 2);
-
+	
 	NextY = ListTitle.Y + ListTitle.Height;
 
 	// KDM : Thin dividing line

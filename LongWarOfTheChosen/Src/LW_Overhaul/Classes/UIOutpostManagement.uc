@@ -7,7 +7,7 @@
 class UIOutpostManagement extends UIScreen
 	config(LW_UI) dependson(XComGameState_LWOutpost);
 
-var config bool USE_FANCY_VERSION;
+var config bool FONT_SIZE_2D_3D_SAME_MK, USE_FANCY_VERSION;
 var config int ADVISOR_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
 var config int ADVISOR_FONT_SIZE_CTRL, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
@@ -113,13 +113,14 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	else
 	{
 		// KDM : The font size for the adviser title and adviser name is larger if viewed on a 3D screen like the Avenger.
+		// This is ignored, however, if FONT_SIZE_2D_3D_SAME_MK is true.
 		if (class'Utilities_LW'.static.IsOnStrategyMap())
 		{
 			TheAdviserFontSize = ADVISOR_FONT_SIZE_MK;
 		}
 		else
 		{
-			TheAdviserFontSize = ADVISOR_FONT_SIZE_MK + 4;
+			TheAdviserFontSize = (FONT_SIZE_2D_3D_SAME_MK) ? ADVISOR_FONT_SIZE_MK : ADVISOR_FONT_SIZE_MK + 4;
 		}
 		
 		TheHeaderButtonHeight = HEADER_BUTTON_HEIGHT_MK;
@@ -160,7 +161,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	ListBG.bAnimateOnInit = false;
 	ListBG.LibID = class'UIUtilities_Controls'.const.MC_X2Background;
 	ListBG.InitBG('ListBG', 0, 0, panelW, panelH);
-
+	
 	// KDM : Header (includes title, and region sub-title) 
 	ListTitle = Spawn(class'UIX2PanelHeader', MainPanel);
 	ListTitle.bAnimateOnInit = false;
