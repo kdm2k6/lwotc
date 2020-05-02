@@ -18,16 +18,14 @@ var config int LEVEL_ICON_OFFSET_CTRL, LEVEL_ICON_SIZE_CTRL, LIST_ITEM_FONT_SIZE
 var bool USE_FANCY_VERSION;
 var int TheFontSize;
 
-var UIButton ButtonBG;
-var UIText LevelLabel2;
-
 var StateObjectReference OutpostRef;
 var StateObjectReference RebelRef;
 var int Index;
 
+var UIButton ButtonBG;
 var UIImage MugShot;
 var UIText NameLabel;
-var UIText LevelLabel;
+var UIText LevelLabel, LevelLabel2;
 var UIList List;
 var array<UIIcon> AbilityIcons;
 var UIOutpostManagement OutpostUI;
@@ -365,11 +363,6 @@ simulated function UpdateMugShot(StateObjectReference UnitRef)
 	}
 }
 
-/*simulated function SetRebelName(String RebelName)
-{
-	NameLabel.SetText(RebelName);
-}*/
-
 simulated function SetJobName(String JobName)
 {
 	local string strRebelJob;
@@ -388,19 +381,7 @@ simulated function SetJobName(String JobName)
 	SpinnerLabel.SetCenteredText(strRebelJob);
 }
 
-/*simulated function SetLevel(int Level)
-{
-	local String text;
-	while(Level > 0)
-	{
-		text = text $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, 20, 20, 0);
-		--Level;
-	}
-
-	LevelLabel.SetHtmlText(text);
-}*/
-
-simulated function AddAbility(X2AbilityTemplate Ability)
+/*simulated function AddAbility(X2AbilityTemplate Ability)
 {
 	local UIIcon Icon;
 
@@ -411,7 +392,7 @@ simulated function AddAbility(X2AbilityTemplate Ability)
 	Icon.SetPosition(ABILITY_ICON_X + ABILITY_ICON_GAP * AbilityIcons.Length, ABILITY_ICON_Y);
 	AbilityIcons.AddItem(Icon);
 	Icon.SetTooltipText(Ability.LocHelpText, Ability.LocFriendlyName,,,true, class'UIUtilities'.const.ANCHOR_BOTTOM_LEFT, false, 0.5);
-}
+}*/
 
 simulated function OnClick(UIImage Btn)
 {

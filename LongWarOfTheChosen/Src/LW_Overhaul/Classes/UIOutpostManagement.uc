@@ -11,10 +11,6 @@ var config bool FONT_SIZE_2D_3D_SAME_MK, USE_FANCY_VERSION;
 var config int ADVISOR_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
 var config int ADVISOR_FONT_SIZE_CTRL, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
-var int TheAdviserFontSize;
-var float NameHeaderPct, JobHeaderPct, PerksHeaderPct;
-var UIButton PerksHeaderButton;
-
 var name DisplayTag;
 var name CameraTag;
 
@@ -41,6 +37,7 @@ var UIPanel DividerLine;
 var UIPanel HeaderPanel;
 var UIButton NameHeaderButton;
 var UIButton JobHeaderButton;
+var UIButton PerksHeaderButton;
 var UIText LiaisonTitle;
 var UIButton LiaisonButton;
 var UIImage LiaisonImage;
@@ -63,6 +60,9 @@ var int panelY;
 var int panelH;
 var int panelW;
 
+var int TheAdviserFontSize;
+var float NameHeaderPct, JobHeaderPct, PerksHeaderPct;
+
 // Debug options
 var bool ShowFaceless;
 
@@ -80,8 +80,6 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
 	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
 
-	BorderPadding = 15;
-	
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
 	if (USE_FANCY_VERSION)
 	{
@@ -97,8 +95,10 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 
 	NextX = 0;
 	NextY = 0;
-	AdviserIconSize = 64;
+	
 	AdviserBorderPadding = 4;
+	AdviserIconSize = 64;
+	BorderPadding = 15;
 	ScrollbarPadding = 10;
 
 	if (`ISCONTROLLERACTIVE)
@@ -334,7 +334,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 		// Therefore, to make things easier, I chose manual positioning rather than positioning through the use of an anchor and origin.
 		RadioTowerUpgradeButton.SetPosition(811, 21);
 		RadioTowerUpgradeButton.SetHeight(30);
-		RadioTowerUpgradeButton.SetFontSize(TheHeaderFontSize);
+		RadioTowerUpgradeButton.SetFontSize(24);
 	}
 
 	// LWS : Redirect all background mouse events to the list so mouse wheel scrolling doesn't get lost when the mouse is positioned between list items.
@@ -591,7 +591,7 @@ simulated function UpdateList()
 	}
 }
 
-simulated function AddAbilities(XComGameState_Unit Unit, UIOutpostManagement_ListItem ListItem)
+/*simulated function AddAbilities(XComGameState_Unit Unit, UIOutpostManagement_ListItem ListItem)
 {
 	local array<SoldierClassAbilityType> Abilities;
 	local X2AbilityTemplate AbilityTemplate;
@@ -609,7 +609,7 @@ simulated function AddAbilities(XComGameState_Unit Unit, UIOutpostManagement_Lis
 			ListItem.AddAbility(AbilityTemplate);
 		}
 	}
-}
+}*/
 
 simulated function RefreshNavHelp()
 {
