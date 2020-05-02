@@ -591,26 +591,6 @@ simulated function UpdateList()
 	}
 }
 
-/*simulated function AddAbilities(XComGameState_Unit Unit, UIOutpostManagement_ListItem ListItem)
-{
-	local array<SoldierClassAbilityType> Abilities;
-	local X2AbilityTemplate AbilityTemplate;
-	local X2AbilityTemplateManager AbilityTemplateManager;
-	local int i;
-
-	Abilities = Unit.GetEarnedSoldierAbilities();
-	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
-	
-	for (i = 0; i < Abilities.Length; ++i)
-	{
-		AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(Abilities[i].AbilityName);
-		if (!AbilityTemplate.bDontDisplayInAbilitySummary)
-		{
-			ListItem.AddAbility(AbilityTemplate);
-		}
-	}
-}*/
-
 simulated function RefreshNavHelp()
 {
 	local UINavigationHelp NavHelp;

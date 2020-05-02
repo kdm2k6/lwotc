@@ -29,7 +29,7 @@ simulated function UIResistanceManagement_ListItem InitListItem(StateObjectRefer
 
 simulated function BuildItem()
 {
-	local int BorderPadding;
+	local int AdviserIconOffset, BorderPadding;
 	local UIResistanceManagement_LW ParentScreen;
 
 	ParentScreen = UIResistanceManagement_LW(Screen);
@@ -65,9 +65,18 @@ simulated function BuildItem()
 	RebelCount.SetSize(ParentScreen.RebelCountHeaderButton.Width - BorderPadding * 2, Height);
 
 	// KDM : Haven adviser
+	if (`ISCONTROLLERACTIVE)
+	{
+		AdviserIconOffset = ADVISER_ICON_OFFSET_CTRL;
+	}
+	else
+	{
+		AdviserIconOffset = ADVISER_ICON_OFFSET_MK;
+	}
+
 	AdviserLabel = Spawn(class'UIText', self);
 	AdviserLabel.InitText(, , true);
-	AdviserLabel.SetPosition(ParentScreen.AdviserHeaderButton.X + BorderPadding, 7);
+	AdviserLabel.SetPosition(ParentScreen.AdviserHeaderButton.X + BorderPadding, 7 - AdviserIconOffset);
 	AdviserLabel.SetSize(ParentScreen.AdviserHeaderButton.Width - BorderPadding * 2, Height);
 
 	// KDM : Haven income
@@ -79,7 +88,7 @@ simulated function BuildItem()
 
 simulated function UpdateData(bool Focused = false)
 {
-	local int TheAdviserIconOffset, TheAdviserIconSize, TheIconOffset, TheIconSize, TheListItemFontSize;
+	local int TheAdviserIconSize, TheIconOffset, TheIconSize, TheListItemFontSize;
 	local String strRegion, strCount, strStatus, strJobDetail, strAdviser, strMoolah;
 
 	local StateObjectReference LiaisonRef;
@@ -91,7 +100,6 @@ simulated function UpdateData(bool Focused = false)
 
 	if (`ISCONTROLLERACTIVE)
 	{
-		TheAdviserIconOffset = ADVISER_ICON_OFFSET_CTRL;
 		TheAdviserIconSize = ADVISER_ICON_SIZE_CTRL;
 		TheIconOffset = ICON_OFFSET_CTRL;
 		TheIconSize = ICON_SIZE_CTRL;
@@ -99,7 +107,6 @@ simulated function UpdateData(bool Focused = false)
 	}
 	else
 	{
-		TheAdviserIconOffset = ADVISER_ICON_OFFSET_MK;
 		TheAdviserIconSize = ADVISER_ICON_SIZE_MK;
 		TheIconOffset = ICON_OFFSET_MK;
 		TheIconSize = ICON_SIZE_MK;
@@ -188,16 +195,16 @@ simulated function UpdateData(bool Focused = false)
 	{
 		LiaisonRef = OutPost.GetLiaison();
 		Liaison = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(LiaisonRef.ObjectID));
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset);
-		strAdviser $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(Liaison.GetSoldierClassTemplate().IconImage, TheAdviserIconSize, TheAdviserIconSize, 0);
+		strAdviser $= class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.static.GetRankIcon(Liaison.GetRank(), Liaison.GetSoldierClassTemplateName()), TheAdviserIconSize, TheAdviserIconSize, 0);
 	}
 	if (OutPost.HasLiaisonOfKind('Engineer'))
 	{
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset + 9);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Engineer, TheAdviserIconSize, TheAdviserIconSize, 9);
 	}
 	if (OutPost.HasLiaisonOfKind('Scientist'))
 	{
-		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, TheAdviserIconSize, TheAdviserIconSize, TheAdviserIconOffset + 9);
+		strAdviser = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.EventQueue_Science, TheAdviserIconSize, TheAdviserIconSize, 9);
 	}
 
 	if (strAdviser != "")

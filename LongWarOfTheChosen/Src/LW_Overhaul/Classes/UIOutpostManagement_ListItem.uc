@@ -37,7 +37,7 @@ var UIText SpinnerLabel;
 
 simulated function BuildItem()
 {
-	local int ArrowSize, BorderPadding, MugShotSize, RebelLevel;
+	local int ArrowSize, BorderPadding, LevelIconOffset, MugShotSize, RebelLevel;
 
 	List = UIList(GetParent(class'UIList'));
 	OutpostUI = UIOutpostManagement(Screen);
@@ -110,25 +110,34 @@ simulated function BuildItem()
 	LevelLabel = Spawn(class'UIText', self);
 	LevelLabel.InitText();
 
+	if (`ISCONTROLLERACTIVE)
+	{
+		LevelIconOffset = LEVEL_ICON_OFFSET_CTRL;
+	}
+	else
+	{
+		LevelIconOffset = LEVEL_ICON_OFFSET_MK;
+	}
+
 	if (USE_FANCY_VERSION)
 	{
 		// KDM : When using the fancy UI, rank 2 rebels have their level icons placed on top of each other.
 		if (RebelLevel == 2)
 		{
-			LevelLabel.SetPosition(MugShot.X + MugShotSize -3, 11);
+			LevelLabel.SetPosition(MugShot.X + MugShotSize - 1, 11 - LevelIconOffset);
 
 			LevelLabel2 = Spawn(class'UIText', self);
 			LevelLabel2.InitText();
-			LevelLabel2.SetPosition(MugShot.X + MugShotSize - 3, 35);
+			LevelLabel2.SetPosition(MugShot.X + MugShotSize - 1, 35 - LevelIconOffset);
 		}
 		else
 		{
-			LevelLabel.SetPosition(MugShot.X + MugShotSize -3, 21);
+			LevelLabel.SetPosition(MugShot.X + MugShotSize - 1, 21 - LevelIconOffset);
 		}
 	}
 	else
 	{
-		LevelLabel.SetPosition(MugShot.X + MugShotSize + 6, 36);
+		LevelLabel.SetPosition(MugShot.X + MugShotSize + 6, 36 - LevelIconOffset);
 	}
 
 	// KDM : Arrows are only displayed when using a mouse & keyboard; controllers use the D-Pad instead.
@@ -178,7 +187,7 @@ simulated function UIOutpostManagement_ListItem InitListItem()
 
 simulated function UpdateStaticData()
 {
-	local int ListItemIndex, RebelLevel, LevelIconOffset, LevelIconSize;
+	local int ListItemIndex, RebelLevel, LevelIconSize;
 	local string strRebelName, strRebelLevel;
 	local XComGameState_Unit Unit;
 	local XComGameStateHistory History;
@@ -187,12 +196,10 @@ simulated function UpdateStaticData()
 	
 	if (`ISCONTROLLERACTIVE)
 	{
-		LevelIconOffset = LEVEL_ICON_OFFSET_CTRL;
 		LevelIconSize = LEVEL_ICON_SIZE_CTRL;
 	}
 	else
 	{
-		LevelIconOffset = LEVEL_ICON_OFFSET_MK;
 		LevelIconSize = LEVEL_ICON_SIZE_MK;
 	}
 
@@ -218,7 +225,7 @@ simulated function UpdateStaticData()
 	RebelLevel = OutpostUI.CachedRebels[ListItemIndex].Level;
 	if (USE_FANCY_VERSION)
 	{
-		strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, LevelIconOffset);
+		strRebelLevel = class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, 0);
 		if (RebelLevel == 2)
 		{
 			LevelLabel.SetHtmlText(strRebelLevel);
@@ -233,7 +240,7 @@ simulated function UpdateStaticData()
 	{
 		while (RebelLevel > 0)
 		{
-			strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, LevelIconOffset);
+			strRebelLevel = strRebelLevel $ class'UIUtilities_Text'.static.InjectImage(class'UIUtilities_Image'.const.HTML_ObjectiveIcon, LevelIconSize, LevelIconSize, 0);
 			--RebelLevel;
 		}
 		LevelLabel.SetHtmlText(strRebelLevel);
@@ -380,19 +387,6 @@ simulated function SetJobName(String JobName)
 
 	SpinnerLabel.SetCenteredText(strRebelJob);
 }
-
-/*simulated function AddAbility(X2AbilityTemplate Ability)
-{
-	local UIIcon Icon;
-
-	Icon = Spawn(class'UIIcon', self).InitIcon(,Ability.IconImage, true, true, 24);
-	Icon.SetSize(24, 24);
-	Icon.bDisableSelectionBrackets = true;
-	Icon.bShouldPlayGenericUIAudioEvents = false;
-	Icon.SetPosition(ABILITY_ICON_X + ABILITY_ICON_GAP * AbilityIcons.Length, ABILITY_ICON_Y);
-	AbilityIcons.AddItem(Icon);
-	Icon.SetTooltipText(Ability.LocHelpText, Ability.LocFriendlyName,,,true, class'UIUtilities'.const.ANCHOR_BOTTOM_LEFT, false, 0.5);
-}*/
 
 simulated function OnClick(UIImage Btn)
 {
