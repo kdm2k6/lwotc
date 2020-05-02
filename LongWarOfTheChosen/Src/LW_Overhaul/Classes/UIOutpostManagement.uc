@@ -80,9 +80,6 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
 	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
 
-	/*DisplayTag = 'UIDisplay_Council';
-	CameraTag = 'UIDisplayCam_ResistanceScreen';*/
-
 	BorderPadding = 15;
 	
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
@@ -141,13 +138,6 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	{
 		panelY = 80;
 	}
-
-	// KDM : On the Avenger, both the Resistance overview screen and, this, Haven screen are placed within a 3D movie;
-	// consequently, a 3D camera needs to be specified.
-	/*if (!class'Utilities_LW'.static.IsOnStrategyMap())
-	{
-		class'UIUtilities'.static.DisplayUI3D(DisplayTag, CameraTag, 0, true);
-	}*/
 
 	// KDM : Container which will hold our UI components : it's invisible
 	MainPanel = Spawn(class 'UIPanel', self);
@@ -334,10 +324,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	List.InitList(, BorderPadding, NextY, HeaderPanel.Width, panelH - NextY - BorderPadding);
 
 	// KDM : As per Long War 2, radio relays can only be built via the strategy map, not via the Avenger.
-	if (!class'Utilities_LW'.static.IsOnStrategyMap())
-	{
-	}
-	else
+	if (class'Utilities_LW'.static.IsOnStrategyMap())
 	{
 		RadioTowerUpgradeButton = Spawn(class'UIButton', MainPanel);
 		RadioTowerUpgradeButton.bAnimateOnInit = false;

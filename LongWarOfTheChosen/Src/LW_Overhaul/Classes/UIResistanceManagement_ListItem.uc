@@ -242,7 +242,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 
 	switch (cmd)
 	{
-		// KDM : A button opens the corresponding Haven screen.
+		// KDM : A button opens the corresponding haven screen.
 		case class'UIUtilities_Input'.const.FXS_BUTTON_A:
 		case class'UIUtilities_Input'.const.FXS_KEY_ENTER:
 		case class'UIUtilities_Input'.const.FXS_KEY_SPACEBAR:
