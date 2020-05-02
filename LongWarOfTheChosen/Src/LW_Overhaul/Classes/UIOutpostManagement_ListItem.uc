@@ -11,7 +11,6 @@ const ABILITY_ICON_X=148;
 const ABILITY_ICON_Y=32;
 const ABILITY_ICON_GAP=30;
 
-// KDM : Additional Variables Start
 var config int LEVEL_ICON_OFFSET_MK, LEVEL_ICON_SIZE_MK, LIST_ITEM_FONT_SIZE_MK, LIST_ITEM_FONT_SIZE_FANCY_MK;
 var config int LEVEL_ICON_OFFSET_CTRL, LEVEL_ICON_SIZE_CTRL, LIST_ITEM_FONT_SIZE_CTRL, LIST_ITEM_FONT_SIZE_FANCY_CTRL;
 
@@ -20,7 +19,6 @@ var int TheFontSize;
 
 var UIButton ButtonBG;
 var UIText LevelLabel2;
-// KDM : Additional Variables End
 
 var StateObjectReference OutpostRef;
 var StateObjectReference RebelRef;

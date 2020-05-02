@@ -7,10 +7,8 @@
 class UIResistanceManagement_ListItem extends UIPanel
 	config(LW_UI);
 
-var config int LIST_ITEM_FONT_SIZE_MK, ICON_SIZE_MK, ICON_OFFSET_MK, ADVISER_ICON_SIZE_MK, ADVISER_ICON_OFFSET_MK;
-var config int LIST_ITEM_FONT_SIZE_CTRL, ICON_SIZE_CTRL, ICON_OFFSET_CTRL, ADVISER_ICON_SIZE_CTRL, ADVISER_ICON_OFFSET_CTRL;
-
-var int TheListItemFontSize;
+var config int LIST_ITEM_FONT_SIZE_MK, ADVISER_ICON_OFFSET_MK, ADVISER_ICON_SIZE_MK, ICON_OFFSET_MK, ICON_SIZE_MK;
+var config int LIST_ITEM_FONT_SIZE_CTRL, ADVISER_ICON_OFFSET_CTRL, ADVISER_ICON_SIZE_CTRL, ICON_OFFSET_CTRL, ICON_SIZE_CTRL;
 
 var StateObjectReference OutpostRef;
 var UIScrollingText RegionLabel;
@@ -21,15 +19,6 @@ var UIList List;
 simulated function UIResistanceManagement_ListItem InitListItem(StateObjectReference Ref)
 {
 	OutpostRef = Ref;
-	
-	if (`ISCONTROLLERACTIVE)
-	{
-		TheListItemFontSize = LIST_ITEM_FONT_SIZE_CTRL;
-	}
-	else
-	{
-		TheListItemFontSize = LIST_ITEM_FONT_SIZE_MK;
-	}
 
 	InitPanel();
 	BuildItem();
@@ -90,7 +79,7 @@ simulated function BuildItem()
 
 simulated function UpdateData(bool Focused = false)
 {
-	local int TheAdviserIconSize, TheAdviserIconOffset, TheIconSize, TheIconOffset;
+	local int TheAdviserIconOffset, TheAdviserIconSize, TheIconOffset, TheIconSize, TheListItemFontSize;
 	local String strRegion, strCount, strStatus, strJobDetail, strAdviser, strMoolah;
 
 	local StateObjectReference LiaisonRef;
@@ -102,17 +91,19 @@ simulated function UpdateData(bool Focused = false)
 
 	if (`ISCONTROLLERACTIVE)
 	{
-		TheAdviserIconSize = ADVISER_ICON_SIZE_CTRL;
 		TheAdviserIconOffset = ADVISER_ICON_OFFSET_CTRL;
-		TheIconSize = ICON_SIZE_CTRL;
+		TheAdviserIconSize = ADVISER_ICON_SIZE_CTRL;
 		TheIconOffset = ICON_OFFSET_CTRL;
+		TheIconSize = ICON_SIZE_CTRL;
+		TheListItemFontSize = LIST_ITEM_FONT_SIZE_CTRL;
 	}
 	else
 	{
-		TheAdviserIconSize = ADVISER_ICON_SIZE_MK;
 		TheAdviserIconOffset = ADVISER_ICON_OFFSET_MK;
-		TheIconSize = ICON_SIZE_MK;
+		TheAdviserIconSize = ADVISER_ICON_SIZE_MK;
 		TheIconOffset = ICON_OFFSET_MK;
+		TheIconSize = ICON_SIZE_MK;
+		TheListItemFontSize = LIST_ITEM_FONT_SIZE_MK;
 	}
 
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));

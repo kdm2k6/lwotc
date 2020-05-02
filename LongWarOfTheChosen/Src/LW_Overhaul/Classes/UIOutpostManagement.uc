@@ -11,8 +11,7 @@ var config bool USE_FANCY_VERSION;
 var config int ADVISOR_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
 var config int ADVISOR_FONT_SIZE_CTRL, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
-var int TheAdviserFontSize, TheHeaderFontSize;
-var int BorderPadding, ItemPadding;
+var int TheAdviserFontSize;
 var float NameHeaderPct, JobHeaderPct, PerksHeaderPct;
 var UIButton PerksHeaderButton;
 
@@ -70,7 +69,7 @@ var bool ShowFaceless;
 simulated function InitScreen(XComPlayerController InitController, UIMovie InitMovie, optional name InitName)
 {
 	local bool IntelProhibited, SupplyProhibited, RecruitProhibited;
-	local int AvailableSpace, i, AdviserIconSize, AdviserBorderPadding, TheHeaderButtonHeight, ScrollbarPadding;
+	local int AdviserBorderPadding, AdviserIconSize, AvailableSpace, BorderPadding, i, TheHeaderButtonHeight, TheHeaderFontSize, ScrollbarPadding;
 
 	local int NextX, NextY;
 	local XComGameState_LWOutpost Outpost;
@@ -81,12 +80,11 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	Outpost = XComGameState_LWOutpost(History.GetGameStateForObjectID(OutpostRef.ObjectID));
 	Region = XComGameState_WorldRegion(History.GetGameStateForObjectID(Outpost.Region.ObjectID));
 
-	DisplayTag = 'UIDisplay_Council';
-	CameraTag = 'UIDisplayCam_ResistanceScreen';
+	/*DisplayTag = 'UIDisplay_Council';
+	CameraTag = 'UIDisplayCam_ResistanceScreen';*/
 
 	BorderPadding = 15;
-	ItemPadding = 10;
-
+	
 	// KDM : The normal UI has 2 columns : rebel name, and rebel job; the fancy UI has a rebel perks column in the middle.
 	if (USE_FANCY_VERSION)
 	{
@@ -145,10 +143,10 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 
 	// KDM : On the Avenger, both the Resistance overview screen and, this, Haven screen are placed within a 3D movie;
 	// consequently, a 3D camera needs to be specified.
-	if (!class'Utilities_LW'.static.IsOnStrategyMap())
+	/*if (!class'Utilities_LW'.static.IsOnStrategyMap())
 	{
 		class'UIUtilities'.static.DisplayUI3D(DisplayTag, CameraTag, 0, true);
-	}
+	}*/
 
 	// KDM : Container which will hold our UI components : it's invisible
 	MainPanel = Spawn(class 'UIPanel', self);
@@ -528,7 +526,7 @@ simulated function RefreshData()
 	if (ShowRadioTowerUpgradeButton())
 		RadioTowerUpgradeButton.Show();
 	else
-	RadioTowerUpgradeButton.Hide();
+		RadioTowerUpgradeButton.Hide();
 }
 
 simulated function GetData()
@@ -1028,6 +1026,6 @@ defaultproperties
 	panelW = 961;
 	panelH = 724;
 
-	// KDM : See the comments in UIMouseGuard_Custom for more information.
+	// KDM : See the comments in UIMouseGuard_LW for more information.
 	MouseGuardClass = class'UIMouseGuard_LW';
 }

@@ -14,14 +14,16 @@ enum EResistanceSortType
 	eResistanceSortType_RebelCount,
 };
 
-var config int HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK, HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
+var config int HEADER_BUTTON_HEIGHT_MK, HEADER_FONT_SIZE_MK;
+var config int HEADER_BUTTON_HEIGHT_CTRL, HEADER_FONT_SIZE_CTRL;
 
 // KDM : Best to explain by way of an example :
 // Assume a controller user is on the Resistance overview screen and clicks on 'Western Canada'; this will bring up the 
 // Haven screen for 'Western Canada'. Now, when we are done dealing with the haven, and re-enter the Resistance overview screen,
 // we want to make sure 'Western Canada' is still selected for consistency. 
 var int SelectedIndexOnFocusLost;
-var int BorderPadding, ItemPadding, TheHeaderFontSize;
+
+// KDM : Determines how wide each of the columns will be.
 var float RegionHeaderPct, RegionStatusPct, RebelCountPct, AdviserHeaderPct, IncomeHeaderPct; 
 
 var bool FlipSort;
@@ -80,7 +82,7 @@ var array<StateObjectReference> CachedOutposts;
 
 simulated function InitScreen(XComPlayerController InitController, UIMovie InitMovie, optional name InitName)
 {
-	local int NextY, ScrollbarPadding, TheHeaderButtonHeight;
+	local int BorderPadding, ItemPadding, NextY, ScrollbarPadding, TheHeaderButtonHeight, TheHeaderFontSize;
 	local float AvailableHeaderSpace;
 
 	SelectedIndexOnFocusLost = INDEX_NONE;
