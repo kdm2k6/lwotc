@@ -279,7 +279,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	// KDM : Automatically select the 1st rebel row when using a controller.
 	if (`ISCONTROLLERACTIVE)
 	{
-		List.SetSelectedIndex(0, true);
+		List.NavigatorSelectionChanged(0);
 	}
 }
 
@@ -474,12 +474,12 @@ simulated function OnReceiveFocus()
 		if (SelectedIndexOnFocusLost == INDEX_NONE)
 		{
 			// KDM : We don't know which list item was selected, so select the 1st one.
-			List.SetSelectedIndex(0, true);
+			List.NavigatorSelectionChanged(0);
 		}
 		else
 		{
 			// KDM : Re-select the list item which was selected when we lost focus.
-			List.SetSelectedIndex(SelectedIndexOnFocusLost, true);
+			List.NavigatorSelectionChanged(SelectedIndexOnFocusLost);
 		}
 	}
 }

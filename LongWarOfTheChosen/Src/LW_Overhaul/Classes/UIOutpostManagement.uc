@@ -348,7 +348,7 @@ simulated function InitScreen(XComPlayerController InitController, UIMovie InitM
 	// KDM : Automatically select the 1st rebel row when using a controller.
 	if (`ISCONTROLLERACTIVE)
 	{
-		List.SetSelectedIndex(0, true);
+		List.NavigatorSelectionChanged(0);
 	}
 }
 
