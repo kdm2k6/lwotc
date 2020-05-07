@@ -24,6 +24,84 @@ var localized string strRecon;
 var transient bool bScanButtonResized;
 var transient float CachedScanButtonWidth;
 
+// KDM : FUNCTIONS START
+
+// KDM : This code has been stripped from OnMouseEvent() --> FXS_L_MOUSE_UP and placed in a function so it can be called from 
+// either mouse and keyboard code or controller code.
+simulated function OpenInfiltrationScreen()
+{
+	local XComGameState_GeoscapeEntity GeoscapeEntity;
+	local XComGameState_LWPersistentSquad InfiltratingSquad;
+	local XComGameStateHistory History;
+	
+	History = `XCOMHISTORY;
+	InfiltratingSquad = GetInfiltratingSquad();
+	
+	if (InfiltratingSquad == none)
+	{
+		GeoscapeEntity = XComGameState_GeoscapeEntity(History.GetGameStateForObjectID(GeoscapeEntityRef.ObjectID));
+		GeoscapeEntity.AttemptSelectionCheckInterruption();
+	}
+	else
+	{
+		OpenInfiltrationMissionScreen();
+	}
+}
+
+simulated function bool OnUnrealCommand(int cmd, int arg)
+{
+	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
+	{
+		return true;
+	}
+
+	switch(cmd)
+	{
+		// KDM : The A button opens the infiltration screen.
+		// OnMouseEvent() checks if the Avenger is in flight before executing any of its code; consequently, I do the same for the controller here.
+		case class'UIUtilities_Input'.static.GetAdvanceButtonInputCode():
+			if (GetStrategyMap().m_eUIState != eSMS_Flight)
+			{
+				OpenInfiltrationScreen();
+				return true;
+			}
+			break;
+
+		default :
+			break;
+	}
+
+	return super.OnUnrealCommand(cmd, arg);
+}
+
+simulated function OnMouseEvent(int cmd, array<string> args)
+{
+	if (GetStrategyMap().m_eUIState == eSMS_Flight)
+	{
+		return;
+	}
+
+	switch(cmd) 
+	{ 
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_IN:
+			OnMouseIn();
+			break;
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
+			OnMouseOut();
+			break;
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP:
+			OpenInfiltrationScreen();
+			break;
+	}
+}
+
+// KDM : FUNCTIONS END
+
+
+
+
+
+
 simulated function UIStrategyMapItem InitMapItem(out XComGameState_GeoscapeEntity Entity)
 {
 	// override the super so we can always use MI_alienfacility to allow displaying of doom pips
@@ -210,41 +288,6 @@ function OpenInfiltrationMissionScreen()
 	MissionScreen.MissionRef = GeoscapeEntityRef;
 	MissionScreen.bInstantInterp = false;
 	MissionScreen = UIMission_LWLaunchDelayedMission(HQPres.ScreenStack.Push(MissionScreen));
-}
-
-simulated function OnMouseEvent(int cmd, array<string> args)
-{
-	local XComGameStateHistory History;
-	local XComGameState_GeoscapeEntity GeoscapeEntity;
-	local XComGameState_LWPersistentSquad InfiltratingSquad;
-
-	if(GetStrategyMap().m_eUIState == eSMS_Flight)
-	{
-		return;
-	}
-
-	switch(cmd) 
-	{ 
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_IN:
-		OnMouseIn();
-		break;
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
-		OnMouseOut();
-		break;
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP:
-		History = `XCOMHISTORY;
-		InfiltratingSquad = GetInfiltratingSquad();
-		if(InfiltratingSquad == none)
-		{
-			GeoscapeEntity = XComGameState_GeoscapeEntity(History.GetGameStateForObjectID(GeoscapeEntityRef.ObjectID));
-			GeoscapeEntity.AttemptSelectionCheckInterruption();
-		}
-		else
-		{
-			OpenInfiltrationMissionScreen();
-		}
-		break;
-	}
 }
 
 simulated function UpdateProgressBar(XComGameState_MissionSite MissionState)
