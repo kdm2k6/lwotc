@@ -35,6 +35,129 @@ var UIButton IgnoreButton;
 var bool bCachedMustLaunch;
 var bool bAborted;
 
+// KDM : Cleaned up UIMission --> BindLibraryItem() and made a few modifications for controller usage
+simulated function BindLibraryItem()
+{
+	local Name AlertLibID;
+	
+	AlertLibID = GetLibraryID();
+	
+	if (AlertLibID != '')
+	{
+		LibraryPanel = Spawn(class'UIPanel', self);
+		LibraryPanel.bAnimateOnInit = false;
+		LibraryPanel.InitPanel('LibraryPanel', AlertLibID);
+
+		ButtonGroup = Spawn(class'UIPanel', LibraryPanel);
+		ButtonGroup.InitPanel('ButtonGroup', '');
+
+		Button1 = Spawn(class'UIButton', ButtonGroup);
+		Button1.OnSizeRealized = OnButtonSizeRealized;
+		Button1.ResizeToText = false;
+		Button1.InitButton('Button0', "", , eUIButtonStyle_NONE);
+		
+		Button2 = Spawn(class'UIButton', ButtonGroup);
+		Button2.OnSizeRealized = OnButtonSizeRealized;
+		Button2.ResizeToText = false;
+		Button2.InitButton('Button1', "", , eUIButtonStyle_NONE);
+
+		Button3 = Spawn(class'UIButton', ButtonGroup);
+		Button3.OnSizeRealized = OnButtonSizeRealized;
+		Button3.ResizeToText = false;
+		Button3.InitButton('Button2', "", , eUIButtonStyle_NONE);
+		
+		// KDM : The Confirm button is now given the style eUIButtonStyle_NONE so that, when using a controller, it doesn't appear as a hotlink.
+		// It is now a normal button, whether you are using a mouse & keyboard, or a controller.
+		ConfirmButton = Spawn(class'UIButton', LibraryPanel);
+		ConfirmButton.ResizeToText = false;
+		ConfirmButton.InitButton('ConfirmButton', "", OnLaunchClicked, eUIButtonStyle_NONE);
+
+		// KDM : I removed the call to ConfirmButton.DisableNavigation() since navigation is dealt with elsewhere
+
+		ShadowChamber = Spawn(class'UIAlertShadowChamberPanel', LibraryPanel);
+		ShadowChamber.InitPanel('UIAlertShadowChamberPanel', 'Alert_ShadowChamber');
+
+		SitrepPanel = Spawn(class'UIAlertSitRepPanel', LibraryPanel);
+		SitrepPanel.InitPanel('SitRep', 'Alert_SitRep');
+		SitrepPanel.SetTitle(m_strSitrepTitle);
+
+		ChosenPanel = Spawn(class'UIPanel', LibraryPanel);
+		ChosenPanel.InitPanel(, 'Alert_ChosenRegionInfo');
+		ChosenPanel.DisableNavigation();
+
+		/*
+		WHEN CONTROLLER IS ACTIVE - THIS WAS CALLED BEFORE
+		ConfirmButton.SetX(1450.0);
+		ConfirmButton.SetY(617.0);
+		ConfirmButton.SetWidth(300);
+		*/
+
+		/*
+		if (`ISCONTROLLERACTIVE)
+		{
+			Button1.OnClickedDelegate = OnLaunchClicked;
+			Button2.OnClickedDelegate = OnCancelClicked;
+		}
+		*/
+
+	}
+}
+
+simulated function AddIgnoreButton()
+{
+	// Ignore button is controller by flash and shows by default; therefore, hide it if necessary.
+	
+	IgnoreButton = Spawn(class'UIButton', LibraryPanel);
+
+	if (CanBackOut())
+	{
+		// KDM : The Ignore button is now given the style eUIButtonStyle_NONE so that, when using a controller, it doesn't appear as a hotlink.
+		// It is now a normal button, whether you are using a mouse & keyboard, or a controller.	
+		IgnoreButton.ResizeToText = false;
+		IgnoreButton.InitButton('IgnoreButton', "", OnCancelClicked, eUIButtonStyle_NONE);
+
+		// KDM : I removed the call to IgnoreButton.DisableNavigation() since navigation is dealt with elsewhere
+
+		/*
+		WHEN CONTROLLER IS ACTIVE - THIS WAS CALLED BEFORE
+		IgnoreButton.SetX(1450.0);
+		IgnoreButton.SetY(644.0);
+		*/
+	}
+	else
+	{
+		IgnoreButton.InitButton('IgnoreButton').Hide();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 simulated function InitScreen(XComPlayerController InitController, UIMovie InitMovie, optional name InitName)
 {
 	local XComGameState_LWAlienActivity AlienActivity;
@@ -327,35 +450,7 @@ simulated function string GetMissionImage()
 	return "img:///UILibrary_StrategyImages.X2StrategyMap.Alert_Guerrilla_Ops";
 }
 
-simulated function AddIgnoreButton()
-{
-	//Button is controlled by flash and shows by default. Hide if need to.
-	//local UIButton IgnoreButton;
 
-	IgnoreButton = Spawn(class'UIButton', LibraryPanel);
-	if(CanBackOut())
-	{
-		if( `ISCONTROLLERACTIVE == false )
-		{
-			IgnoreButton.SetResizeToText(false);
-			IgnoreButton.InitButton('IgnoreButton', "", OnCancelClicked);
-		}
-		else
-		{
-			IgnoreButton.InitButton('IgnoreButton', "", OnCancelClicked, eUIButtonStyle_HOTLINK_WHEN_SANS_MOUSE);
-			IgnoreButton.SetGamepadIcon(class'UIUtilities_Input'.static.GetBackButtonIcon());
-			//IgnoreButton.OnSizeRealized = OnIgnoreButtonSizeRealized;
-			IgnoreButton.SetX(1450.0);
-			IgnoreButton.SetY(644.0);
-		}
-
-		IgnoreButton.DisableNavigation();
-	}
-	else
-	{
-		IgnoreButton.InitButton('IgnoreButton').Hide();
-	}
-}
 
 simulated function OnButtonSizeRealized()
 {
