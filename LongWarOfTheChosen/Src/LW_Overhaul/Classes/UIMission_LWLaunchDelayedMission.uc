@@ -35,6 +35,58 @@ var UIButton IgnoreButton;
 var bool bCachedMustLaunch;
 var bool bAborted;
 
+simulated function bool OnUnrealCommand(int cmd, int arg)
+{
+	local bool bHandled;
+	local UIButton SelectedButton;
+
+	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
+	{
+		return false;
+	}
+
+	bHandled = true;
+
+	switch(cmd)
+	{
+		// KDM : A button clicks on the selected button, if a button is currently selected.
+		case class'UIUtilities_Input'.const.FXS_BUTTON_A:
+		case class'UIUtilities_Input'.const.FXS_KEY_ENTER:
+		case class'UIUtilities_Input'.const.FXS_KEY_SPACEBAR:
+			SelectedButton = UIButton(Navigator.GetSelected());
+			if (SelectedButton != none)
+			{
+				SelectedButton.Click();
+				break;
+			}
+			// KDM : If no button was selected then fall down to the next case. I am only doing this to stay consistent with UIMission --> OnUnrealCommand.
+
+		// KDM : B button backs out of the screen if allowed.
+		case class'UIUtilities_Input'.const.FXS_BUTTON_B:
+		case class'UIUtilities_Input'.const.FXS_KEY_ESCAPE:
+		case class'UIUtilities_Input'.const.FXS_R_MOUSE_DOWN:
+			if (CanBackOut())
+			{
+				CloseScreen();
+			}
+			break;
+
+		case class'UIUtilities_Input'.const.FXS_BUTTON_L3 :
+			if (`ISCONTROLLERACTIVE && SitrepPanel.bIsVisible)
+			{
+				SitrepPanel.OnInfoButtonMouseEvent(SitrepPanel.InfoButton);
+			}
+			break;
+		
+		default :
+			bHandled = false;
+			break;
+	}
+
+	return bHandled || super(UIX2SimpleScreen).OnUnrealCommand(cmd, arg);
+}
+
+
 simulated function TheIndexChanged(int index)
 {
 	local UIPanel ThePanel;
@@ -106,7 +158,7 @@ simulated function BindLibraryItem()
 
 simulated function AddIgnoreButton()
 {
-	// Ignore button is controller by flash and shows by default; therefore, hide it if necessary.
+	// Ignore button is controlled by flash and shows by default; therefore, hide it if necessary.
 	
 	IgnoreButton = Spawn(class'UIButton', LibraryPanel);
 
@@ -141,7 +193,7 @@ simulated function RefreshNavigation()
 	Navigator.LoopSelection = true;
 
 	// KDM : There are 5 main buttons : Button1, Button2, Button3, ConfirmButton, and IgnoreButton.
-	// If a given button is visible then it will be used, as per an official WOTC comment in UIMission; therfore, add it to the navigation system.
+	// If a given button is visible then it will be used, as per a WOTC comment in UIMission --> BuildScreen(); therfore, add it to the navigation system.
 	// If a given button is not visible it won't be used so just remove it; I am uncertain why code within UIMission --> RefreshNavigation() hides
 	// the button before removing it, as this appears unnecessary.
 	if (Button1.bIsVisible)
@@ -218,8 +270,6 @@ simulated function RefreshNavigation()
 	}
 	
 
-	// TO DO : BuildMissionInfoPanel is called after this so we need to remove navigation from any controls added there
-	// since I don't want to mess around with ordering - their code might rely normal buildscreen code
 	// TO DO : ONUNREAL COMMAND LINKS TO PROPER BUTTON SELECTION
 
 
