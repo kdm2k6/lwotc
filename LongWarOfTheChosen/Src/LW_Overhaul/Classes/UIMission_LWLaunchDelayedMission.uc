@@ -35,11 +35,20 @@ var UIButton IgnoreButton;
 var bool bCachedMustLaunch;
 var bool bAborted;
 
+simulated function TheIndexChanged(int index)
+{
+	`log("KDM SELECTED ITEM IS :" @ Navigator.GetSelected());
+	`log("KDM GET VIA INDEX IS :" @ Navigator.GetControl(index);
+}
+
 // KDM : Cleaned up UIMission --> BindLibraryItem() and made a few modifications for controller usage
 simulated function BindLibraryItem()
 {
 	local Name AlertLibID;
 	
+	// KDM TEMPORARY *****************
+	Navigator.OnSelectedIndexChanged = TheIndexChanged;
+
 	AlertLibID = GetLibraryID();
 	
 	if (AlertLibID != '')
@@ -51,16 +60,19 @@ simulated function BindLibraryItem()
 		ButtonGroup = Spawn(class'UIPanel', LibraryPanel);
 		ButtonGroup.InitPanel('ButtonGroup', '');
 
+		// KDM : Boost infiltration button
 		Button1 = Spawn(class'UIButton', ButtonGroup);
 		Button1.OnSizeRealized = OnButtonSizeRealized;
 		Button1.ResizeToText = false;
 		Button1.InitButton('Button0', "", , eUIButtonStyle_NONE);
 		
+		// KDM : View squad button
 		Button2 = Spawn(class'UIButton', ButtonGroup);
 		Button2.OnSizeRealized = OnButtonSizeRealized;
 		Button2.ResizeToText = false;
 		Button2.InitButton('Button1', "", , eUIButtonStyle_NONE);
 
+		// KDM : Abort button
 		Button3 = Spawn(class'UIButton', ButtonGroup);
 		Button3.OnSizeRealized = OnButtonSizeRealized;
 		Button3.ResizeToText = false;
@@ -83,23 +95,8 @@ simulated function BindLibraryItem()
 
 		ChosenPanel = Spawn(class'UIPanel', LibraryPanel);
 		ChosenPanel.InitPanel(, 'Alert_ChosenRegionInfo');
-		ChosenPanel.DisableNavigation();
-
-		/*
-		WHEN CONTROLLER IS ACTIVE - THIS WAS CALLED BEFORE
-		ConfirmButton.SetX(1450.0);
-		ConfirmButton.SetY(617.0);
-		ConfirmButton.SetWidth(300);
-		*/
-
-		/*
-		if (`ISCONTROLLERACTIVE)
-		{
-			Button1.OnClickedDelegate = OnLaunchClicked;
-			Button2.OnClickedDelegate = OnCancelClicked;
-		}
-		*/
-
+		
+		// KDM : I removed the call to ChosenPanel.DisableNavigation() since navigation is dealt with elsewhere
 	}
 }
 
@@ -117,18 +114,234 @@ simulated function AddIgnoreButton()
 		IgnoreButton.InitButton('IgnoreButton', "", OnCancelClicked, eUIButtonStyle_NONE);
 
 		// KDM : I removed the call to IgnoreButton.DisableNavigation() since navigation is dealt with elsewhere
-
-		/*
-		WHEN CONTROLLER IS ACTIVE - THIS WAS CALLED BEFORE
-		IgnoreButton.SetX(1450.0);
-		IgnoreButton.SetY(644.0);
-		*/
 	}
 	else
 	{
 		IgnoreButton.InitButton('IgnoreButton').Hide();
 	}
 }
+
+// KDM : UIMission --> RefreshNavigation() within is a confusing mess and not controller compatible; therefore, I am cleaning it up
+// and making it controller compatible.
+simulated function RefreshNavigation()
+{
+	/*
+	var UIPanel LibraryPanel;
+	var UIAlertShadowChamberPanel ShadowChamber;
+	var UIAlertSitRepPanel SitrepPanel;
+	var UIPanel ChosenPanel;
+	var UIButton Button1, Button2, Button3, ConfirmButton;
+	var UIPanel ButtonGroup;
+
+	var UIPanel LockedPanel;
+	var UIButton LockedButton;
+	*/
+
+	/*
+	var UITextContainer InfiltrationInfoText;
+	var UITextContainer MissionInfoText;
+
+	var UIButton IgnoreButton;
+	*/
+
+	// LibraryPanel --> ButtonGroup --> Button 1
+	// LibraryPanel --> ButtonGroup --> Button 2
+	// LibraryPanel --> ButtonGroup --> Button 3
+
+	// LibraryPanel --> ConfirmButton
+	// LibraryPanel --> IgnoreButton
+
+
+	Navigator.Clear();
+	Navigator.LoopSelection = true;
+
+	if (Button1.bIsVisible)
+	{
+		Navigator.AddControl(Button1);
+	}
+	else
+	{
+		Button1.Hide();
+		Button1.Remove();
+	}
+
+	if (Button2.bIsVisible)
+	{
+		Navigator.AddControl(Button2);
+	}
+	else
+	{
+		Button2.Hide();
+		Button2.Remove();
+	}
+
+	if (Button3.bIsVisible)
+	{
+		Navigator.AddControl(Button3);
+	}
+	else
+	{
+		Button3.Hide();
+		Button3.Remove();
+	}
+
+	if (ConfirmButton.bIsVisible)
+	{
+		Navigator.AddControl(ConfirmButton);
+	}
+	else
+	{
+		ConfirmButton.Hide();
+		ConfirmButton.Remove();
+	}
+
+	if (IgnoreButton.bIsVisible)
+	{
+		Navigator.AddControl(IgnoreButton);
+	}
+	else
+	{
+		IgnoreButton.Hide();
+		IgnoreButton.Remove();
+	}
+
+
+	if (ConfirmButton.bIsVisible)
+	{
+		Navigator.SetSelected(ConfirmButton);
+	}
+	else if (Button1.bIsVisible)
+	{
+		Navigator.SetSelected(Button1);
+	}
+	else if (Button2.bIsVisible)
+	{
+		Navigator.SetSelected(Button2);
+	}
+	else if (Button3.bIsVisible)
+	{
+		Navigator.SetSelected(Button3);
+	}
+	else if (IgnoreButton.bIsVisible)
+	{
+		Navigator.SetSelected(IgnoreButton);
+	}
+	
+
+	// TO DO : DEAL WITH LOCKED PANELS
+
+
+	return;
+
+
+
+
+
+	
+	if( ConfirmButton.bIsVisible )
+	{
+		ConfirmButton.EnableNavigation();
+	}
+	else
+	{
+		ConfirmButton.DisableNavigation();
+	}
+
+	if( Button1.bIsVisible )
+	{
+		Button1.EnableNavigation();
+	}
+	else
+	{
+		Button1.DisableNavigation();
+		Button1.Hide();
+		Button1.Remove();
+	}
+
+	if( Button2.bIsVisible )
+	{
+		Button2.EnableNavigation();
+	}
+	else
+	{
+		Button2.DisableNavigation();
+		Button2.Hide();
+		Button2.Remove();
+	}
+
+	if( Button3.bIsVisible )
+	{
+		Button3.EnableNavigation();
+	}
+	else
+	{
+		Button3.DisableNavigation();
+		Button3.Hide();
+		Button3.Remove();
+	}
+
+	if( LockedPanel != none && LockedPanel.bIsVisible )
+	{
+		ConfirmButton.DisableNavigation();
+		Button1.DisableNavigation();
+		Button2.DisableNavigation();
+		Button3.DisableNavigation();
+		Button1.Hide();
+		Button2.Hide();
+		Button3.Hide();
+		Button1.Remove();
+		Button2.Remove();
+		Button3.Remove();
+	}
+
+	LibraryPanel.bCascadeFocus = false;
+	LibraryPanel.SetSelectedNavigation();
+	ButtonGroup.bCascadeFocus = false;
+	ButtonGroup.SetSelectedNavigation();
+	ConfirmButton.DisableNavigation();
+
+	if( `ISCONTROLLERACTIVE == false )
+	{
+		if( Button1.bIsNavigable )
+			Button1.SetSelectedNavigation();
+		else if( Button2.bIsNavigable )
+			Button2.SetSelectedNavigation();
+		else if( Button3.bIsNavigable )
+			Button3.SetSelectedNavigation();
+		else if( LockedPanel != none && LockedPanel.IsVisible() )
+			LockedButton.SetSelectedNavigation();
+		else if( ConfirmButton.bIsNavigable )
+			ConfirmButton.SetSelectedNavigation();
+	}
+	
+	if( ShadowChamber != none )
+		ShadowChamber.DisableNavigation();
+		
+	ButtonGroup.DisableNavigation();
+	Navigator.Clear();
+	if (Button1.bIsVisible)
+	{
+		Navigator.AddControl(Button1);
+	}
+
+	if (Button2.bIsVisible)
+	{
+		Navigator.AddControl(Button2);
+	}
+
+	if (Button3.bIsVisible)
+	{
+		Navigator.AddControl(Button3);
+	}
+
+	Navigator.LoopSelection = true;
+
+	if(ChosenPanel != none)
+		ChosenPanel.DisableNavigation();
+}
+
+
+
 
 
 
