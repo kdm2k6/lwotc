@@ -126,20 +126,31 @@ simulated function AddIgnoreButton()
 	}
 }
 
-// KDM : UIMission --> RefreshNavigation() within is a confusing mess and not controller compatible; therefore, I am cleaning it up
-// and making it controller compatible.
+// KDM : UIMission --> RefreshNavigation(), which this class used for controller and arrow navigation setup, is a bit of a mess. 
+// It enables and disables navigation for various components, then ultimately kills the screens navigation system with Navigator.Clear()
+// before adding 3 buttons back into it. Furthermore, Long War 2 calls UIUtilities_LW --> BuildMissionInfoPanel() after this function,
+// and ends up adding a useless UIPanel, MissionExpiryPanel, to the navigation system. The goal is to clean everything up and make it controller compatible.
+//
+// NOTE 1 : LockedPanel is never Spawned() in UIMission or UIMission_LWLaunchDelayedMission so it need not be dealt with here.
+// NOTE 2 : As mentioned above, UIUtilities_LW --> BuildMissionInfoPanel() creates a navigable UIPanel which should not be navigable; therefore,
+// that function has been modified appropriately.
 simulated function RefreshNavigation()
 {
+	// KDM : Start with an empty navigation system.
 	Navigator.Clear();
 	Navigator.LoopSelection = true;
 
+	// KDM : There are 5 main buttons : Button1, Button2, Button3, ConfirmButton, and IgnoreButton.
+	// If a given button is visible then it will be used, as per an official WOTC comment in UIMission; therfore, add it to the navigation system.
+	// If a given button is not visible it won't be used so just remove it; I am uncertain why code within UIMission --> RefreshNavigation() hides
+	// the button before removing it, as this appears unnecessary.
 	if (Button1.bIsVisible)
 	{
 		Navigator.AddControl(Button1);
 	}
 	else
 	{
-		Button1.Hide();
+		//Button1.Hide();
 		Button1.Remove();
 	}
 
@@ -149,7 +160,7 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		Button2.Hide();
+		//Button2.Hide();
 		Button2.Remove();
 	}
 
@@ -159,7 +170,7 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		Button3.Hide();
+		//Button3.Hide();
 		Button3.Remove();
 	}
 
@@ -169,7 +180,7 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		ConfirmButton.Hide();
+		//ConfirmButton.Hide();
 		ConfirmButton.Remove();
 	}
 
@@ -179,11 +190,12 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		IgnoreButton.Hide();
+		//IgnoreButton.Hide();
 		IgnoreButton.Remove();
 	}
 
-
+	// KDM : At this point, our navigation system is set up. We now need to determine which button to select initially.
+	// A reasonable ordering, taking into account button visibility, is : ConfirmButton --> Button1 --> Button2 --> Button3 --> IgnoreButton 
 	if (ConfirmButton.bIsVisible)
 	{
 		Navigator.SetSelected(ConfirmButton);
@@ -206,7 +218,6 @@ simulated function RefreshNavigation()
 	}
 	
 
-	// TO DO : DEAL WITH LOCKED PANELS
 	// TO DO : BuildMissionInfoPanel is called after this so we need to remove navigation from any controls added there
 	// since I don't want to mess around with ordering - their code might rely normal buildscreen code
 	// TO DO : ONUNREAL COMMAND LINKS TO PROPER BUTTON SELECTION
