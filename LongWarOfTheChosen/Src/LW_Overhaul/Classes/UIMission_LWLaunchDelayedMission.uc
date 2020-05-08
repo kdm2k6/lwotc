@@ -37,8 +37,12 @@ var bool bAborted;
 
 simulated function TheIndexChanged(int index)
 {
-	`log("KDM SELECTED ITEM IS :" @ Navigator.GetSelected());
-	`log("KDM GET VIA INDEX IS :" @ Navigator.GetControl(index);
+	local UIPanel ThePanel;
+
+	ThePanel = Navigator.GetSelected();
+	`log("KDM SELECTED ITEM IS :" @ ThePanel @ " WITH NAME : " @ ThePanel.MCName @ " : " @ ThePanel.LibID);
+	//`log("KDM SELECTED ITEM IS :" @ Navigator.GetSelected());
+	//`log("KDM GET VIA INDEX IS :" @ Navigator.GetControl(index));
 }
 
 // KDM : Cleaned up UIMission --> BindLibraryItem() and made a few modifications for controller usage
@@ -117,7 +121,8 @@ simulated function AddIgnoreButton()
 	}
 	else
 	{
-		IgnoreButton.InitButton('IgnoreButton').Hide();
+		IgnoreButton.InitButton('IgnoreButton');
+		IgnoreButton.Hide();
 	}
 }
 
@@ -125,33 +130,6 @@ simulated function AddIgnoreButton()
 // and making it controller compatible.
 simulated function RefreshNavigation()
 {
-	/*
-	var UIPanel LibraryPanel;
-	var UIAlertShadowChamberPanel ShadowChamber;
-	var UIAlertSitRepPanel SitrepPanel;
-	var UIPanel ChosenPanel;
-	var UIButton Button1, Button2, Button3, ConfirmButton;
-	var UIPanel ButtonGroup;
-
-	var UIPanel LockedPanel;
-	var UIButton LockedButton;
-	*/
-
-	/*
-	var UITextContainer InfiltrationInfoText;
-	var UITextContainer MissionInfoText;
-
-	var UIButton IgnoreButton;
-	*/
-
-	// LibraryPanel --> ButtonGroup --> Button 1
-	// LibraryPanel --> ButtonGroup --> Button 2
-	// LibraryPanel --> ButtonGroup --> Button 3
-
-	// LibraryPanel --> ConfirmButton
-	// LibraryPanel --> IgnoreButton
-
-
 	Navigator.Clear();
 	Navigator.LoopSelection = true;
 
@@ -229,8 +207,12 @@ simulated function RefreshNavigation()
 	
 
 	// TO DO : DEAL WITH LOCKED PANELS
+	// TO DO : BuildMissionInfoPanel is called after this so we need to remove navigation from any controls added there
+	// since I don't want to mess around with ordering - their code might rely normal buildscreen code
+	// TO DO : ONUNREAL COMMAND LINKS TO PROPER BUTTON SELECTION
 
 
+	// KDM : REMOVE RETURN HERE WHEN DONE **********************************
 	return;
 
 
