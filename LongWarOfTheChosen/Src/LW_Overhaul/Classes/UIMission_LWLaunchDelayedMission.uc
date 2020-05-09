@@ -35,7 +35,9 @@ var UIButton IgnoreButton;
 var bool bCachedMustLaunch;
 var bool bAborted;
 
-// MOUSE AND KEYBOARD USERS MIGHT NOT WANT AUTO SELECTION - CHECK WHAT BASE LW2 DOES
+
+
+
 
 simulated function BuildOptionsPanel()
 {
@@ -87,7 +89,7 @@ simulated function BuildOptionsPanel()
 	// This was noticeable when using the controller as the Ignore button suddenly looked like it couldn't be selected; this was because the Ignore 
 	// button being selected was the bottom one.
 	//
-	// Now, one possible solution is to leave AddIgnoreButton() alone, but exit it when IgnoreButton != none; this, in fact work !
+	// Now, one possible solution is to leave AddIgnoreButton() alone, but exit it when IgnoreButton != none; this in fact works !
 	// However, the Ignore button should really be created and dealt with when the rest of the buttons are created and dealt with.
 	//
 	// One final note : AddIgnoreButton() is added outside of the AlertLibID != '' check since, in Long War 2's original code, it doesn't
@@ -111,7 +113,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 
 	switch(cmd)
 	{
-		// KDM : A button clicks on the selected button, if a button is currently selected.
+		// KDM : A button clicks on the selected button, if such a button exists.
+		// If no button was selected then fall down to the next case; this is to stay consistent with UIMission --> OnUnrealCommand.
 		case class'UIUtilities_Input'.const.FXS_BUTTON_A:
 		case class'UIUtilities_Input'.const.FXS_KEY_ENTER:
 		case class'UIUtilities_Input'.const.FXS_KEY_SPACEBAR:
@@ -121,8 +124,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 				SelectedButton.Click();
 				break;
 			}
-			// KDM : If no button was selected then fall down to the next case. I am only doing this to stay consistent with UIMission --> OnUnrealCommand.
-
+			
 		// KDM : B button backs out of the screen if allowed.
 		case class'UIUtilities_Input'.const.FXS_BUTTON_B:
 		case class'UIUtilities_Input'.const.FXS_KEY_ESCAPE:
@@ -148,26 +150,14 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 	return bHandled || super(UIX2SimpleScreen).OnUnrealCommand(cmd, arg);
 }
 
-
-simulated function TheIndexChanged(int index)
-{
-	local UIPanel ThePanel;
-
-	ThePanel = Navigator.GetSelected();
-	`log("KDM SELECTED ITEM IS :" @ ThePanel @ " WITH NAME : " @ ThePanel.MCName @ " : " @ ThePanel.LibID);
-	`log("IgnoreButton bIsFocused DURING INDEX CHANGED IS *** " @ IgnoreButton.bIsFocused);
-	//`log("KDM SELECTED ITEM IS :" @ Navigator.GetSelected());
-	//`log("KDM GET VIA INDEX IS :" @ Navigator.GetControl(index));
-}
-
 // KDM : Cleaned up UIMission --> BindLibraryItem() and made a few modifications for controller usage
+// KDM FIX UP HERE ****************
+// OnButtonSizeRealized removed since it does nothing in this function - don't want to change the location of the confirm button
+// Add ignore button - refer to info above
 simulated function BindLibraryItem()
 {
 	local Name AlertLibID;
 	
-	// KDM TEMPORARY *****************
-	//Navigator.OnSelectedIndexChanged = TheIndexChanged;
-
 	AlertLibID = GetLibraryID();
 	
 	if (AlertLibID != '')
@@ -181,19 +171,16 @@ simulated function BindLibraryItem()
 
 		// KDM : Boost infiltration button
 		Button1 = Spawn(class'UIButton', ButtonGroup);
-		Button1.OnSizeRealized = OnButtonSizeRealized;
 		Button1.ResizeToText = false;
 		Button1.InitButton('Button0', "", , eUIButtonStyle_NONE);
 		
 		// KDM : View squad button
 		Button2 = Spawn(class'UIButton', ButtonGroup);
-		Button2.OnSizeRealized = OnButtonSizeRealized;
 		Button2.ResizeToText = false;
 		Button2.InitButton('Button1', "", , eUIButtonStyle_NONE);
 
 		// KDM : Abort button
 		Button3 = Spawn(class'UIButton', ButtonGroup);
-		Button3.OnSizeRealized = OnButtonSizeRealized;
 		Button3.ResizeToText = false;
 		Button3.InitButton('Button2', "", , eUIButtonStyle_NONE);
 		
@@ -203,7 +190,7 @@ simulated function BindLibraryItem()
 		ConfirmButton.ResizeToText = false;
 		ConfirmButton.InitButton('ConfirmButton', "", OnLaunchClicked, eUIButtonStyle_NONE);
 		
-		// KDM : I removed the call to ConfirmButton.DisableNavigation() since navigation is dealt with elsewhere
+		// KDM : Removed the call to ConfirmButton.DisableNavigation() since navigation is dealt with elsewhere
 
 		ShadowChamber = Spawn(class'UIAlertShadowChamberPanel', LibraryPanel);
 		ShadowChamber.InitPanel('UIAlertShadowChamberPanel', 'Alert_ShadowChamber');
@@ -215,7 +202,7 @@ simulated function BindLibraryItem()
 		ChosenPanel = Spawn(class'UIPanel', LibraryPanel);
 		ChosenPanel.InitPanel(, 'Alert_ChosenRegionInfo');
 		
-		// KDM : I removed the call to ChosenPanel.DisableNavigation() since navigation is dealt with elsewhere
+		// KDM : Removed the call to ChosenPanel.DisableNavigation() since navigation is dealt with elsewhere
 	}
 
 	// KDM : AddIgnoreButton() was moved here from BuildOptionsPanel(). Read the comments in that section for the reasoning.
@@ -235,7 +222,7 @@ simulated function AddIgnoreButton()
 		IgnoreButton.ResizeToText = false;
 		IgnoreButton.InitButton('IgnoreButton', "", OnCancelClicked, eUIButtonStyle_NONE);
 
-		// KDM : I removed the call to IgnoreButton.DisableNavigation() since navigation is dealt with elsewhere
+		// KDM : Removed the call to IgnoreButton.DisableNavigation() since navigation is dealt with elsewhere
 	}
 	else
 	{
@@ -258,17 +245,17 @@ simulated function RefreshNavigation()
 	Navigator.Clear();
 	Navigator.LoopSelection = true;
 
-	// KDM : There are 5 main buttons : Button1, Button2, Button3, ConfirmButton, and IgnoreButton.
+	// KDM : There are 5 potentially selectable buttons : Button1, Button2, Button3, ConfirmButton, and IgnoreButton.
 	// If a given button is visible then it will be used, as per a WOTC comment in UIMission --> BuildScreen(); therfore, add it to the navigation system.
 	// If a given button is not visible it won't be used so just remove it; I am uncertain why code within UIMission --> RefreshNavigation() hides
 	// the button before removing it, as this appears unnecessary.
+
 	if (Button1.bIsVisible)
 	{
 		Navigator.AddControl(Button1);
 	}
 	else
 	{
-		//Button1.Hide();
 		Button1.Remove();
 	}
 
@@ -278,7 +265,6 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		//Button2.Hide();
 		Button2.Remove();
 	}
 
@@ -288,7 +274,6 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		//Button3.Hide();
 		Button3.Remove();
 	}
 
@@ -298,7 +283,6 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		//ConfirmButton.Hide();
 		ConfirmButton.Remove();
 	}
 
@@ -308,7 +292,6 @@ simulated function RefreshNavigation()
 	}
 	else
 	{
-		//IgnoreButton.Hide();
 		IgnoreButton.Remove();
 	}
 
@@ -334,117 +317,6 @@ simulated function RefreshNavigation()
 	{
 		Navigator.SetSelected(IgnoreButton);
 	}
-	
-	
-
-	// KDM : REMOVE RETURN HERE WHEN DONE **********************************
-	return;
-
-
-
-
-
-	
-	if( ConfirmButton.bIsVisible )
-	{
-		ConfirmButton.EnableNavigation();
-	}
-	else
-	{
-		ConfirmButton.DisableNavigation();
-	}
-
-	if( Button1.bIsVisible )
-	{
-		Button1.EnableNavigation();
-	}
-	else
-	{
-		Button1.DisableNavigation();
-		Button1.Hide();
-		Button1.Remove();
-	}
-
-	if( Button2.bIsVisible )
-	{
-		Button2.EnableNavigation();
-	}
-	else
-	{
-		Button2.DisableNavigation();
-		Button2.Hide();
-		Button2.Remove();
-	}
-
-	if( Button3.bIsVisible )
-	{
-		Button3.EnableNavigation();
-	}
-	else
-	{
-		Button3.DisableNavigation();
-		Button3.Hide();
-		Button3.Remove();
-	}
-
-	if( LockedPanel != none && LockedPanel.bIsVisible )
-	{
-		ConfirmButton.DisableNavigation();
-		Button1.DisableNavigation();
-		Button2.DisableNavigation();
-		Button3.DisableNavigation();
-		Button1.Hide();
-		Button2.Hide();
-		Button3.Hide();
-		Button1.Remove();
-		Button2.Remove();
-		Button3.Remove();
-	}
-
-	LibraryPanel.bCascadeFocus = false;
-	LibraryPanel.SetSelectedNavigation();
-	ButtonGroup.bCascadeFocus = false;
-	ButtonGroup.SetSelectedNavigation();
-	ConfirmButton.DisableNavigation();
-
-	if( `ISCONTROLLERACTIVE == false )
-	{
-		if( Button1.bIsNavigable )
-			Button1.SetSelectedNavigation();
-		else if( Button2.bIsNavigable )
-			Button2.SetSelectedNavigation();
-		else if( Button3.bIsNavigable )
-			Button3.SetSelectedNavigation();
-		else if( LockedPanel != none && LockedPanel.IsVisible() )
-			LockedButton.SetSelectedNavigation();
-		else if( ConfirmButton.bIsNavigable )
-			ConfirmButton.SetSelectedNavigation();
-	}
-	
-	if( ShadowChamber != none )
-		ShadowChamber.DisableNavigation();
-		
-	ButtonGroup.DisableNavigation();
-	Navigator.Clear();
-	if (Button1.bIsVisible)
-	{
-		Navigator.AddControl(Button1);
-	}
-
-	if (Button2.bIsVisible)
-	{
-		Navigator.AddControl(Button2);
-	}
-
-	if (Button3.bIsVisible)
-	{
-		Navigator.AddControl(Button3);
-	}
-
-	Navigator.LoopSelection = true;
-
-	if(ChosenPanel != none)
-		ChosenPanel.DisableNavigation();
 }
 
 

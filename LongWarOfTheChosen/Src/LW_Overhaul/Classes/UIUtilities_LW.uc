@@ -358,8 +358,7 @@ function static string GetInfiltrationString(XComGameState_MissionSite MissionSt
 	return InfiltrationString;
 }
 
-
-// KDM : FUNCTION CHANGED
+// KDM : Function modified : Remove this comment before submission ***
 function static BuildMissionInfoPanel(UIScreen ParentScreen, StateObjectReference MissionRef, bool IsInfiltrating)
 {
 	local int EvacFlareTimer;
@@ -446,8 +445,8 @@ function static BuildMissionInfoPanel(UIScreen ParentScreen, StateObjectReferenc
 		MissionExpiryPanel.Remove();
 	}
 	MissionExpiryPanel = ParentScreen.Spawn(class'UIPanel', ParentScreen);
-	// KDM : Make sure MissionExpiryPanel isn't navigable because :
-	// 1.] It shouldn't be navigable in the 1st place. 2.] It messes up controller and arrow key navigation within the infiltration screen, UIMission_LWLaunchDelayedMission. 
+	// KDM : Make sure MissionExpiryPanel isn't navigable because : 1.] It shouldn't be navigable in the 1st place. 
+	// 2.] It messes up controller and arrow key navigation within the infiltration screen, UIMission_LWLaunchDelayedMission. 
 	MissionExpiryPanel.bIsNavigable = false;
 	MissionExpiryPanel.InitPanel('ExpiryPanel').SetPosition(725, 180);
 	MissionExpiryBG = ParentScreen.Spawn(class'UIBGBox', MissionExpiryPanel);
@@ -457,7 +456,7 @@ function static BuildMissionInfoPanel(UIScreen ParentScreen, StateObjectReferenc
 	// status string needs some extra lines in a large-ish font.
 	MissionExpiryBG.InitBG('ExpiryBG', 0, 0, 470, IsInfiltrating ? 200 : 130);
 	MissionExpiryTitle = ParentScreen.Spawn(class'UIX2PanelHeader', MissionExpiryPanel);
-	// KDM : Make sure MissionExpiryTitle isn't navigable.
+	// KDM : Make sure MissionExpiryTitle isn't navigable; the reasoning is the same as for MissionExpiryPanel above.
 	MissionExpiryTitle.bIsNavigable = false;
 
 	if (TotalMissionHours >= 0.0 && TotalMissionHours <= 10000.0 && MissionState.ExpirationDateTime.m_iYear < 2100)

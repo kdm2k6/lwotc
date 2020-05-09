@@ -24,11 +24,14 @@ var localized string strRecon;
 var transient bool bScanButtonResized;
 var transient float CachedScanButtonWidth;
 
-// KDM : FUNCTIONS START
 
-// KDM : This code has been stripped from OnMouseEvent() --> FXS_L_MOUSE_UP and placed in a function so it can be called from 
-// either mouse and keyboard code or controller code.
-simulated function OpenInfiltrationScreen()
+
+
+
+
+// KDM : This code was stripped out of OnMouseEvent() --> FXS_L_MOUSE_UP and placed within a function so that it could be called from both
+// 1.] OnMouseEvent() for mouse & keyboard users 2.] OnUnrealCommand() for controller users.
+simulated function MapItemMissionClicked()
 {
 	local XComGameState_GeoscapeEntity GeoscapeEntity;
 	local XComGameState_LWPersistentSquad InfiltratingSquad;
@@ -50,28 +53,32 @@ simulated function OpenInfiltrationScreen()
 
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
+	local bool bHandled;
+
 	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
 	{
 		return true;
 	}
 
+	bHandled = true;
+
 	switch(cmd)
 	{
-		// KDM : The A button opens the infiltration screen.
+		// KDM : The A button opens a mission's infiltration screen if it is currently being infiltrated.
 		// OnMouseEvent() checks if the Avenger is in flight before executing any of its code; consequently, I do the same for the controller here.
 		case class'UIUtilities_Input'.static.GetAdvanceButtonInputCode():
 			if (GetStrategyMap().m_eUIState != eSMS_Flight)
 			{
-				OpenInfiltrationScreen();
-				return true;
+				MapItemMissionClicked();
 			}
 			break;
 
 		default :
+			bHandled = false;
 			break;
 	}
 
-	return super.OnUnrealCommand(cmd, arg);
+	return bHandled || super.OnUnrealCommand(cmd, arg);
 }
 
 simulated function OnMouseEvent(int cmd, array<string> args)
@@ -90,12 +97,20 @@ simulated function OnMouseEvent(int cmd, array<string> args)
 			OnMouseOut();
 			break;
 		case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP:
-			OpenInfiltrationScreen();
+			// KDM : A mouse click opens a mission's infiltration screen if it is currently being infiltrated.
+			MapItemMissionClicked();
 			break;
 	}
 }
 
-// KDM : FUNCTIONS END
+
+
+
+
+
+
+
+
 
 
 
