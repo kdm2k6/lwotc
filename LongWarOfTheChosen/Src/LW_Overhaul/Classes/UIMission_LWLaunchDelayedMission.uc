@@ -35,6 +35,68 @@ var UIButton IgnoreButton;
 var bool bCachedMustLaunch;
 var bool bAborted;
 
+// MOUSE AND KEYBOARD USERS MIGHT NOT WANT AUTO SELECTION - CHECK WHAT BASE LW2 DOES
+
+simulated function BuildOptionsPanel()
+{
+	local string Reason;
+	
+	LibraryPanel.MC.BeginFunctionOp("UpdateGuerrillaOpsButtonBlade");
+	LibraryPanel.MC.QueueString(m_strOptions);
+	LibraryPanel.MC.QueueString("");	// left blank in favor of a separately placed string, InfiltrationInfoText
+	LibraryPanel.MC.QueueString(m_strBoostInfiltration);
+	LibraryPanel.MC.QueueString(m_strViewSquad);
+	LibraryPanel.MC.QueueString(m_strAbort);
+	LibraryPanel.MC.QueueString(m_strLaunchMission);
+	LibraryPanel.MC.QueueString((bCachedMustLaunch ? class'UISkyrangerArrives'.default.m_strReturnToBase : m_strWait));
+	LibraryPanel.MC.EndOp();
+
+	Button1.OnClickedDelegate = OnBoostInfiltrationClicked;
+	Button2.OnClickedDelegate = OnViewSquadClicked;
+	// If mission is expiring, can't Cancel/wait, so need to disable
+	Button3.OnClickedDelegate = OnAbortClicked;
+
+	BuildConfirmPanel();
+
+	if (CanBoostInfiltration(Reason))
+	{
+		Button1.SetDisabled(false);
+	}
+	else
+	{
+		Button1.SetDisabled(true, Reason);
+	}
+
+	if (CanLaunchInfiltration(Reason))
+	{
+		ConfirmButton.SetDisabled(false);
+	}
+	else
+	{
+		ConfirmButton.SetDisabled(true, Reason);
+	}
+
+	// KDM : A call to AddIgnoreButton() has been removed and placed within BindLibraryItem(). Here is the reasoning :
+	// 1A.] The function BindLibraryItem() is called a single time through : InitScreen() --> BuildScreen() --> Super.BuildScreen() --> BindLibraryItem()
+	// 1B.] The function BuildOptionsPanel(), is called in 2 possible places : 
+	//		InitScreen() --> BuildScreen() --> Super.BuildScreen() --> BuildOptionsPanel()
+	//		ConfirmBoostInfiltrationCallback() --> BuildOptionsPanel()
+	//
+	// The problem is that AddIgnoreButton() spawns a new button each time it is called; therefore, a problematic scenario can occur whereby
+	// one button is spawned when the screen appears, and another button is spawned, right on top, when "Boost Infiltration" is chosen and accepted.
+	// This was noticeable when using the controller as the Ignore button suddenly looked like it couldn't be selected; this was because the Ignore 
+	// button being selected was the bottom one.
+	//
+	// Now, one possible solution is to leave AddIgnoreButton() alone, but exit it when IgnoreButton != none; this, in fact work !
+	// However, the Ignore button should really be created and dealt with when the rest of the buttons are created and dealt with.
+	//
+	// One final note : AddIgnoreButton() is added outside of the AlertLibID != '' check since, in Long War 2's original code, it doesn't
+	// rely upon such conditional statements; I don't believe this matters, but will leave it this way anyways.
+	
+	RefreshNavigation();
+}
+
+
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	local bool bHandled;
@@ -93,6 +155,7 @@ simulated function TheIndexChanged(int index)
 
 	ThePanel = Navigator.GetSelected();
 	`log("KDM SELECTED ITEM IS :" @ ThePanel @ " WITH NAME : " @ ThePanel.MCName @ " : " @ ThePanel.LibID);
+	`log("IgnoreButton bIsFocused DURING INDEX CHANGED IS *** " @ IgnoreButton.bIsFocused);
 	//`log("KDM SELECTED ITEM IS :" @ Navigator.GetSelected());
 	//`log("KDM GET VIA INDEX IS :" @ Navigator.GetControl(index));
 }
@@ -103,7 +166,7 @@ simulated function BindLibraryItem()
 	local Name AlertLibID;
 	
 	// KDM TEMPORARY *****************
-	Navigator.OnSelectedIndexChanged = TheIndexChanged;
+	//Navigator.OnSelectedIndexChanged = TheIndexChanged;
 
 	AlertLibID = GetLibraryID();
 	
@@ -139,7 +202,7 @@ simulated function BindLibraryItem()
 		ConfirmButton = Spawn(class'UIButton', LibraryPanel);
 		ConfirmButton.ResizeToText = false;
 		ConfirmButton.InitButton('ConfirmButton', "", OnLaunchClicked, eUIButtonStyle_NONE);
-
+		
 		// KDM : I removed the call to ConfirmButton.DisableNavigation() since navigation is dealt with elsewhere
 
 		ShadowChamber = Spawn(class'UIAlertShadowChamberPanel', LibraryPanel);
@@ -154,12 +217,15 @@ simulated function BindLibraryItem()
 		
 		// KDM : I removed the call to ChosenPanel.DisableNavigation() since navigation is dealt with elsewhere
 	}
+
+	// KDM : AddIgnoreButton() was moved here from BuildOptionsPanel(). Read the comments in that section for the reasoning.
+	AddIgnoreButton();
 }
 
 simulated function AddIgnoreButton()
 {
 	// Ignore button is controlled by flash and shows by default; therefore, hide it if necessary.
-	
+
 	IgnoreButton = Spawn(class'UIButton', LibraryPanel);
 
 	if (CanBackOut())
@@ -269,9 +335,7 @@ simulated function RefreshNavigation()
 		Navigator.SetSelected(IgnoreButton);
 	}
 	
-
-	// TO DO : ONUNREAL COMMAND LINKS TO PROPER BUTTON SELECTION
-
+	
 
 	// KDM : REMOVE RETURN HERE WHEN DONE **********************************
 	return;
@@ -578,43 +642,7 @@ simulated function BuildMissionPanel()
 	}
 }
 
-simulated function BuildOptionsPanel()
-{
-	local string Reason;
 
-	LibraryPanel.MC.BeginFunctionOp("UpdateGuerrillaOpsButtonBlade");
-	LibraryPanel.MC.QueueString(m_strOptions);
-	LibraryPanel.MC.QueueString(""); //// left blank in favor of a separately placed string, InfiltrationInfoText
-	//LibraryPanel.MC.QueueString(GetInfiltrationString());
-	LibraryPanel.MC.QueueString(m_strBoostInfiltration);
-	LibraryPanel.MC.QueueString(m_strViewSquad);
-	LibraryPanel.MC.QueueString(m_strAbort);
-	LibraryPanel.MC.QueueString(m_strLaunchMission);
-	LibraryPanel.MC.QueueString((bCachedMustLaunch ? class'UISkyrangerArrives'.default.m_strReturnToBase : m_strWait));
-	LibraryPanel.MC.EndOp();
-
-	Button1.OnClickedDelegate = OnBoostInfiltrationClicked;
-	Button2.OnClickedDelegate = OnViewSquadClicked;
-	//If mission is expiring, can't Cancel/wait, so need to disable
-	Button3.OnClickedDelegate = OnAbortClicked;
-
-	BuildConfirmPanel();
-
-	if (CanBoostInfiltration(Reason))
-		Button1.SetDisabled(false);
-	else
-		Button1.SetDisabled(true, Reason);
-
-	if (CanLaunchInfiltration(Reason))
-		ConfirmButton.SetDisabled(false);
-	else
-		ConfirmButton.SetDisabled(true, Reason);
-
-	// BuildConfirmPanel does nothing, but left in for comparison with UIMission_GOps.
-	// BuildConfirmPanel();
-	AddIgnoreButton();
-	RefreshNavigation();
-}
 
 simulated function String GetObjectiveString()
 {
