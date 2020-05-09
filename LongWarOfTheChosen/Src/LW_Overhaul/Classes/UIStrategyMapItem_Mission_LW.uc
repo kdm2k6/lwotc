@@ -93,11 +93,13 @@ simulated function OnMouseEvent(int cmd, array<string> args)
 		case class'UIUtilities_Input'.const.FXS_L_MOUSE_IN:
 			OnMouseIn();
 			break;
+
 		case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
 			OnMouseOut();
 			break;
+
+		// KDM : A mouse click opens a mission's infiltration screen if it is currently being infiltrated.
 		case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP:
-			// KDM : A mouse click opens a mission's infiltration screen if it is currently being infiltrated.
 			MapItemMissionClicked();
 			break;
 	}

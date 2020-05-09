@@ -358,7 +358,6 @@ function static string GetInfiltrationString(XComGameState_MissionSite MissionSt
 	return InfiltrationString;
 }
 
-// KDM : Function modified : Remove this comment before submission ***
 function static BuildMissionInfoPanel(UIScreen ParentScreen, StateObjectReference MissionRef, bool IsInfiltrating)
 {
 	local int EvacFlareTimer;
