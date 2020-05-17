@@ -1,24 +1,20 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    UIFacility_LWOfficerSlot.uc
-//  AUTHOR:  Amineri
-//           
+//  AUTHOR:  Amineri         
 //  PURPOSE: Reworked UIFacility_StaffSlot for officer functionality
 //---------------------------------------------------------------------------------------
 
-class UIFacility_LWOfficerSlot extends UIFacility_StaffSlot
-	dependson(UIPersonnel);
+class UIFacility_LWOfficerSlot extends UIFacility_StaffSlot dependson(UIPersonnel);
 
 var localized string m_strTrainOfficerDialogTitle;
 var localized string m_strTrainOfficerDialogText;
 var localized string m_strStopTrainOfficerDialogTitle;
 var localized string m_strStopTrainOfficerDialogText;
 
-//-----------------------------------------------------------------------------
 simulated function OnClickStaffSlot(UIPanel kControl, int cmd)
 {
 	local XComGameState_StaffSlot StaffSlot;
 	local XComGameState_Unit UnitState;
-	//local XComGameState_HeadquartersXCom XComHQ;
 	local XComGameState_HeadquartersProjectTrainLWOfficer TrainProject;
 	local string StopTrainingText;
 
@@ -26,52 +22,50 @@ simulated function OnClickStaffSlot(UIPanel kControl, int cmd)
 
 	switch (cmd)
 	{
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_DOUBLE_UP:
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP_DELAYED:
-		if (StaffSlot.IsLocked())
-		{
-			ShowUpgradeFacility();
-		}
-		else if (StaffSlot.IsSlotEmpty())
-		{
-			//StaffContainer.ShowDropDown(self);
-			OnOfficerTrainSelected();
-		}
-		else // Ask the user to confirm that they want to empty the slot and stop training
-		{
-			//XComHQ = class'UIUtilities_Strategy'.static.GetXComHQ();
-			UnitState = StaffSlot.GetAssignedStaff();
-			TrainProject = class'X2StrategyElement_LW_OTS_OfficerStaffSlot'.static.GetLWOfficerTrainProject(UnitState.GetReference(), StaffSlot);
+		// KDM : UIStaffSlot --> OnUnrealCommand() simulates a click by calling OnClickStaffSlot() with FXS_L_MOUSE_UP.
+		// Therefore, add this case to make it controller compatible.
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP:
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_DOUBLE_UP:
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_UP_DELAYED:
+			if (StaffSlot.IsLocked())
+			{
+				ShowUpgradeFacility();
+			}
+			else if (StaffSlot.IsSlotEmpty())
+			{
+				OnOfficerTrainSelected();
+			}
+			else // Ask the user to confirm that they want to empty the slot and stop training
+			{
+				UnitState = StaffSlot.GetAssignedStaff();
+				TrainProject = class'X2StrategyElement_LW_OTS_OfficerStaffSlot'.static.GetLWOfficerTrainProject(UnitState.GetReference(), StaffSlot);
 
-			StopTrainingText = m_strStopTrainOfficerDialogText;
-			StopTrainingText = Repl(StopTrainingText, "%UNITNAME", UnitState.GetName(eNameType_RankFull));
-			StopTrainingText = Repl(StopTrainingText, "%CLASSNAME", TrainProject.GetTrainingAbilityFriendlyName());
+				StopTrainingText = m_strStopTrainOfficerDialogText;
+				StopTrainingText = Repl(StopTrainingText, "%UNITNAME", UnitState.GetName(eNameType_RankFull));
+				StopTrainingText = Repl(StopTrainingText, "%CLASSNAME", TrainProject.GetTrainingAbilityFriendlyName());
 
-			ConfirmEmptyProjectSlotPopup(m_strStopTrainOfficerDialogTitle, StopTrainingText);
-		}
-		break;
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
-	case class'UIUtilities_Input'.const.FXS_L_MOUSE_RELEASE_OUTSIDE:
-		if(!StaffSlot.IsLocked())
-		{
-			StaffContainer.HideDropDown(self);
-		}
-		break;
+				ConfirmEmptyProjectSlotPopup(m_strStopTrainOfficerDialogTitle, StopTrainingText);
+			}
+			break;
+
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT:
+		case class'UIUtilities_Input'.const.FXS_L_MOUSE_RELEASE_OUTSIDE:
+			if (!StaffSlot.IsLocked())
+			{
+				StaffContainer.HideDropDown(self);
+			}
+			break;
 	}
 }
 
 simulated function QueueDropDownDisplay()
 {
 	OnClickStaffSlot(none, class'UIUtilities_Input'.const.FXS_L_MOUSE_DOUBLE_UP);
-	//m_QueuedDropDown = true;
 }
 
 simulated function OnOfficerTrainSelected()
 {
-	//local XGParamTag LocTag;
 	local TDialogueBoxData DialogData;
-	//local XComGameState_Unit Unit;
-	//local UICallbackData_StateObjectReference CallbackData;
 	local XComGameState_HeadquartersXCom XComHQ;
 	local XComGameState_CampaignSettings Settings;
 	local name FlagName;
@@ -100,7 +94,7 @@ simulated function OnOfficerTrainSelected()
 	}
 	else
 	{
-		// go directly to soldier list and bypass warning
+		// Go directly to soldier list and bypass warning
 		TrainOfficerDialogCallback('eUIAction_Accept', none);
 	}
 }
@@ -135,18 +129,15 @@ simulated function TrainOfficerDialogCallback(Name eAction, UICallbackData xUser
 {
 	local UIPersonnel_LWOfficer kPersonnelList;
 	local XComHQPresentationLayer HQPres;
-	//local UICallbackData_StateObjectReference CallbackData;
 	local XComGameState_StaffSlot StaffSlotState;
-	
-	//CallbackData = UICallbackData_StateObjectReference(xUserData);
 	
 	if (eAction == 'eUIAction_Accept')
 	{
 		HQPres = `HQPRES;
 		StaffSlotState = XComGameState_StaffSlot(`XCOMHISTORY.GetGameStateForObjectID(StaffSlotRef.ObjectID));
 
-		//Don't allow clicking of Personnel List is active or if staffslot is filled
-		if(HQPres.ScreenStack.IsNotInStack(class'UIPersonnel') && !StaffSlotState.IsSlotFilled())
+		// Don't allow clicking of Personnel List if active or if staffslot is filled
+		if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel') && !StaffSlotState.IsSlotFilled())
 		{
 			kPersonnelList = Spawn( class'UIPersonnel_LWOfficer', HQPres);
 			kPersonnelList.m_eListType = eUIPersonnel_Soldiers;
@@ -168,9 +159,6 @@ simulated function OnSoldierSelected(StateObjectReference _UnitRef)
 	OfficerScreen.InitPromotion(_UnitRef, false);
 	OfficerScreen.CreateSoldierPawn();
 }
-
-
-//==============================================================================
 
 defaultproperties
 {

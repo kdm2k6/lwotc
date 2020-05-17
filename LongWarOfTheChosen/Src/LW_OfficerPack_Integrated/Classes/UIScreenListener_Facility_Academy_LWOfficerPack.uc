@@ -1,146 +1,179 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    UIScreenListener_Academy_StaffSlot_LWOfficerPack
 //  AUTHOR:  Amineri
-//
 //  PURPOSE: Implements hooks to setup officer Staff Slot 
 //--------------------------------------------------------------------------------------- 
 
-class UIScreenListener_Facility_Academy_LWOfficerPack extends UIScreenListener;
+class UIScreenListener_Facility_Academy_LWOfficerPack extends UIScreenListener dependsOn(UIScreenListener_Facility);
 
 var UIButton OfficerButton;
-//var UIFacility_Academy ParentScreen;
 var UIFacility_LWOfficerSlot Slot;
 var localized string strOfficerTrainButton;
 var UIPersonnel PersonnelSelection;
 var XComGameState_StaffSlot StaffSlot;
 
-// This event is triggered after a screen is initialized
 event OnInit(UIScreen Screen)
 {
 	local int i, QueuedDropDown;
 	local UIFacility_Academy ParentScreen;
 
-	//default is no dropdown
+	// Default is no dropdown
 	QueuedDropDown = -1;
 
 	ParentScreen = UIFacility_Academy(Screen);
 
-	//check for queued dropdown, and cache it if find one
-	for(i = 0; i < ParentScreen.m_kStaffSlotContainer.StaffSlots.Length; i++)
+	// Check for queued dropdown, and cache it if find one
+	for (i = 0; i < ParentScreen.m_kStaffSlotContainer.StaffSlots.Length; i++)
 	{
-		if(ParentScreen.m_kStaffSlotContainer.StaffSlots[i].m_QueuedDropDown)
+		if (ParentScreen.m_kStaffSlotContainer.StaffSlots[i].m_QueuedDropDown)
 		{
 			QueuedDropDown = i;
 			break;
 		}
 	}
 
-	//update template and facility as needed
-	//`Log("LW OfficerPack: AcademyListener Start");
-	//class'X2DownloadableContentInfo_LWOfficerPack'.static.OnLoadedSavedGame();
 	ParentScreen.RealizeNavHelp();
 
-	//UpdateStaffSlots();
-
-	//Get rid of existing staff slots
-	for(i = ParentScreen.m_kStaffSlotContainer.StaffSlots.Length-1; i >= 0; i--)
+	// Get rid of existing staff slots
+	for (i = ParentScreen.m_kStaffSlotContainer.StaffSlots.Length-1; i >= 0; i--)
 	{
 		ParentScreen.m_kStaffSlotContainer.StaffSlots[i].Remove();
 		ParentScreen.m_kStaffSlotContainer.StaffSlots[i].Destroy();
 	}
 
-	//Get rid of the existing staff slot container
+	// Get rid of the existing staff slot container
 	ParentScreen.m_kStaffSlotContainer.Hide();
-	//ParentScreen.m_kStaffSlotContainer.Remove();
 	ParentScreen.m_kStaffSlotContainer.Destroy();
 
-	//Create the new staff slot container that correctly handles the second soldier officer slot
+	// Create the new staff slot container that correctly handles the second soldier officer slot
 	ParentScreen.m_kStaffSlotContainer = ParentScreen.Spawn(class'UIFacilityStaffContainer_LWOTS', ParentScreen);
 	ParentScreen.m_kStaffSlotContainer.InitStaffContainer();
 	ParentScreen.m_kStaffSlotContainer.SetMessage("");
 	ParentScreen.RealizeStaffSlots();
 
-	//re-queue the dropdown if there was one
-	if(QueuedDropDown >= 0)
+	// Re-queue the dropdown if there was one
+	if (QueuedDropDown >= 0)
 	{
-		//if (ParentScreen.m_kStaffSlotContainer != none)
-		//{
-			//UIFacility_StaffSlot(ParentScreen.m_kStaffSlotContainer.GetChildAt(QueuedDropDown)).OnClickStaffSlot(none, class'UIUtilities_Input'.const.FXS_L_MOUSE_UP);
-		//}
-
 		ParentScreen.ClickStaffSlot(QueuedDropDown);
+	}
+
+
+	// KDM : UIScreenListener_Facility fixes the finnicky UIFacility controller navigation system via OnInit(); unfortunately,
+	// its functions need to be called last, after the facility screen has been setup. Since we can't determine screen listener ordering, 
+	// make sure these functions are called last no matter what.
+	class'UIScreenListener_Facility'.static.ReconstructNavigationSystem(UIFacility(Screen));
+	class'UIScreenListener_Facility'.static.PerformInitialSelection(UIFacility(Screen));
+	// KDM : Navigation selection done in UIFacility --> InitScreen() has been contaminated since the staff slot container, as well as
+	// its staff slots, have been destroyed and replaced with custom variants. Consequently, redo initial selection.
+	//ParentScreen.Navigator.SelectFirstAvailable();
+	//ReconstructNavigation(ParentScreen);
+	// KDM TO DO : I'm thinking the navigation system has been screwed up since m_kStaffSlotContainer's navigation had already been
+	// setup before it was destroyed and replaced with a custom variant.
+}
+
+// UIFacility has :
+// m_kRoomContainer (UIRoomContainer --> UIPanel) stores array of UIFacility_RoomFunc's (UPanel's basically)
+// m_kStaffSlotContainer (UIFacilityStaffContainer --> UIStaffContainer --> UIPanel) has an array of UIStaffSlot's (or subclasses) and
+// an UIPersonnel_DropDown. UIPersonnel_DropDown is a UIPanel and UIStaffSlot is a UIPanel.
+
+function ReconstructNavigation(UIFacility_Academy FacilityScreen)
+{
+	local bool StaffSlotContainerIsUsable;
+	local UIRoomContainer RoomContainer;
+	local UIStaffContainer StaffSlotContainer;
+
+	RoomContainer = FacilityScreen.m_kRoomContainer;
+	StaffSlotContainer = FacilityScreen.m_kStaffSlotContainer;
+	StaffSlotContainerIsUsable = (StaffSlotContainer != none && StaffSlotContainer.NumChildren() > 0) ? true : false;
+	
+	// KDM : We want the UIFacility to ignore D-Pad left/right; it's subcomponents will do that. 
+	FacilityScreen.Navigator.HorizontalNavigation = false;
+	if (StaffSlotContainerIsUsable)
+	{
+		// KDM : Staff slots are placed horizontally, so we want the container to work horizontally.
+		StaffSlotContainer.Navigator.HorizontalNavigation = true;
+		// KDM : We want staff slot selection to loop around with D-Pad left/right; this also prevents situations in which D-Pad left/right 
+		// are sent up to the facility screen, which will then select the next/previous UI element, like the room container.
+		StaffSlotContainer.Navigator.LoopSelection = true;
+	}
+
+	// KDM : Remove all focus, just in case any existed beforehand
+	FacilityScreen.Navigator.ClearSelectionHierarchy();
+	// KDM : Remove all navigable controls
+	FacilityScreen.Navigator.Clear();
+	// KDM : Remove all navigation targets
+	FacilityScreen.Navigator.ClearAllNavigationTargets();
+	
+	if (StaffSlotContainerIsUsable)
+	{
+		// KDM : Remove all focus, just in case any existed beforehand
+		StaffSlotContainer.Navigator.ClearSelectionHierarchy();
+		// KDM : Remove all navigation targets, just in case they were set beforehand
+		StaffSlotContainer.Navigator.ClearAllNavigationTargets();
+		
+		FacilityScreen.Navigator.AddControl(StaffSlotContainer);
+		if (RoomContainer != none)
+		{
+			// KDM : If the staff slot container is selected and you hit D-Pad down, select the room button container below it.
+			StaffSlotContainer.Navigator.AddNavTargetDown(RoomContainer);
+		}
+	}
+
+	if (RoomContainer != none)
+	{
+		// KDM : Remove all focus, just in case any existed beforehand
+		RoomContainer.Navigator.ClearSelectionHierarchy();
+		// KDM : Remove all navigation targets, just in case they were set beforehand
+		RoomContainer.Navigator.ClearAllNavigationTargets();
+
+		FacilityScreen.Navigator.AddControl(RoomContainer);
+		if (StaffSlotContainerIsUsable)
+		{
+			// KDM : If the room button container is selected and you hit D-Pad up, select the staff slot container above it.
+			RoomContainer.Navigator.AddNavTargetUp(StaffSlotContainer);
+		}
+	}
+
+	// KDM : When you hit the left and right bumper buttons, the navigation system moves down to the Avenger shortcut bar. 
+	// We want to be able to escape the shortcut bar, and move back to the facility's buttons, with D-Pad up; however, this escape
+	// depends upon what is available. If possible, we will choose the room container, since it is closest the shortcut bar; however,
+	// if it isn't available, we will go with the staff slot container.
+	if (RoomContainer != none)
+	{
+		FacilityScreen.Navigator.AddNavTargetUp(RoomContainer);
+	}
+	else if (StaffSlotContainerIsUsable)
+	{
+		FacilityScreen.Navigator.AddNavTargetUp(StaffSlotContainer);
+	}
+
+	// KDM : Navigation has been set up; it's now time for initial selection
+	if (StaffSlotContainerIsUsable)
+	{
+		// KDM : The staff slot container has bCascadeFocus set to false, so we need to select the 1st available slot as well as itself.
+		StaffSlotContainer.Navigator.SelectFirstAvailable();
+		FacilityScreen.Navigator.SetSelected(StaffSlotContainer);
+	}
+	else if (RoomContainer != none)
+	{
+		FacilityScreen.Navigator.SetSelected(RoomContainer);
 	}
 }
 
-
-// This event is triggered after a screen receives focus
 event OnReceiveFocus(UIScreen Screen)
 {
-	//UpdateStaffSlots();
 	UIFacility_Academy(Screen).m_kStaffSlotContainer.Show();
 }
-// This event is triggered after a screen loses focus
+
 event OnLoseFocus(UIScreen Screen)
 {
-	//UpdateStaffSlots();
 	UIFacility_Academy(Screen).m_kStaffSlotContainer.Hide();
 }
 
-// This event is triggered when a screen is removed
 event OnRemoved(UIScreen Screen)
 {
-	//clear reference to UIScreen so it can be garbage collected
-	//ParentScreen = none;
+	// KDM : This did nothing so it probably doesn't need to be here; leaving it, for the moment, just in case.
 }
-
-//function UpdateStaffSlots()
-//{
-	//local int i;
-	//local XComGameState_FacilityXCom Facility;
-//
-	//Facility = ParentScreen.GetFacility();
-	//`log("LW Officer Pack: Facility Template instantiated=" $ Facility.GetMyTemplateName());
-//
-	////currently only retrieves first officer staffslot
-	//for (i = 0; i < Facility.StaffSlots.Length; ++i)
-	//{
-		//StaffSlot = Facility.GetStaffSlot(i);
-		//if (StaffSlot.GetMyTemplateName() == 'OTSOfficerSlot')
-			//break;
-	//}
-//}
-
-//function AddFloatingButton()
-//{
-	//OfficerButton = ParentScreen.Spawn(class'UIButton', ParentScreen.m_kStaffSlotContainer);
-	//OfficerButton.InitButton('', Caps(strOfficerTrainButton), OnButtonCallback, eUIButtonStyle_HOTLINK_BUTTON);
-	////OfficerButton.AnchorBottomCenter();
-	//OfficerButton.OriginTopLeft();
-	//OfficerButton.SetResizeToText(false);
-	//OfficerButton.SetFontSize(24);
-	//OfficerButton.SetPosition(10, 100);
-	//OfficerButton.SetSize(280, 40);
-	//OfficerButton.Show();
-//}
-
-//simulated function OnButtonCallback(UIButton kButton)
-//{
-	//local UIPersonnel_LWOfficer kPersonnelList;
-	//local XComHQPresentationLayer HQPres;
-//
-	//HQPres = `HQPRES;
-	//
-	////Don't allow clicking of Personnel List is active or if staffslot is filled
-	//if(HQPres.ScreenStack.IsNotInStack(class'UIPersonnel') && !StaffSlot.IsSlotFilled())
-	//{
-		//kPersonnelList = HQPres.Spawn( class'UIPersonnel_LWOfficer', HQPres);
-		//kPersonnelList.m_eListType = eUIPersonnel_Soldiers;
-		//kPersonnelList.onSelectedDelegate = OnSoldierSelected;
-		//kPersonnelList.m_bRemoveWhenUnitSelected = true;
-		//kPersonnelList.SlotRef = StaffSlot.GetReference();
-		//HQPres.ScreenStack.Push( kPersonnelList );
-	//}
-//}
 
 simulated function OnSoldierSelected(StateObjectReference _UnitRef)
 {
@@ -155,6 +188,5 @@ simulated function OnSoldierSelected(StateObjectReference _UnitRef)
 
 defaultproperties
 {
-	// Leaving this assigned to none will cause every screen to trigger its signals on this class
 	ScreenClass = UIFacility_Academy;
 }
