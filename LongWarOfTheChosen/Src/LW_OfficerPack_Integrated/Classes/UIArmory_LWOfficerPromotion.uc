@@ -291,12 +291,16 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 	MC.EndOp();
 }
 
+// KDM : OnLoseFocus(), as of WotC, now stores the list's selection in previousSelectedIndexOnFocusLost so it can be re-selected
+// upon receiving focus. Since Long War 2 does nothing unique with this function, we no longer want to override it.
+
+/*
 simulated function OnLoseFocus()
 {
 	super(UIArmory).OnLoseFocus();
-	//List.SetSelectedIndex(-1);
 	`HQPRES.m_kAvengerHUD.NavHelp.ClearButtonHelp();
 }
+*/
 
 
 simulated function PreviewRow(UIList ContainerList, int ItemIndex)
@@ -439,12 +443,23 @@ simulated function string GetFormattedLeadershipText()
 
 simulated function UpdateNavHelp()
 {
-	//<workshop> SCI 2016/4/12
-	//INS:
+	// KDM : UpdateNavHelp() has changed significantly between WotC and base XCom2; furthermore, Long War 2 appears to do nothing unique
+	// with this function. Therefore, simply use UIArmory_Promotion --> UpdateNavHelp().
+	//
+	// KDM : Questions :
+	// 1.] Do I leave the call to JumpToRecoveryFacility() ?
+
+	super.UpdateNavHelp();
+}
+
+/*
+simulated function UpdateNavHelp()
+{
 	local int i;
 	local string PrevKey, NextKey;
 	local XGParamTag LocTag;
-	if(!bIsFocused)
+	
+	if (!bIsFocused)
 	{
 		return;
 	}
@@ -452,11 +467,7 @@ simulated function UpdateNavHelp()
 	NavHelp = `HQPRES.m_kAvengerHUD.NavHelp;
 
 	NavHelp.ClearButtonHelp();
-	//</workshop>
-
-	//<workshop> SCI 2016/4/12
-	//WAS:
-	//super.UpdateNavHelp();
+	
 	NavHelp.AddBackButton(OnCancel);
 		
 	if (XComHQPresentationLayer(Movie.Pres) != none)
@@ -494,7 +505,7 @@ simulated function UpdateNavHelp()
 		NavHelp.AddLeftHelp(m_strInfo, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $class'UIUtilities_Input'.const.ICON_LSCLICK_L3);
 	}
 
-	if( `ISCONTROLLERACTIVE )
+	if (`ISCONTROLLERACTIVE)
 	{
 		if (IsAllowedToCycleSoldiers() && class'UIUtilities_Strategy'.static.HasSoldiersToCycleThrough(UnitReference, CanCycleTo))
 		{
@@ -505,8 +516,8 @@ simulated function UpdateNavHelp()
 	}
 
 	NavHelp.Show();
-	//</workshop>
 }
+*/
 
 simulated function ConfirmAbilitySelection(int Rank, int Branch)
 {
