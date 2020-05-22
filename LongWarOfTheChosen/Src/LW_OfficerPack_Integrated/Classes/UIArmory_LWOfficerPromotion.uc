@@ -1,9 +1,7 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    UIArmory_LWOfficerPromotion
 //  AUTHOR:  Amineri (Pavonis Interactive)
-//
 //  PURPOSE: Tweaked ability selection UI for LW officer system
-//
 //--------------------------------------------------------------------------------------- 
 
 class UIArmory_LWOfficerPromotion extends UIArmory_Promotion config(LW_OfficerPack);
@@ -22,7 +20,7 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 {
 	// If the AfterAction screen is running, let it position the camera
 	AfterActionScreen = UIAfterAction(Movie.Stack.GetScreen(class'UIAfterAction'));
-	if(AfterActionScreen != none)
+	if (AfterActionScreen != none)
 	{
 		bAfterActionPromotion = true;
 		PawnLocationTag = AfterActionScreen.GetPawnLocationTag(UnitRef);
@@ -38,17 +36,33 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 	// Don't show nav help during tutorial, or during the After Action sequence.
 	bUseNavHelp = class'XComGameState_HeadquartersXCom'.static.IsObjectiveCompleted('T0_M2_WelcomeToArmory') || Movie.Pres.ScreenStack.IsInStack(class'UIAfterAction');
 
+	// KDM : Following the lead of UIArmoryPromotion --> InitPromotion()
+	UnitReference = UnitRef;
+
 	super(UIArmory).InitArmory(UnitRef,,,,,, bInstantTransition);
 
-	List = Spawn(class'UIList', self).InitList('', 58, 170, 630, 700);
-	List.OnSelectionChanged = PreviewRow;
-	List.bStickyHighlight = false;
+	List = Spawn(class'UIList', self);
 	List.bAutosizeItems = false;
-
-	LeadershipButton = Spawn(class'UIButton', self).InitButton(, strLeadershipButton, ViewLeadershipStats);
-	LeadershipButton.SetPosition(58, 971); //100,100
+	List.bStickyHighlight = false;
+	List.OnSelectionChanged = PreviewRow;
+	List.InitList('', 58, 170, 630, 700);
+	
+	LeadershipButton = Spawn(class'UIButton', self);
+	// KDM : Make the Leadership button a hotlink when using a controller.
+	LeadershipButton.InitButton(, strLeadershipButton, ViewLeadershipStats, eUIButtonStyle_HOTLINK_BUTTON);
+	// KDM : Add the gamepad icon, right stick click, to be used when a controller is in use.
+	LeadershipButton.SetGamepadIcon(class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
+	LeadershipButton.SetPosition(58, 971);
 
 	PopulateData();
+
+	// KDM : Start navigator setup; ClassRowItem is not used for officers, so we can safely ignore it.
+	Navigator.Clear();
+	Navigator.LoopSelection = false;
+	Navigator.AddControl(List);
+	Navigator.SetSelected(List);
+	// Upon loading the screen, select the list item's leftmost ability.
+	UIArmory_LWOfficerPromotionItem(List.GetSelectedItem()).SetSelectedAbility(0);
 
 	MC.FunctionVoid("animateIn");
 }
