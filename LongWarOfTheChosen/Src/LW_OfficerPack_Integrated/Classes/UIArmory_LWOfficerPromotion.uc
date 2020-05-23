@@ -6,8 +6,8 @@
 
 
 // KDM - TO DO
-// IF you select next/previous soldier if they have same rank - don't see ability selection
 // Check navigation buttons + help links
+// Test mouse
 
 class UIArmory_LWOfficerPromotion extends UIArmory_Promotion config(LW_OfficerPack);
 
@@ -59,13 +59,11 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 	LeadershipButton.SetGamepadIcon(class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
 	LeadershipButton.SetPosition(58, 971);
 
-	// KDM : Start navigator setup; ClassRowItem is not used for officers, so we can safely ignore it.
+	// KDM : Set up the navigator; ClassRowItem is not used for officers, so we can safely ignore it.
 	Navigator.Clear();
 	Navigator.LoopSelection = false;
 	Navigator.AddControl(List);
 	Navigator.SetSelected(List);
-	// Upon loading the screen, select the list item's leftmost ability.
-	// UIArmory_LWOfficerPromotionItem(List.GetSelectedItem()).SetSelectedAbility(SelectedAbilityIndex);
 
 	PopulateData();
 
@@ -95,7 +93,6 @@ simulated function bool CanUnitEnterOTSTraining(XComGameState_Unit Unit)
 
 simulated function PopulateData()
 {
-	// KDM TO DO : PROBABLY NEED TO DEAL WITH PreviewIndex
 	local bool bHasAbility1, bHasAbility2, DisplayOnly;
 	local int i, MaxRank, RankToPromote, SelectionIndex;
 	local string AbilityIcon1, AbilityIcon2, AbilityName1, AbilityName2, HeaderString;
@@ -126,11 +123,10 @@ simulated function PopulateData()
 		HeaderString = m_strSelectAbility;
 	}
 
-	// Clear left/right ability titles
+	// Clear left and right ability titles
 	AS_SetTitle("", HeaderString, "", "", "");
 
 	// Init but then hide the first row, since it's set up for both class and single ability
-	// KDM : Does this really need to be done ? Investigate later.
 	if (ClassRowItem == none)
 	{
 		ClassRowItem = Spawn(class'UIArmory_PromotionItem', self);
@@ -185,12 +181,12 @@ simulated function PopulateData()
 		OfficerState = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit);
 		if (OfficerState != none)
 		{
-			// KDM : Determines if the officer already has either of these abilities
+			// KDM : Determines if the officer already has either of these abilities.
 			bHasAbility1 = OfficerState.HasOfficerAbility(AbilityTemplate1.DataName);
 			bHasAbility2 = OfficerState.HasOfficerAbility(AbilityTemplate2.DataName);
 		}
 		
-		// KDM : Determines which row of officer abilites is the promotion row, the row we will be selecting abilities from.
+		// KDM : Determines which row of officer abilites is the current promotion row.
 		if (DisplayOnly)
 		{
 			RankToPromote = -1;
@@ -243,12 +239,11 @@ simulated function PopulateData()
 		Item.SetAbilityData(AbilityIcon1, AbilityName1, AbilityIcon2, AbilityName2);
 		Item.SetEquippedAbilities(bHasAbility1, bHasAbility2);
 
-		// KDM : If this is the promotion row, highlight it as such.
+		// KDM : If this is the promotion row, highlight it as such; this row will also be given initial focus.
 		if (Item.Rank == RankToPromote)
 		{
 			Item.SetPromote(true);
 			SelectionIndex = i;
-			// Item.SetDisabled(false); KDM : WHY IS THIS DONE HERE SINCE IT IS JUST DONE BELOW - SAFE TO REMOVE ??
 		}
 		else
 		{
@@ -271,19 +266,17 @@ simulated function PopulateData()
 	// Update ability summary at the bottom
 	PopulateAbilitySummary(Unit);
 
-	/* KDM - OLD CALLS
-	List.SetSelectedIndex(-1); // initial selection
-	PreviewRow(List, 1); // initial abilities shown at bottom of panel
-	*/
-
-	// KDM : NEW CODE HERE
-	//PreviewRow(List, SelectionIndex); // I don't know if this is needed since List.OnSelectionChanged = PreviewRow
-	//Navigator.SetSelected(List);
-	// I AM SENDING FORCE = TRUE SINCE WE CAN RUN INTO A SITUATION WHERE NEXT/PREV SOLDIER ON SAME ROW SO NO
-	// UPDATE IN SELECTION
+	// KDM : If there was no promotion row for some reason, just select the 1st row.
+	if (SelectionIndex == INDEX_NONE)
+	{
+		SelectionIndex = 0;
+	}
+	
+	// KDM : Whenever list selection is changed, PreviewRow() is called, due to the setting of OnSelectionChanged within InitPromotion().
+	// Note that the parameter, bForce, is set to true so that PreviewRow() is called no matter what. Previously, if you clicked next /
+	// previous soldier, and the 2 soldiers had the same rank, the list would ignore SetSelectedIndex() since it was trying to set
+	// the list to the same index value.
 	List.SetSelectedIndex(SelectionIndex, true);
-
-	UpdateNavHelp(); // KDM THIS IS A NEW CALL, IS IT NEEDED ?
 }
 
 simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
@@ -329,15 +322,6 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 // KDM : OnLoseFocus(), as of WotC, now stores the list's selection in previousSelectedIndexOnFocusLost so it can be re-selected
 // upon receiving focus. Since Long War 2 does nothing unique with this function, we no longer want to override it.
 
-/*
-simulated function OnLoseFocus()
-{
-	super(UIArmory).OnLoseFocus();
-	`HQPRES.m_kAvengerHUD.NavHelp.ClearButtonHelp();
-}
-*/
-
-
 simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 {
 	local bool DisplayOnly;
@@ -378,7 +362,7 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 		EffectiveRank++;
 	}
 
-	// KDM : If the rank associated with this list item row is greater than the officer's actual rank show locked information and icons.
+	// KDM : If the rank associated with this row is greater than the officer's actual rank show locked information and icons.
 	// This, however, can be negated by ALWAYSSHOW and IsViewLockedStatsEnabled().
 	if ((Rank > EffectiveRank) && !(default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled()))
 	{
@@ -390,14 +374,14 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 			MC.QueueBoolean(false); // IsClassIcon
 		}
 	}
-	// KDM : We are looking at a list item row whose associated rank is less than the officer's actual rank.
+	// KDM : We are looking at a row whose associated rank is less than, or equal to, the officer's actual rank.
 	else
 	{
 		AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 
 		for (i = 0; i < NUM_ABILITIES_PER_RANK; ++i)
 		{
-			// KDM : The 1st list item row corresponds to the officer's core, non-selectable, abilities.
+			// KDM : The 1st row corresponds to the officer's core, non-selectable, abilities.
 			if (ItemIndex == 0)
 			{
 				AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.static.GetAbilityName(0, i));
@@ -430,8 +414,14 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 
 	MC.EndOp();
 
-	// KDM : NEW CALLS BELOW
+	// KDM : When a new row is selected, preserve the ability selection; this means :
+	// 1.] If the previous row's left ability was selected, select the left ability for the new row.
+	// 2.] If the previous row's right ability was selected, select the right ability for the new row.
 	UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).SetSelectedAbility(SelectedAbilityIndex);
+	
+	// KDM : The navigation help system is called more often in WotC becayse it updates under these situations :
+	// 1.] If you have a promotion row ability selected, a "Select" tip will be displayed.
+	// 2.] If you have an unhidden ability selected, an "Ability Info" tip will be displayed.   
 	UpdateNavHelp();
 }
 
@@ -446,26 +436,30 @@ simulated function ViewLeadershipStats(UIButton Button)
 	DialogData.strText = GetFormattedLeadershipText();
 	DialogData.strCancel = class'UIUtilities_Text'.default.m_strGenericOK;;
 	Movie.Pres.UIRaiseDialog(DialogData);
-
 }
 
 simulated function string GetFormattedLeadershipText()
 {
-	local XComGameStateHistory History;
+	local int idx, limit;
 	local string OutString;
-	local XComGameState_Unit_LWOfficer OfficerState;
-	local XComGameState_Unit OfficerUnit, Unit;
 	local array<LeadershipEntry> LeadershipData;
 	local LeadershipEntry Entry;
-	local int idx, limit;
-	//local XGParamTag LocTag;
 	local X2SoldierClassTemplate ClassTemplate;
-
+	local XComGameState_Unit OfficerUnit, Unit;
+	local XComGameState_Unit_LWOfficer OfficerState;
+	local XComGameStateHistory History;
+	
 	OutString = "";
 	OfficerUnit = GetUnit();
-	if (OfficerUnit == none) { return Outstring; }
+	if (OfficerUnit == none)
+	{
+		return Outstring;
+	}
 	OfficerState = class'LWOfficerUtilities'.static.GetOfficerComponent(OfficerUnit);
-	if (OfficerState == none) {return Outstring; }
+	if (OfficerState == none)
+	{
+		return Outstring;
+	}
 
 	LeadershipData = OfficerState.GetLeadershipData_MissionSorted();
 	History = `XCOMHISTORY;
@@ -474,105 +468,49 @@ simulated function string GetFormattedLeadershipText()
 
 	foreach LeaderShipData (Entry, idx)
 	{
-		if (idx >= limit) { break; } // limit to the top 40
-		if (Entry.UnitRef.ObjectID == 0) { limit += 1; continue; }
+		// Limit to the top 40
+		if (idx >= limit) 
+		{
+			break;
+		}
+		
+		if (Entry.UnitRef.ObjectID == 0)
+		{
+			limit += 1; 
+			continue;
+		}
+		
 		Unit = XComGameState_Unit(History.GetGameStateForObjectID(Entry.UnitRef.ObjectID));
-		if (Unit == none) { limit += 1; continue; }
-		if (Unit.IsDead()) { limit += 1; continue; }
-		ClassTemplate = Unit.GetSoldierClassTemplate();
-		if (ClassTemplate.DataName == 'LWS_RebelSoldier') { limit += 1; continue; }
+		if (Unit == none)
+		{
+			limit += 1;
+			continue;
+		}
+		
+		if (Unit.IsDead())
+		{
+			limit += 1;
+			continue;
+		}
 
+		ClassTemplate = Unit.GetSoldierClassTemplate();
+		if (ClassTemplate.DataName == 'LWS_RebelSoldier')
+		{
+			limit += 1;
+			continue;
+		}
 
 		OutString $= Entry.SuccessfulMissionCount $ " : ";
 		OutString $= Unit.GetName(eNameType_RankFull) $ " / ";
 		Outstring $= ClassTemplate.DisplayName;
-		//LocTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
-		//LocTag.StrValue0 = Unit.GetName(eNameType_RankFull);
-		//LocTag.IntValue0 = Entry.SuccessfulMissionCount;
-		//Outstring $= `XEXPAND.ExpandString(strLeadershipDialogueData);
 		Outstring $= "\n";
 	}
 
 	return OutString;
 }
 
-simulated function UpdateNavHelp()
-{
-	// KDM : UpdateNavHelp() has changed significantly between WotC and base XCom2; furthermore, Long War 2 appears to do nothing unique
-	// with this function. Therefore, simply use UIArmory_Promotion --> UpdateNavHelp().
-	//
-	// KDM : Questions :
-	// 1.] Do I leave the call to JumpToRecoveryFacility() ?
-
-	super.UpdateNavHelp();
-}
-
-/*
-simulated function UpdateNavHelp()
-{
-	local int i;
-	local string PrevKey, NextKey;
-	local XGParamTag LocTag;
-	
-	if (!bIsFocused)
-	{
-		return;
-	}
-
-	NavHelp = `HQPRES.m_kAvengerHUD.NavHelp;
-
-	NavHelp.ClearButtonHelp();
-	
-	NavHelp.AddBackButton(OnCancel);
-		
-	if (XComHQPresentationLayer(Movie.Pres) != none)
-	{
-		LocTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
-		LocTag.StrValue0 = Movie.Pres.m_kKeybindingData.GetKeyStringForAction(PC.PlayerInput, eTBC_PrevUnit);
-		PrevKey = `XEXPAND.ExpandString(PrevSoldierKey);
-		LocTag.StrValue0 = Movie.Pres.m_kKeybindingData.GetKeyStringForAction(PC.PlayerInput, eTBC_NextUnit);
-		NextKey = `XEXPAND.ExpandString(NextSoldierKey);
-
-		if (class'XComGameState_HeadquartersXCom'.static.GetObjectiveStatus('T0_M7_WelcomeToGeoscape') != eObjectiveState_InProgress &&
-			RemoveMenuEvent == '' && NavigationBackEvent == '' && !`ScreenStack.IsInStack(class'UISquadSelect'))
-		{
-			NavHelp.AddGeoscapeButton();
-		}
-
-		if (Movie.IsMouseActive() && IsAllowedToCycleSoldiers() && class'UIUtilities_Strategy'.static.HasSoldiersToCycleThrough(UnitReference, CanCycleTo))
-		{
-			NavHelp.SetButtonType("XComButtonIconPC");
-			i = eButtonIconPC_Prev_Soldier;
-			NavHelp.AddCenterHelp( string(i), "", PrevSoldier, false, PrevKey);
-			i = eButtonIconPC_Next_Soldier; 
-			NavHelp.AddCenterHelp( string(i), "", NextSoldier, false, NextKey);
-			NavHelp.SetButtonType("");
-		}
-	}
-
-	if (UIArmory_PromotionItem(List.GetSelectedItem()).bEligibleForPromotion)
-	{
-		NavHelp.AddSelectNavHelp();
-	}
-
-	if (`ISCONTROLLERACTIVE && !UIArmory_PromotionItem(List.GetSelectedItem()).bIsDisabled)
-	{
-		NavHelp.AddLeftHelp(m_strInfo, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $class'UIUtilities_Input'.const.ICON_LSCLICK_L3);
-	}
-
-	if (`ISCONTROLLERACTIVE)
-	{
-		if (IsAllowedToCycleSoldiers() && class'UIUtilities_Strategy'.static.HasSoldiersToCycleThrough(UnitReference, CanCycleTo))
-		{
-			NavHelp.AddLeftHelp(class'UIUtilities_Input'.static.InsertGamepadIcons("%LB %RB" @ m_strTabNavHelp));
-		}
-
-		NavHelp.AddLeftHelp(class'UIUtilities_Input'.static.InsertGamepadIcons("%RS" @ m_strRotateNavHelp));
-	}
-
-	NavHelp.Show();
-}
-*/
+// KDM : UpdateNavHelp() has changed significantly between WotC and base XCom2; furthermore, Long War 2 appears to do nothing unique
+// with this function. Therefore, simply use UIArmory_Promotion --> UpdateNavHelp().
 
 simulated function ConfirmAbilitySelection(int Rank, int Branch)
 {
@@ -601,7 +539,7 @@ simulated function ConfirmAbilitySelection(int Rank, int Branch)
 	DialogData.strText = `XEXPAND.ExpandString(m_strConfirmAbilityText);
 	Movie.Pres.UIRaiseDialog(DialogData);
 
-	// KDM NEW CALL IS IT NEEDED?
+	// KDM : Follow the new WotC UIArmory_Promotion and update the navigation help system.
 	UpdateNavHelp();
 }
 
@@ -621,11 +559,11 @@ simulated function ConfirmAbilityCallback(Name Action)
 	local XComGameState_HeadquartersProjectTrainLWOfficer TrainLWOfficerProject;
 	local XComGameState_StaffSlot StaffSlotState;
 
-	if(Action == 'eUIAction_Accept')
+	if (Action == 'eUIAction_Accept')
 	{
 		Unit = GetUnit();
 
-		//Build ClassAgnosticAbility to allow instant training into Officer Ability
+		// Build ClassAgnosticAbility to allow instant training into Officer Ability
 		Ability.AbilityName = class'LWOfficerUtilities'.static.GetAbilityName(PendingRank, PendingBranch);
 		Ability.ApplyToWeaponSlot = eInvSlot_Unknown;
 		Ability.UtilityCat = '';
@@ -633,36 +571,41 @@ simulated function ConfirmAbilityCallback(Name Action)
 		NewOfficerAbility.iRank = PendingRank;
 		NewOfficerAbility.bUnlocked = true;
 
-		//Build GameState change container
+		// Build GameState change container
 		History = `XCOMHISTORY;
 		ChangeContainer = class'XComGameStateContext_ChangeContainer'.static.CreateEmptyChangeContainer("Staffing Train Officer Slot");
 		UpdateState = History.CreateNewGameState(true, ChangeContainer);
 		UpdatedUnit = XComGameState_Unit(UpdateState.CreateStateObject(class'XComGameState_Unit', GetUnit().ObjectID));
 
-		//Try to retrieve new OfficerComponent from Unit -- note that it may not have been created for non-officers yet
+		// Try to retrieve new OfficerComponent from Unit -- note that it may not have been created for non-officers yet
 		OfficerState = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit);
 
 		if (OfficerState == none) 
 		{
-			//first promotion, create component gamestate and attach it
+			// First promotion, create component gamestate and attach it
 			OfficerState = XComGameState_Unit_LWOfficer(UpdateState.CreateStateObject(class'XComGameState_Unit_LWOfficer'));
 			OfficerState.InitComponent();
 			if (default.INSTANTTRAINING) 
 			{
 				OfficerState.SetOfficerRank(1);
-			} else {
+			}
+			else
+			{
 				NewOfficerRank = 1;
 			}
 			UpdatedUnit.AddComponentObject(OfficerState);
-		} else {
-			//subsequent promotion, update existing component gamestate
+		}
+		else
+		{
+			// Subsequent promotion, update existing component gamestate
 			NewOfficerRank = OfficerState.GetOfficerRank() + 1;
 			OfficerState = XComGameState_Unit_LWOfficer(UpdateState.CreateStateObject(class'XComGameState_Unit_LWOfficer', OfficerState.ObjectID));
 			if (default.INSTANTTRAINING) 
 			{
 				OfficerState.SetOfficerRank(NewOfficerRank);
-			} else {
-				
+			}
+			else
+			{	
 			}
 		}
 
@@ -672,7 +615,9 @@ simulated function ConfirmAbilityCallback(Name Action)
 			OfficerState.OfficerAbilities.AddItem(NewOfficerAbility);
 			UpdatedUnit = class'LWOfficerUtilities'.static.AddInitialAbilities(UpdatedUnit, OfficerState, UpdateState);
 			bTrainingSuccess = true;
-		} else {
+		}
+		else
+		{
 			bTrainingSuccess = OfficerState.SetRankTraining(NewOfficerRank, Ability.AbilityName);
 		}
 
@@ -682,32 +627,34 @@ simulated function ConfirmAbilityCallback(Name Action)
 			if (StaffSlotState != none)
 			{
 				UnitInfo.UnitRef = UpdatedUnit.GetReference();
-				StaffSlotState.FillSlot(UnitInfo, UpdateState); // The Training project is started when the staff slot is filled
+				// The Training project is started when the staff slot is filled
+				StaffSlotState.FillSlot(UnitInfo, UpdateState); 
 		
 				// Find the new Training Project which was just created by filling the staff slot and set the rank and ability
 				foreach UpdateState.IterateByClassType(class'XComGameState_HeadquartersProjectTrainLWOfficer', TrainLWOfficerProject)
 				{
-					if (TrainLWOfficerProject.ProjectFocus.ObjectID == GetUnit().ObjectID) //handle possible cases of multiple officer training slots
+					// Handle possible cases of multiple officer training slots
+					if (TrainLWOfficerProject.ProjectFocus.ObjectID == GetUnit().ObjectID) 
 					{
 						TrainLWOfficerProject.AbilityName = Ability.AbilityName;
 						TrainLWOfficerProject.NewRank = NewOfficerRank;
 
-						// have to recompute time for project after rank is set in order to handle completion time based on rank
+						// Have to recompute time for project after rank is set in order to handle completion time based on rank
 						TrainLWOfficerProject.ProjectPointsRemaining = TrainLWOfficerProject.CalculatePointsToTrain(); 
 						TrainLWOfficerProject.InitialProjectPoints = TrainLWOfficerProject.CalculatePointsToTrain();
 						TrainLWOfficerProject.SetProjectedCompletionDateTime(TrainLWOfficerProject.StartDateTime);
 						break;
 					}
 				}
-
-				//RefreshAcademyFacility();
-			} else {
+			}
+			else
+			{
 				`Redscreen("LW Officer Pack : Failed to find StaffSlot in UIArmory_LWOfficerPromotion.ConfirmAbilityCallback");
 				bTrainingSuccess = false;
 			}
 		}
 
-		//submit or clear update state based on success/failure
+		// Submit or clear update state based on success/failure
 		if (bTrainingSuccess) 
 		{
 			UpdateState.AddStateObject(UpdatedUnit);
@@ -716,14 +663,18 @@ simulated function ConfirmAbilityCallback(Name Action)
 
 			Header.PopulateData();
 			PopulateData();
-		} else {
+		}
+		else 
+		{
 			History.CleanupPendingGameState(UpdateState);
 		}
 		Movie.Pres.PlayUISound(eSUISound_SoldierPromotion);
 		Movie.Pres.ScreenStack.PopUntilClass(class'UIFacility_Academy', true);
 	}
 	else
+	{
 		Movie.Pres.PlayUISound(eSUISound_MenuClickNegative);
+	}
 }
 
 simulated function XComGameState_StaffSlot GetEmptyOfficerTrainingStaffSlot()
@@ -737,19 +688,21 @@ simulated function XComGameState_StaffSlot GetEmptyOfficerTrainingStaffSlot()
 
 	ScreenStack = Movie.Pres.ScreenStack;
 
-	//find the class UIFacilityAcademy that invoked this (just in case there's more than 1)
+	// Find the class UIFacilityAcademy that invoked this (just in case there's more than 1)
 	AcademyUI = UIFacility_Academy(ScreenStack.GetScreen(class'UIFacility_Academy'));
-	if(AcademyUI == none)
+	if (AcademyUI == none)
 	{
-		//search for override classes
+		// Search for override classes
 		foreach ScreenStack.Screens(CurrScreen)
 		{
 			AcademyUI = UIFacility_Academy(CurrScreen);
-			if(AcademyUI != none)
+			if (AcademyUI != none)
+			{
 				break;
+			}
 		}
 	}
-	if(AcademyUI == none)
+	if (AcademyUI == none)
 	{
 		FacilityState = `XCOMHQ.GetFacilityByName('OfficerTrainingSchool');
 	}
@@ -758,13 +711,10 @@ simulated function XComGameState_StaffSlot GetEmptyOfficerTrainingStaffSlot()
 		FacilityState = AcademyUI.GetFacility();
 	}
 
-	for(idx = 0; idx < FacilityState.StaffSlots.Length; idx++)
+	for (idx = 0; idx < FacilityState.StaffSlots.Length; idx++)
 	{
 		SlotState = FacilityState.GetStaffSlot(idx);
-		if(SlotState != none 
-			&& SlotState.GetMyTemplateName() == 'OTSOfficerSlot' 
-			&& SlotState.IsSlotEmpty()
-			&& !SlotState.bIsLocked)
+		if (SlotState != none && SlotState.GetMyTemplateName() == 'OTSOfficerSlot' && SlotState.IsSlotEmpty() && !SlotState.bIsLocked)
 		{
 			return SlotState;
 		}
@@ -791,7 +741,6 @@ simulated static function CycleToSoldier(StateObjectReference UnitRef)
 	super(UIArmory).CycleToSoldier(UnitRef);
 }
 
-// KDM : TOTALLY NEW HERE
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	local bool bHandled;
@@ -808,6 +757,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		return false;
 	}
 	
+	// KDM : Give the selected list item the first chance at the input.
 	if (List.GetSelectedItem().OnUnrealCommand(cmd, arg))
 	{
 		UpdateNavHelp();
@@ -825,25 +775,6 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 				ViewLeadershipStats(none);
 			}
 			break;
-
-		// DEBUG : Press Tab to rank up the soldier
-		`if (`notdefined(FINAL_RELEASE))
-		case class'UIUtilities_Input'.const.FXS_KEY_TAB:
-			History = `XCOMHISTORY;
-			ChangeContainer = class'XComGameStateContext_ChangeContainer'.static.CreateEmptyChangeContainer("DEBUG Unit Rank Up");
-			UpdateState = History.CreateNewGameState(true, ChangeContainer);
-			UpdatedUnit = XComGameState_Unit(UpdateState.ModifyStateObject(class'XComGameState_Unit', GetUnit().ObjectID));
-
-			if (UpdatedUnit.GetRank() == 0)
-				SoldierClassName = class'UIUtilities_Strategy'.static.GetXComHQ().SelectNextSoldierClass();
-
-			UpdatedUnit.RankUpSoldier(UpdateState, SoldierClassName);
-
-			`GAMERULES.SubmitGameState(UpdateState);
-
-			PopulateData();
-			break;
-		`endif
 		
 		case class'UIUtilities_Input'.const.FXS_MOUSE_5:
 		case class'UIUtilities_Input'.const.FXS_KEY_TAB:
@@ -852,8 +783,10 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		case class'UIUtilities_Input'.const.FXS_KEY_LEFT_SHIFT:
 		case class'UIUtilities_Input'.const.FXS_BUTTON_LBUMPER:
 			// Prevent switching soldiers during AfterAction promotion
-			if( UIAfterAction(Movie.Stack.GetScreen(class'UIAfterAction')) == none )
+			if (UIAfterAction(Movie.Stack.GetScreen(class'UIAfterAction')) == none)
+			{
 				bHandled = false;
+			}
 			break;
 		
 		case class'UIUtilities_Input'.const.FXS_BUTTON_B:
@@ -868,9 +801,12 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		
 		case class'UIUtilities_Input'.const.FXS_BUTTON_SELECT : // bsg-jrebar (4/21/17): Changed UI flow and button positions per new additions
 			//bsg-hlee (05.09.17): If the nav help does not how up do not allow the button to navigate to the facility. Condition taken from UpdateNavHelp when deciding to add the nav help or not.
-			if( class'UIUtilities_Strategy'.static.GetXComHQ().HasFacilityByName('RecoveryCenter') && IsAllowedToCycleSoldiers() && !`ScreenStack.IsInStack(class'UIFacility_TrainingCenter')
-			&& !`ScreenStack.IsInStack(class'UISquadSelect') && !`ScreenStack.IsInStack(class'UIAfterAction') && Unit.GetSoldierClassTemplate().bAllowAWCAbilities)
+			if (class'UIUtilities_Strategy'.static.GetXComHQ().HasFacilityByName('RecoveryCenter') && IsAllowedToCycleSoldiers() &&
+				!`ScreenStack.IsInStack(class'UIFacility_TrainingCenter') && !`ScreenStack.IsInStack(class'UISquadSelect') && 
+				!`ScreenStack.IsInStack(class'UIAfterAction') && Unit.GetSoldierClassTemplate().bAllowAWCAbilities)
+			{
 				JumpToRecoveryFacility();
+			}
 		
 		default:
 			bHandled = false;

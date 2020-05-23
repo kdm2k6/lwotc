@@ -120,7 +120,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 				OnChildMouseEvent(AbilityIcon1, class'UIUtilities_Input'.const.FXS_L_MOUSE_IN);
 				OnChildMouseEvent(AbilityIcon2, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
 				SelectedAbility = 0;
-				// KDM : Update SelectedAbilityIndex.
+				// KDM : Let SelectedAbilityIndex know that the left ability has been selected; this information will be used when
+				// we select a new row.
 				UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
 			}
 			return true;
@@ -133,7 +134,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 				OnChildMouseEvent(AbilityIcon1, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
 				OnChildMouseEvent(AbilityIcon2, class'UIUtilities_Input'.const.FXS_L_MOUSE_IN);
 				SelectedAbility = 1;
-				// KDM : Update SelectedAbilityIndex.
+				// KDM : Let SelectedAbilityIndex know that the right ability has been selected; this information will be used when
+				// we select a new row.
 				UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
 			}
 			return true;
@@ -143,10 +145,10 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		case class'UIUtilities_Input'.const.FXS_ARROW_UP:
 			if (self != UIArmory_Promotion(Screen).ClassRowItem)
 			{
-				//UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
+				// KDM : When a new row is selected, UIArmory_LWOfficerPromotion --> PreviewRow() will make sure that ability selection
+				// remains consistent between the previous row and newly selected row.
 				OnChildMouseEvent(AbilityIcon1, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
 				OnChildMouseEvent(AbilityIcon2, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
-				//SelectedAbility = -1;
 			}
 			break;
 
@@ -155,10 +157,10 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		case class'UIUtilities_Input'.const.FXS_ARROW_DOWN:
 			if (UIArmory_Promotion(Screen).List.SelectedIndex < UIArmory_Promotion(Screen).List.GetItemCount() - 1)
 			{
-				//UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
+				// KDM : When a new row is selected, UIArmory_LWOfficerPromotion --> PreviewRow() will make sure that ability selection
+				// remains consistent between the previous row and newly selected row.
 				OnChildMouseEvent(AbilityIcon1, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
 				OnChildMouseEvent(AbilityIcon2, class'UIUtilities_Input'.const.FXS_L_MOUSE_OUT);
-				//SelectedAbility = -1;
 			}
 			break;
 
@@ -170,7 +172,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 				return false;
 			}
 
-			//UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
+			// KDM : SelectedAbilityIndex need not be updated here since the A button does nothing to change the selected ability.
+
 			if (SelectedAbility == 0)
 			{
 				OnChildMouseEvent(AbilityIcon1, class'UIUtilities_Input'.const.FXS_L_MOUSE_UP);
@@ -184,7 +187,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		case class'UIUtilities_Input'.const.FXS_BUTTON_L3:
 			if (!bIsDisabled)
 			{
-				//UIArmory_Promotion(Screen).SelectedAbilityIndex = SelectedAbility;
+				// KDM : SelectedAbilityIndex need not be updated here since the L3 button does nothing to change the selected ability.
+
 				if (SelectedAbility == 0)
 				{
 					OnChildMouseEvent(InfoButton1, class'UIUtilities_Input'.const.FXS_L_MOUSE_UP);
