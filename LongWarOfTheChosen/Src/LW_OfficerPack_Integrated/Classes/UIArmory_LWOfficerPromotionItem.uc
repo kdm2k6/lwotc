@@ -1,14 +1,12 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    UIArmory_LWOfficerPromotionItem
 //  AUTHOR:  Amineri
-//
 //  PURPOSE: Tweaked ability selection UI for LW officer system
-//
 //--------------------------------------------------------------------------------------- 
 
 class UIArmory_LWOfficerPromotionItem extends UIArmory_PromotionItem;
 
-//override Mouse Controls to point back to UIArmory_LWOfficerPromotion mouse handlers
+// Override Mouse Controls to point back to UIArmory_LWOfficerPromotion mouse handlers
 // all other functionality identical to parent method
 simulated function OnChildMouseEvent(UIPanel ChildControl, int cmd)
 {

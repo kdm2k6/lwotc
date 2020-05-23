@@ -4,6 +4,9 @@
 //  PURPOSE: Tweaked ability selection UI for LW officer system
 //--------------------------------------------------------------------------------------- 
 
+
+// KDM - MAKE SURE SelectedAbilityIndex is dealt with in both files
+
 class UIArmory_LWOfficerPromotion extends UIArmory_Promotion config(LW_OfficerPack);
 
 var config bool ALWAYSSHOW;
@@ -74,10 +77,16 @@ simulated function bool CanUnitEnterOTSTraining(XComGameState_Unit Unit)
 
 	UnitInfo.UnitRef = Unit.GetReference();
 
-	if (`SCREENSTACK.IsInStack(class'UIFacility_Academy')) { return true; }
+	if (`SCREENSTACK.IsInStack(class'UIFacility_Academy'))
+	{
+		return true;
+	}
 	StaffSlotState = GetEmptyOfficerTrainingStaffSlot();
 	if (StaffSlotState != none && 
-			class'X2StrategyElement_LW_OTS_OfficerStaffSlot'.static.IsUnitValidForOTSOfficerSlot(StaffSlotState, UnitInfo)) { return true; }
+		class'X2StrategyElement_LW_OTS_OfficerStaffSlot'.static.IsUnitValidForOTSOfficerSlot(StaffSlotState, UnitInfo)) 
+	{
+		return true;
+	}
 
 	return false;
 }
@@ -244,7 +253,7 @@ simulated function PopulateData()
 			Item.SetPromote(false);
 		}
 
-		if ((Item.Rank <= OfficerState.GetOfficerRank()) || ((Item.Rank == RankToPromote)) || default.ALWAYSSHOW || 
+		if ((Item.Rank <= OfficerState.GetOfficerRank()) || (Item.Rank == RankToPromote) || default.ALWAYSSHOW || 
 			class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled())
 		{
 			Item.SetDisabled(false);
@@ -266,8 +275,8 @@ simulated function PopulateData()
 	*/
 
 	// KDM : NEW CODE HERE
-	PreviewRow(List, SelectionIndex);
-	Navigator.SetSelected(List);
+	//PreviewRow(List, SelectionIndex); // I don't know if this is needed since List.OnSelectionChanged = PreviewRow
+	//Navigator.SetSelected(List);
 	List.SetSelectedIndex(SelectionIndex);
 
 	UpdateNavHelp(); // KDM THIS IS A NEW CALL, IS IT NEEDED ?
@@ -285,7 +294,7 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 	Movie.Pres.m_kTooltipMgr.RemoveTooltipsByPartialPath(string(MCPath) $ ".abilitySummaryList");
 
 	OfficerState = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit);
-	if( OfficerState == none || OfficerState.GetOfficerRank() == 0 )
+	if (OfficerState == none || OfficerState.GetOfficerRank() == 0)
 	{
 		MC.FunctionVoid("hideAbilityList");
 		return;
@@ -300,10 +309,10 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 
 	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	`Log("Soldier has " $ OfficerState.OfficerAbilities.Length $ " officer abilities");
-	for(i = 0; i < OfficerState.OfficerAbilities.Length; ++i)
+	for (i = 0; i < OfficerState.OfficerAbilities.Length; ++i)
 	{
 		AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(OfficerState.OfficerAbilities[i].AbilityType.AbilityName);
-		if( AbilityTemplate != none && !AbilityTemplate.bDontDisplayInAbilitySummary )
+		if (AbilityTemplate != none && !AbilityTemplate.bDontDisplayInAbilitySummary)
 		{
 			`Log("Adding " $ AbilityTemplate.DataName $ " to the summary");
 			class'UIUtilities_Strategy'.static.AddAbilityToSummary(self, AbilityTemplate, Index++, Unit, none);
@@ -327,13 +336,15 @@ simulated function OnLoseFocus()
 
 simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 {
+	local bool DisplayOnly;
 	local int i, Rank, EffectiveRank;
 	local string TmpStr;
 	local X2AbilityTemplate AbilityTemplate;
 	local X2AbilityTemplateManager AbilityTemplateManager;
 	local XComGameState_Unit Unit; 
-	local bool DisplayOnly;
 
+	// KDM : EffectiveRank is the rank the officer actually is, while Rank is the rank associated with this particular list item row.
+	
 	Unit = GetUnit();
 	DisplayOnly = !CanUnitEnterOTSTraining(Unit);
 
@@ -341,65 +352,83 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 	{
 		Rank = 1;
 		return;
-	} else {
+	}
+	else
+	{
 		Rank = UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).Rank;
 	}
 
 	MC.BeginFunctionOp("setAbilityPreview");
 
-	if(class'LWOfficerUtilities'.static.GetOfficerComponent(Unit) != none)
-		EffectiveRank = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit).GetOfficerRank();
-	else
-		EffectiveRank = 0;
-
-	if (!DisplayOnly) {	EffectiveRank++; }
-
-	if((Rank > EffectiveRank) && !(default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled()))
+	if (class'LWOfficerUtilities'.static.GetOfficerComponent(Unit) != none)
 	{
-		for(i = 0; i < NUM_ABILITIES_PER_RANK; ++i)
+		EffectiveRank = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit).GetOfficerRank();
+	}
+	else
+	{
+		EffectiveRank = 0;
+	}
+
+	if (!DisplayOnly)
+	{
+		EffectiveRank++;
+	}
+
+	// KDM : If the rank associated with this list item row is greater than the officer's actual rank show locked information and icons.
+	// This, however, can be negated by ALWAYSSHOW and IsViewLockedStatsEnabled().
+	if ((Rank > EffectiveRank) && !(default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled()))
+	{
+		for (i = 0; i < NUM_ABILITIES_PER_RANK; ++i)
 		{
-			MC.QueueString(class'UIUtilities_Image'.const.LockedAbilityIcon); // icon
-			MC.QueueString(class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedTitle, eUIState_Disabled)); // name
-			MC.QueueString(class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedDescription, eUIState_Disabled)); // description
-			MC.QueueBoolean(false); // isClassIcon
+			MC.QueueString(class'UIUtilities_Image'.const.LockedAbilityIcon); // Icon
+			MC.QueueString(class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedTitle, eUIState_Disabled)); // Name
+			MC.QueueString(class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedDescription, eUIState_Disabled)); // Description
+			MC.QueueBoolean(false); // IsClassIcon
 		}
 	}
+	// KDM : We are looking at a list item row whose associated rank is less than the officer's actual rank.
 	else
 	{
 		AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 
-		for(i = 0; i < NUM_ABILITIES_PER_RANK; ++i)
+		for (i = 0; i < NUM_ABILITIES_PER_RANK; ++i)
 		{
+			// KDM : The 1st list item row corresponds to the officer's core, non-selectable, abilities.
 			if (ItemIndex == 0)
 			{
-				AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate (class'LWOfficerUtilities'.static.GetAbilityName(0, i));
+				AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.static.GetAbilityName(0, i));
 			}
 			else
 			{
 				AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.static.GetAbilityName(Rank, i));
 			}
-			if(AbilityTemplate != none)
+
+			if (AbilityTemplate != none)
 			{
-				MC.QueueString(AbilityTemplate.IconImage); // icon
+				MC.QueueString(AbilityTemplate.IconImage); // Icon
 
 				TmpStr = AbilityTemplate.LocFriendlyName != "" ? AbilityTemplate.LocFriendlyName : ("Missing 'LocFriendlyName' for " $ AbilityTemplate.DataName);
-				MC.QueueString(Caps(TmpStr)); // name
+				MC.QueueString(Caps(TmpStr)); // Name
 
 				TmpStr = AbilityTemplate.HasLongDescription() ? AbilityTemplate.GetMyLongDescription() : ("Missing 'LocLongDescription' for " $ AbilityTemplate.DataName);
-				MC.QueueString(TmpStr); // description
-				MC.QueueBoolean(false); // isClassIcon
+				MC.QueueString(TmpStr); // Description
+				MC.QueueBoolean(false); // IsClassIcon
 			}
 			else
 			{
-				MC.QueueString(""); // icon
-				MC.QueueString(string(class'LWOfficerUtilities'.static.GetAbilityName(Rank, i))); // name
-				MC.QueueString("Missing template for ability '" $ class'LWOfficerUtilities'.static.GetAbilityName(Rank, i) $ "'"); // description
-				MC.QueueBoolean(false); // isClassIcon
+				MC.QueueString(""); // Icon
+				MC.QueueString(string(class'LWOfficerUtilities'.static.GetAbilityName(Rank, i))); // Name
+				MC.QueueString("Missing template for ability '" $ class'LWOfficerUtilities'.static.GetAbilityName(Rank, i) $ "'"); // Description
+				MC.QueueBoolean(false); // IsClassIcon
 			}
 		}
 	}
 
 	MC.EndOp();
+
+	// KDM : NEW CALLS BELOW
+	UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).SetSelectedAbility(SelectedAbilityIndex);
+	UpdateNavHelp();
 }
 
 simulated function ViewLeadershipStats(UIButton Button)
@@ -543,11 +572,11 @@ simulated function UpdateNavHelp()
 
 simulated function ConfirmAbilitySelection(int Rank, int Branch)
 {
-	local XGParamTag LocTag;
 	local TDialogueBoxData DialogData;
 	local X2AbilityTemplate AbilityTemplate;
 	local X2AbilityTemplateManager AbilityTemplateManager;
-
+	local XGParamTag LocTag;
+	
 	PendingRank = Rank;
 	PendingBranch = Branch;
 
@@ -567,6 +596,9 @@ simulated function ConfirmAbilitySelection(int Rank, int Branch)
 	LocTag.StrValue0 = AbilityTemplate.LocFriendlyName;
 	DialogData.strText = `XEXPAND.ExpandString(m_strConfirmAbilityText);
 	Movie.Pres.UIRaiseDialog(DialogData);
+
+	// KDM NEW CALL IS IT NEEDED?
+	UpdateNavHelp();
 }
 
 simulated function ConfirmAbilityCallback(Name Action)
@@ -753,5 +785,94 @@ simulated static function bool CanCycleTo(XComGameState_Unit Soldier)
 simulated static function CycleToSoldier(StateObjectReference UnitRef)
 {
 	super(UIArmory).CycleToSoldier(UnitRef);
+}
+
+// KDM : TOTALLY NEW HERE
+simulated function bool OnUnrealCommand(int cmd, int arg)
+{
+	local bool bHandled;
+	local name SoldierClassName;
+	local XComGameState UpdateState;
+	local XComGameState_Unit UpdatedUnit, Unit;
+	local XComGameStateContext_ChangeContainer ChangeContainer;
+	local XComGameStateHistory History;
+	
+	Unit = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(UnitReference.ObjectID));
+
+	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
+	{
+		return false;
+	}
+	
+	if (List.GetSelectedItem().OnUnrealCommand(cmd, arg))
+	{
+		UpdateNavHelp();
+		return true;
+	}
+
+	bHandled = true;
+
+	switch(cmd)
+	{
+		// KDM : Right stick click opens up the leadership screen for controller users.
+		case class'UIUtilities_Input'.const.FXS_BUTTON_R3:
+			if (LeadershipButton.bIsVisible)
+			{
+				ViewLeadershipStats(none);
+			}
+			break;
+
+		// DEBUG : Press Tab to rank up the soldier
+		`if (`notdefined(FINAL_RELEASE))
+		case class'UIUtilities_Input'.const.FXS_KEY_TAB:
+			History = `XCOMHISTORY;
+			ChangeContainer = class'XComGameStateContext_ChangeContainer'.static.CreateEmptyChangeContainer("DEBUG Unit Rank Up");
+			UpdateState = History.CreateNewGameState(true, ChangeContainer);
+			UpdatedUnit = XComGameState_Unit(UpdateState.ModifyStateObject(class'XComGameState_Unit', GetUnit().ObjectID));
+
+			if (UpdatedUnit.GetRank() == 0)
+				SoldierClassName = class'UIUtilities_Strategy'.static.GetXComHQ().SelectNextSoldierClass();
+
+			UpdatedUnit.RankUpSoldier(UpdateState, SoldierClassName);
+
+			`GAMERULES.SubmitGameState(UpdateState);
+
+			PopulateData();
+			break;
+		`endif
+		
+		case class'UIUtilities_Input'.const.FXS_MOUSE_5:
+		case class'UIUtilities_Input'.const.FXS_KEY_TAB:
+		case class'UIUtilities_Input'.const.FXS_BUTTON_RBUMPER:
+		case class'UIUtilities_Input'.const.FXS_MOUSE_4:
+		case class'UIUtilities_Input'.const.FXS_KEY_LEFT_SHIFT:
+		case class'UIUtilities_Input'.const.FXS_BUTTON_LBUMPER:
+			// Prevent switching soldiers during AfterAction promotion
+			if( UIAfterAction(Movie.Stack.GetScreen(class'UIAfterAction')) == none )
+				bHandled = false;
+			break;
+		
+		case class'UIUtilities_Input'.const.FXS_BUTTON_B:
+		case class'UIUtilities_Input'.const.FXS_KEY_ESCAPE:
+		case class'UIUtilities_Input'.const.FXS_R_MOUSE_DOWN:
+			OnCancel();
+			break;
+		
+		case class'UIUtilities_Input'.const.FXS_BUTTON_X: // bsg-jrebar (4/21/17): Changed UI flow and button positions per new additions
+			MakePosterButton();
+			break;
+		
+		case class'UIUtilities_Input'.const.FXS_BUTTON_SELECT : // bsg-jrebar (4/21/17): Changed UI flow and button positions per new additions
+			//bsg-hlee (05.09.17): If the nav help does not how up do not allow the button to navigate to the facility. Condition taken from UpdateNavHelp when deciding to add the nav help or not.
+			if( class'UIUtilities_Strategy'.static.GetXComHQ().HasFacilityByName('RecoveryCenter') && IsAllowedToCycleSoldiers() && !`ScreenStack.IsInStack(class'UIFacility_TrainingCenter')
+			&& !`ScreenStack.IsInStack(class'UISquadSelect') && !`ScreenStack.IsInStack(class'UIAfterAction') && Unit.GetSoldierClassTemplate().bAllowAWCAbilities)
+				JumpToRecoveryFacility();
+		
+		default:
+			bHandled = false;
+			break;
+	}
+	
+	return bHandled || super.OnUnrealCommand(cmd, arg);
 }
 
