@@ -84,42 +84,42 @@ simulated function bool CanUnitEnterOTSTraining(XComGameState_Unit Unit)
 
 simulated function PopulateData()
 {
-	local int i, MaxRank;
+	// KDM TO DO : PROBABLY NEED TO DEAL WITH PreviewIndex
+	local bool bHasAbility1, bHasAbility2, DisplayOnly;
+	local int i, MaxRank, RankToPromote, SelectionIndex;
 	local string AbilityIcon1, AbilityIcon2, AbilityName1, AbilityName2, HeaderString;
-	local bool bHasAbility1, bHasAbility2;
-	local XComGameState_Unit Unit;
+	local UIArmory_LWOfficerPromotionItem Item;
 	local X2AbilityTemplate AbilityTemplate1, AbilityTemplate2;
 	local X2AbilityTemplateManager AbilityTemplateManager;
-	local UIArmory_LWOfficerPromotionItem Item;
+	local XComGameState_Unit Unit;
 	local XComGameState_Unit_LWOfficer OfficerState;
-	local int RankToPromote;
-
-	local bool DisplayOnly;
-
-	//AlwaysShow = true; // Debug switch to always show all perks
-
-	// We don't need to clear the list, or recreate the pawn here -sbatista
-	//super.PopulateData();
+	
+	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	Unit = GetUnit();
 	DisplayOnly = !CanUnitEnterOTSTraining(Unit);
 	MaxRank = class'LWOfficerUtilities'.static.GetMaxRank();
-	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	SelectionIndex = INDEX_NONE;
 
 	if (default.ALLOWTRAININGINARMORY)
+	{
 		DisplayOnly = false;
+	}
 
-	//Differentiate Header based on whether is in Armory or in OTS Facility
+	// Differentiate header based on whether we are in the Armory or the OTS Facility.
 	if (DisplayOnly)
 	{
 		HeaderString = m_strAbilityHeader;
-	} else {
+	} 
+	else
+	{
 		HeaderString = m_strSelectAbility;
 	}
 
-	//clear left/right ability titles
+	// Clear left/right ability titles
 	AS_SetTitle("", HeaderString, "", "", "");
 
-	//Init but then hide the first row, since it's set up for both class and single ability
+	// Init but then hide the first row, since it's set up for both class and single ability
+	// KDM : Does this really need to be done ? Investigate later.
 	if (ClassRowItem == none)
 	{
 		ClassRowItem = Spawn(class'UIArmory_PromotionItem', self);
@@ -128,87 +128,102 @@ simulated function PopulateData()
 	}
 	ClassRowItem.Hide();
 
-	//List.SetPosition(58, 170); // shift the list object to cover the gap from hiding the ClassRow and the left/right ability titles
-
-	// show core abilities
+	// Core, non-selectable, officer abilities are shown as the list's 1st row; these are "Leadership" and "Command".
 	Item = UIArmory_LWOfficerPromotionItem(List.GetItem(0));
 	if (Item == none)
 	{
-		Item = UIArmory_LWOfficerPromotionItem(UIArmory_LWOfficerPromotionItem(List.CreateItem(class'UIArmory_LWOfficerPromotionItem')).InitPromotionItem(0));
+		Item = UIArmory_LWOfficerPromotionItem(List.CreateItem(class'UIArmory_LWOfficerPromotionItem'));
+		Item.InitPromotionItem(0);
 	}
+
 	Item.Rank = 1;
 	Item.SetRankData(class'LWOfficerUtilities'.static.GetRankIcon(1), Caps(class'LWOfficerUtilities'.static.GetLWOfficerRankName(1)));
+	
 	AbilityTemplate1 = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.default.OfficerAbilityTree[0].AbilityName);
-	AbilityTemplate2 = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.default.OfficerAbilityTree[1].AbilityName);
 	AbilityName1 = Caps(AbilityTemplate1.LocFriendlyName);
 	AbilityIcon1 = AbilityTemplate1.IconImage;
+	Item.AbilityName1 = AbilityTemplate1.DataName;
+	
+	AbilityTemplate2 = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.default.OfficerAbilityTree[1].AbilityName);
 	AbilityName2 = Caps(AbilityTemplate2.LocFriendlyName);
 	AbilityIcon2 = AbilityTemplate2.IconImage;
-	Item.AbilityName1 = AbilityTemplate1.DataName;
 	Item.AbilityName2 = AbilityTemplate2.DataName;
+	
 	Item.SetAbilityData(AbilityIcon1, AbilityName1, AbilityIcon2, AbilityName2);
 	Item.SetEquippedAbilities(true, true);
 	Item.SetPromote(false);
 	Item.SetDisabled(false);
 	Item.RealizeVisuals();
 		
-	//loop over rows
+	// Show the rest of the officer rows; these will have the officer's selectable abilities.
 	for (i = 1; i <= MaxRank; ++i)
 	{
 		Item = UIArmory_LWOfficerPromotionItem(List.GetItem(i));
 		if (Item == none)
 		{
-			Item = UIArmory_LWOfficerPromotionItem(UIArmory_LWOfficerPromotionItem(List.CreateItem(class'UIArmory_LWOfficerPromotionItem')).InitPromotionItem(i));
+			Item = UIArmory_LWOfficerPromotionItem(List.CreateItem(class'UIArmory_LWOfficerPromotionItem'));
+			Item.InitPromotionItem(i);
 		}
+		
 		Item.Rank = i;
 		Item.SetRankData(class'LWOfficerUtilities'.static.GetRankIcon(Item.Rank), Caps(class'LWOfficerUtilities'.static.GetLWOfficerRankName(Item.Rank)));
 
 		AbilityTemplate1 = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.static.GetAbilityName(Item.Rank, 0));
 		AbilityTemplate2 = AbilityTemplateManager.FindAbilityTemplate(class'LWOfficerUtilities'.static.GetAbilityName(Item.Rank, 1));
-		//`log("LW Officer Pack : Display Ability:" @ string(AbilityTemplate1.DataName) @ "at Rank:" @ Item.Rank $ ", Option: 0");
-		//`log("LW Officer Pack : Display Ability:" @ string(AbilityTemplate2.DataName) @ "at Rank:" @ Item.Rank $ ", Option: 1");
 		
 		OfficerState = class'LWOfficerUtilities'.static.GetOfficerComponent(Unit);
-		if(OfficerState != none)
+		if (OfficerState != none)
 		{
+			// KDM : Determines if the officer already has either of these abilities
 			bHasAbility1 = OfficerState.HasOfficerAbility(AbilityTemplate1.DataName);
 			bHasAbility2 = OfficerState.HasOfficerAbility(AbilityTemplate2.DataName);
 		}
+		
+		// KDM : Determines which row of officer abilites is the promotion row, the row we will be selecting abilities from.
 		if (DisplayOnly)
 		{
 			RankToPromote = -1;
-		} else 	if (OfficerState == none) 
+		} 
+		else if (OfficerState == none) 
 		{
 			RankToPromote = 1;
-			//`log("LW Officer Pack : Did not find Unit Officer Component");
-		} else {
+		}
+		else
+		{
 			RankToPromote = OfficerState.GetOfficerRank() + 1;
-			//`log("LW Officer Pack : Found Unit Officer Component, Rank=" $ string(OfficerState.GetOfficerRank()));
 		}
 
-		//get left-side ability
+		// Left side ability
 		if (AbilityTemplate1 != none)
 		{
 			Item.AbilityName1 = AbilityTemplate1.DataName;
-			if (default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled() || Item.Rank <= OfficerState.GetOfficerRank() || (!DisplayOnly && Item.Rank == RankToPromote))
+			// KDM : Determines whether we show the ability name and icon, or an unknown ability name and icon.
+			if (default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled() || Item.Rank <= OfficerState.GetOfficerRank() || 
+				(!DisplayOnly && Item.Rank == RankToPromote))
 			{
 				AbilityName1 = Caps(AbilityTemplate1.LocFriendlyName);
 				AbilityIcon1 = AbilityTemplate1.IconImage;
-			} else {
+			} 
+			else
+			{
 				AbilityName1 = class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedTitle, eUIState_Disabled);
 				AbilityIcon1 = class'UIUtilities_Image'.const.UnknownAbilityIcon;
 			}
 		}
 
-		//get right-side ability
+		// Right side ability
 		if (AbilityTemplate2 != none)
 		{
 			Item.AbilityName2 = AbilityTemplate2.DataName;
-			if (default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled()  || Item.Rank <= OfficerState.GetOfficerRank() || (!DisplayOnly && Item.Rank == RankToPromote))
+			// KDM : Determines whether we show the ability name and icon, or an unknown ability name and icon.
+			if (default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled()  || Item.Rank <= OfficerState.GetOfficerRank() || 
+				(!DisplayOnly && Item.Rank == RankToPromote))
 			{
 				AbilityName2 = Caps(AbilityTemplate2.LocFriendlyName);
 				AbilityIcon2 = AbilityTemplate2.IconImage;
-			} else {
+			}
+			else
+			{
 				AbilityName2 = class'UIUtilities_Text'.static.GetColoredText(m_strAbilityLockedTitle, eUIState_Disabled);
 				AbilityIcon2 = class'UIUtilities_Image'.const.UnknownAbilityIcon;
 			}
@@ -217,22 +232,20 @@ simulated function PopulateData()
 		Item.SetAbilityData(AbilityIcon1, AbilityName1, AbilityIcon2, AbilityName2);
 		Item.SetEquippedAbilities(bHasAbility1, bHasAbility2);
 
+		// KDM : If this is the promotion row, highlight it as such.
 		if (Item.Rank == RankToPromote)
 		{
 			Item.SetPromote(true);
-			Item.SetDisabled(false);
-		} else {
+			SelectionIndex = i;
+			// Item.SetDisabled(false); KDM : WHY IS THIS DONE HERE SINCE IT IS JUST DONE BELOW - SAFE TO REMOVE ??
+		}
+		else
+		{
 			Item.SetPromote(false);
 		}
 
-		//if (bHasRankAbility || default.ALWAYSSHOW)
-		//{
-			//Item.SetDisabled(false);
-		//} else {
-			//Item.SetDisabled(true);
-		//}
-
-		if((Item.Rank <= OfficerState.GetOfficerRank()) || ((Item.Rank == RankToPromote)) || default.ALWAYSSHOW || class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled())
+		if ((Item.Rank <= OfficerState.GetOfficerRank()) || ((Item.Rank == RankToPromote)) || default.ALWAYSSHOW || 
+			class'XComGameState_LWPerkPackOptions'.static.IsViewLockedStatsEnabled())
 		{
 			Item.SetDisabled(false);
 		}
@@ -240,15 +253,24 @@ simulated function PopulateData()
 		{
 			Item.SetDisabled(true);
 		}
+
 		Item.RealizeVisuals();
 	}
 
-	//updates right-side ability panel
+	// Update ability summary at the bottom
 	PopulateAbilitySummary(Unit);
 
+	/* KDM - OLD CALLS
 	List.SetSelectedIndex(-1); // initial selection
-
 	PreviewRow(List, 1); // initial abilities shown at bottom of panel
+	*/
+
+	// KDM : NEW CODE HERE
+	PreviewRow(List, SelectionIndex);
+	Navigator.SetSelected(List);
+	List.SetSelectedIndex(SelectionIndex);
+
+	UpdateNavHelp(); // KDM THIS IS A NEW CALL, IS IT NEEDED ?
 }
 
 simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
