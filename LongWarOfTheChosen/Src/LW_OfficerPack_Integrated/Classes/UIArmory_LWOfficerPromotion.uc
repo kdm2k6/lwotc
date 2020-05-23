@@ -277,6 +277,8 @@ simulated function PopulateData()
 	// previous soldier, and the 2 soldiers had the same rank, the list would ignore SetSelectedIndex() since it was trying to set
 	// the list to the same index value.
 	List.SetSelectedIndex(SelectionIndex, true);
+
+	UpdateNavHelp();
 }
 
 simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
@@ -414,15 +416,18 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 
 	MC.EndOp();
 
-	// KDM : When a new row is selected, preserve the ability selection; this means :
-	// 1.] If the previous row's left ability was selected, select the left ability for the new row.
-	// 2.] If the previous row's right ability was selected, select the right ability for the new row.
-	UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).SetSelectedAbility(SelectedAbilityIndex);
-	
-	// KDM : The navigation help system is called more often in WotC becayse it updates under these situations :
-	// 1.] If you have a promotion row ability selected, a "Select" tip will be displayed.
-	// 2.] If you have an unhidden ability selected, an "Ability Info" tip will be displayed.   
-	UpdateNavHelp();
+	if (`ISCONTROLLERACTIVE)
+	{
+		// KDM : When a new row is selected, preserve the ability selection; this means :
+		// 1.] If the previous row's left ability was selected, select the left ability for the new row.
+		// 2.] If the previous row's right ability was selected, select the right ability for the new row.
+		UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).SetSelectedAbility(SelectedAbilityIndex);
+
+		// KDM : The navigation system should be updated because it can change due to the following circumstances :
+		// 1.] If you have a promotion row ability selected, a "Select" tip will be displayed.
+		// 2.] If you have an unhidden ability selected, an "Ability Info" tip will be displayed.   
+		UpdateNavHelp();
+	}
 }
 
 simulated function ViewLeadershipStats(UIButton Button)
