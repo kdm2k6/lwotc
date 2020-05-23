@@ -5,7 +5,9 @@
 //--------------------------------------------------------------------------------------- 
 
 
-// KDM - MAKE SURE SelectedAbilityIndex is dealt with in both files
+// KDM - TO DO
+// IF you select next/previous soldier if they have same rank - don't see ability selection
+// Check navigation buttons + help links
 
 class UIArmory_LWOfficerPromotion extends UIArmory_Promotion config(LW_OfficerPack);
 
@@ -57,15 +59,15 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 	LeadershipButton.SetGamepadIcon(class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
 	LeadershipButton.SetPosition(58, 971);
 
-	PopulateData();
-
 	// KDM : Start navigator setup; ClassRowItem is not used for officers, so we can safely ignore it.
 	Navigator.Clear();
 	Navigator.LoopSelection = false;
 	Navigator.AddControl(List);
 	Navigator.SetSelected(List);
 	// Upon loading the screen, select the list item's leftmost ability.
-	UIArmory_LWOfficerPromotionItem(List.GetSelectedItem()).SetSelectedAbility(0);
+	// UIArmory_LWOfficerPromotionItem(List.GetSelectedItem()).SetSelectedAbility(SelectedAbilityIndex);
+
+	PopulateData();
 
 	MC.FunctionVoid("animateIn");
 }
@@ -277,7 +279,9 @@ simulated function PopulateData()
 	// KDM : NEW CODE HERE
 	//PreviewRow(List, SelectionIndex); // I don't know if this is needed since List.OnSelectionChanged = PreviewRow
 	//Navigator.SetSelected(List);
-	List.SetSelectedIndex(SelectionIndex);
+	// I AM SENDING FORCE = TRUE SINCE WE CAN RUN INTO A SITUATION WHERE NEXT/PREV SOLDIER ON SAME ROW SO NO
+	// UPDATE IN SELECTION
+	List.SetSelectedIndex(SelectionIndex, true);
 
 	UpdateNavHelp(); // KDM THIS IS A NEW CALL, IS IT NEEDED ?
 }
@@ -876,3 +880,8 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 	return bHandled || super.OnUnrealCommand(cmd, arg);
 }
 
+defaultproperties
+{
+	// KDM : Select the left ability on initialization.
+	SelectedAbilityIndex = 0;
+}
