@@ -98,11 +98,6 @@ simulated function OnChildMouseEvent(UIPanel ChildControl, int cmd)
 	}
 }
 
-
-// KDM STUFF BELOW
-
-// REGARDING COLOURING - I WILL HAVE TO HACK FLASH CODE IF I WANT TO MAINTAIN M&K LOOK AND FEEL
-
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))

@@ -4,11 +4,6 @@
 //  PURPOSE: Tweaked ability selection UI for LW officer system
 //--------------------------------------------------------------------------------------- 
 
-
-// KDM - TO DO
-// Check navigation buttons + help links
-// Test mouse
-
 class UIArmory_LWOfficerPromotion extends UIArmory_Promotion config(LW_OfficerPack);
 
 var config bool ALWAYSSHOW;
@@ -20,6 +15,9 @@ var UIButton LeadershipButton;
 var localized string strLeadershipButton;
 var localized string strLeadershipDialogueTitle;
 var localized string strLeadershipDialogueData;
+
+// KDM : -1 = unset, 0 = false, 1 = true
+var int AbilityInfoTipIsShowing, SelectAbilityTipIsShowing;
 
 simulated function InitPromotion(StateObjectReference UnitRef, optional bool bInstantTransition)
 {
@@ -321,8 +319,15 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 	MC.EndOp();
 }
 
-// KDM : OnLoseFocus(), as of WotC, now stores the list's selection in previousSelectedIndexOnFocusLost so it can be re-selected
-// upon receiving focus. Since Long War 2 does nothing unique with this function, we no longer want to override it.
+simulated function OnLoseFocus()
+{
+	// KDM : We want the navigation help system to guarantee it reloads itself, if it receives focus again.
+	AbilityInfoTipIsShowing = -1;
+	SelectAbilityTipIsShowing = -1;
+
+	super.OnLoseFocus();
+
+}
 
 simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 {
@@ -513,9 +518,6 @@ simulated function string GetFormattedLeadershipText()
 
 	return OutString;
 }
-
-// KDM : UpdateNavHelp() has changed significantly between WotC and base XCom2; furthermore, Long War 2 appears to do nothing unique
-// with this function. Therefore, simply use UIArmory_Promotion --> UpdateNavHelp().
 
 simulated function ConfirmAbilitySelection(int Rank, int Branch)
 {
@@ -746,17 +748,107 @@ simulated static function CycleToSoldier(StateObjectReference UnitRef)
 	super(UIArmory).CycleToSoldier(UnitRef);
 }
 
+// KDM : Use UIArmory_Promotion --> UpdateNavHelp() as our base since it has been update for WotC.
+simulated function UpdateNavHelp()
+{
+	local int i, AbilityInfoTipShouldShow, SelectAbilityTipShouldShow;
+	local string PrevKey, NextKey;
+	local XGParamTag LocTag;
+	
+	if (!bIsFocused)
+	{
+		return;
+	}
+
+	// KDM : -1 = unset, 0 = false, 1 = true
+	AbilityInfoTipShouldShow = (!UIArmory_PromotionItem(List.GetSelectedItem()).bIsDisabled) ? 1 : 0;
+	SelectAbilityTipShouldShow = (UIArmory_PromotionItem(List.GetSelectedItem()).bEligibleForPromotion) ? 1 : 0;
+
+	// KDM : Whenever the promotion screen updates its navigation help system, the whole navigation help system flickers off then on; 
+	// this is because it needs to be cleared, recreated, then re-shown. This is mainly an issue for controller users, since, for them,
+	// the navigation system has to refresh whenever a new row is selected, as well as whenever a new ability is selected. The reason is :
+	// 1.] A 'Select' tip appears when a promotion eligible row is selected, and disappears otherwise.
+	// 2.] An 'Ability Info' tip appears whenever an unhidden ability is selected, and disappears otherwise.
+	//
+	// The easiest solution is to keep track of the tips which change, according to row and ability selection, and only update the 
+	// navigation help system when one of their values change.
+	if (`ISCONTROLLERACTIVE && (AbilityInfoTipIsShowing == AbilityInfoTipShouldShow) && (SelectAbilityTipIsShowing == SelectAbilityTipShouldShow))
+	{
+		// KDM : The navigation help system has not changed to just get out.
+		return;
+	}
+	else if (`ISCONTROLLERACTIVE && ((AbilityInfoTipIsShowing != AbilityInfoTipShouldShow) || (SelectAbilityTipIsShowing != SelectAbilityTipShouldShow)))
+	{
+		// KDM : The navigation help system has changed so let it on through.
+		AbilityInfoTipIsShowing = AbilityInfoTipShouldShow;
+		SelectAbilityTipIsShowing = SelectAbilityTipShouldShow;
+	}
+	
+	NavHelp = `HQPRES.m_kAvengerHUD.NavHelp;
+
+	NavHelp.ClearButtonHelp();
+	
+	// KDM : The officer promotion screen is not accessible via the post mission squad view, represented by UIAfterAction, so related
+	// code has been removed.
+
+	NavHelp.AddBackButton(OnCancel);
+
+	if (UIArmory_PromotionItem(List.GetSelectedItem()).bEligibleForPromotion)
+	{
+		NavHelp.AddSelectNavHelp();
+	}
+
+	if (XComHQPresentationLayer(Movie.Pres) != none)
+	{
+		LocTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		LocTag.StrValue0 = Movie.Pres.m_kKeybindingData.GetKeyStringForAction(PC.PlayerInput, eTBC_PrevUnit);
+		PrevKey = `XEXPAND.ExpandString(PrevSoldierKey);
+		LocTag.StrValue0 = Movie.Pres.m_kKeybindingData.GetKeyStringForAction(PC.PlayerInput, eTBC_NextUnit);
+		NextKey = `XEXPAND.ExpandString(NextSoldierKey);
+
+		if (class'XComGameState_HeadquartersXCom'.static.GetObjectiveStatus('T0_M7_WelcomeToGeoscape') != eObjectiveState_InProgress &&
+			RemoveMenuEvent == '' && NavigationBackEvent == '' && !`ScreenStack.IsInStack(class'UISquadSelect'))
+		{
+			NavHelp.AddGeoscapeButton();
+		}
+
+		if (Movie.IsMouseActive() && IsAllowedToCycleSoldiers() && class'UIUtilities_Strategy'.static.HasSoldiersToCycleThrough(UnitReference, CanCycleTo))
+		{
+			NavHelp.SetButtonType("XComButtonIconPC");
+			i = eButtonIconPC_Prev_Soldier;
+			NavHelp.AddCenterHelp( string(i), "", PrevSoldier, false, PrevKey);
+			i = eButtonIconPC_Next_Soldier; 
+			NavHelp.AddCenterHelp( string(i), "", NextSoldier, false, NextKey);
+			NavHelp.SetButtonType("");
+		}
+	}
+
+	// KDM : 'Make poster' help item has been removed.
+
+	if (`ISCONTROLLERACTIVE)
+	{
+		if (!UIArmory_PromotionItem(List.GetSelectedItem()).bIsDisabled)
+		{
+			NavHelp.AddLeftHelp(m_strInfo, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $class'UIUtilities_Input'.const.ICON_LSCLICK_L3);
+		}
+
+		if (IsAllowedToCycleSoldiers() && class'UIUtilities_Strategy'.static.HasSoldiersToCycleThrough(UnitReference, CanCycleTo))
+		{
+			NavHelp.AddCenterHelp(m_strTabNavHelp, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_LBRB_L1R1);
+		}
+
+		NavHelp.AddCenterHelp(m_strRotateNavHelp, class'UIUtilities_Input'.static.GetGamepadIconPrefix() $ class'UIUtilities_Input'.const.ICON_RSTICK); 
+	}
+
+	// KDM : 'Go to Training Center' help item has been removed; might be ok to keep this one though. 
+
+	NavHelp.Show();
+}
+
 simulated function bool OnUnrealCommand(int cmd, int arg)
 {
 	local bool bHandled;
-	local name SoldierClassName;
-	local XComGameState UpdateState;
-	local XComGameState_Unit UpdatedUnit, Unit;
-	local XComGameStateContext_ChangeContainer ChangeContainer;
-	local XComGameStateHistory History;
 	
-	Unit = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(UnitReference.ObjectID));
-
 	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
 	{
 		return false;
@@ -800,29 +892,23 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 			OnCancel();
 			break;
 		
-		case class'UIUtilities_Input'.const.FXS_BUTTON_X: // bsg-jrebar (4/21/17): Changed UI flow and button positions per new additions
-			MakePosterButton();
-			break;
-		
-		case class'UIUtilities_Input'.const.FXS_BUTTON_SELECT : // bsg-jrebar (4/21/17): Changed UI flow and button positions per new additions
-			//bsg-hlee (05.09.17): If the nav help does not how up do not allow the button to navigate to the facility. Condition taken from UpdateNavHelp when deciding to add the nav help or not.
-			if (class'UIUtilities_Strategy'.static.GetXComHQ().HasFacilityByName('RecoveryCenter') && IsAllowedToCycleSoldiers() &&
-				!`ScreenStack.IsInStack(class'UIFacility_TrainingCenter') && !`ScreenStack.IsInStack(class'UISquadSelect') && 
-				!`ScreenStack.IsInStack(class'UIAfterAction') && Unit.GetSoldierClassTemplate().bAllowAWCAbilities)
-			{
-				JumpToRecoveryFacility();
-			}
+		// KDM : 'Make poster' case has been removed.
+
+		// KDM : 'Go to Training Center' case has been removed
 		
 		default:
 			bHandled = false;
 			break;
 	}
 	
-	return bHandled || super.OnUnrealCommand(cmd, arg);
+	return bHandled || super(UIArmory).OnUnrealCommand(cmd, arg);
 }
 
 defaultproperties
 {
 	// KDM : Select the left ability on initialization.
 	SelectedAbilityIndex = 0;
+
+	AbilityInfoTipIsShowing = -1;
+	SelectAbilityTipIsShowing = -1;
 }
