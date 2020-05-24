@@ -92,15 +92,17 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		return false;
 	}
 
-	// KDM : OnUnrealCommand() is not set up properly for this particular alert, which uses eAlertName == 'eAlert_TrainingComplete';
-	// therefore, put in custom logic.
+	// KDM : OnUnrealCommand() was not set up properly for this particular alert, which uses eAlertName == 'eAlert_TrainingComplete';
+	// previously, both the A button and the B button called OnCancelClicked().
 	if ((cmd == class'UIUtilities_Input'.const.FXS_BUTTON_A) && Button1.bIsVisible)
 	{
+		// KDM : Views the soldier via the officer promotion screen.
 		OnConfirmClicked(none);
 		return true;
 	}
 	else if ((cmd == class'UIUtilities_Input'.const.FXS_BUTTON_B) && Button2.bIsVisible)
 	{
+		// KDM : Closes the screen.
 		OnCancelClicked(none);
 		return true;
 	}

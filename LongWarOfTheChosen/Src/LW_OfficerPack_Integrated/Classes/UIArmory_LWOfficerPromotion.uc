@@ -39,9 +39,6 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 	// Don't show nav help during tutorial, or during the After Action sequence.
 	bUseNavHelp = class'XComGameState_HeadquartersXCom'.static.IsObjectiveCompleted('T0_M2_WelcomeToArmory') || Movie.Pres.ScreenStack.IsInStack(class'UIAfterAction');
 
-	// KDM : Following the lead of UIArmoryPromotion --> InitPromotion()
-	UnitReference = UnitRef;
-
 	super(UIArmory).InitArmory(UnitRef,,,,,, bInstantTransition);
 
 	List = Spawn(class'UIList', self);
@@ -53,7 +50,7 @@ simulated function InitPromotion(StateObjectReference UnitRef, optional bool bIn
 	LeadershipButton = Spawn(class'UIButton', self);
 	// KDM : Make the Leadership button a hotlink when using a controller.
 	LeadershipButton.InitButton(, strLeadershipButton, ViewLeadershipStats, eUIButtonStyle_HOTLINK_BUTTON);
-	// KDM : Add the gamepad icon, right stick click, to be used when a controller is in use.
+	// KDM : Add the gamepad icon, right stick click, when a controller is in use.
 	LeadershipButton.SetGamepadIcon(class'UIUtilities_Input'.const.ICON_RSCLICK_R3);
 	LeadershipButton.SetPosition(58, 971);
 
@@ -270,10 +267,9 @@ simulated function PopulateData()
 		SelectionIndex = OfficerState.GetOfficerRank();
 	}
 	
-	// KDM : Whenever list selection is changed, PreviewRow() is called, due to the setting of OnSelectionChanged within InitPromotion();
-	// note that the parameter, bForce, is set to true so that PreviewRow() is called no matter what. 
-	// Previously, if you clicked next / previous soldier, and the 2 soldiers had the same rank, the list would ignore SetSelectedIndex(), 
-	// since it was trying to set the list to the same index value.
+	// KDM : Whenever list selection is changed, PreviewRow() is called, due to the setting of OnSelectionChanged within InitPromotion().
+	// The parameter, bForce, is set to true so that PreviewRow() is called regardless of the list's previously selected index.
+	// This matters when the next/previous soldier button is clicked, with the 2 soldiers having the same rank and, thus, SelectionIndex.
 	List.SetSelectedIndex(SelectionIndex, true);
 
 	UpdateNavHelp();
@@ -321,7 +317,7 @@ simulated function PopulateAbilitySummary(XComGameState_Unit Unit)
 
 simulated function OnLoseFocus()
 {
-	// KDM : We want the navigation help system to guarantee it reloads itself, if it receives focus again.
+	// KDM : We want the navigation help system to reload itself upon receiving focus.
 	AbilityInfoTipIsShowing = -1;
 	SelectAbilityTipIsShowing = -1;
 
@@ -428,9 +424,9 @@ simulated function PreviewRow(UIList ContainerList, int ItemIndex)
 		// 2.] If the previous row's right ability was selected, select the right ability for the new row.
 		UIArmory_LWOfficerPromotionItem(List.GetItem(ItemIndex)).SetSelectedAbility(SelectedAbilityIndex);
 
-		// KDM : The navigation system should be updated because it can change due to the following circumstances :
-		// 1.] If you have a promotion row ability selected, a "Select" tip will be displayed.
-		// 2.] If you have an unhidden ability selected, an "Ability Info" tip will be displayed.   
+		// KDM : The navigation system should be updated because it might have changed. For example,
+		// 1.] If a promotion row ability is selected, a "Select" tip needs to be displayed.
+		// 2.] If an unhidden ability is selected, an "Ability Info" tip needs to be displayed.   
 		UpdateNavHelp();
 	}
 }
@@ -748,7 +744,7 @@ simulated static function CycleToSoldier(StateObjectReference UnitRef)
 	super(UIArmory).CycleToSoldier(UnitRef);
 }
 
-// KDM : Use UIArmory_Promotion --> UpdateNavHelp() as our base since it has been update for WotC.
+// KDM : Use UIArmory_Promotion --> UpdateNavHelp() as our code base since it has been updated for WotC.
 simulated function UpdateNavHelp()
 {
 	local int i, AbilityInfoTipShouldShow, SelectAbilityTipShouldShow;
@@ -765,16 +761,15 @@ simulated function UpdateNavHelp()
 	SelectAbilityTipShouldShow = (UIArmory_PromotionItem(List.GetSelectedItem()).bEligibleForPromotion) ? 1 : 0;
 
 	// KDM : Whenever the promotion screen updates its navigation help system, the whole navigation help system flickers off then on; 
-	// this is because it needs to be cleared, recreated, then re-shown. This is mainly an issue for controller users, since, for them,
+	// this is because it needs to be cleared, recreated, then re-shown. This is mainly an issue for controller users since, for them,
 	// the navigation system has to refresh whenever a new row is selected, as well as whenever a new ability is selected. The reason is :
 	// 1.] A 'Select' tip appears when a promotion eligible row is selected, and disappears otherwise.
 	// 2.] An 'Ability Info' tip appears whenever an unhidden ability is selected, and disappears otherwise.
 	//
-	// The easiest solution is to keep track of the tips which change, according to row and ability selection, and only update the 
-	// navigation help system when one of their values change.
+	// The easiest solution is to only update the navigation help system when dynamic tips do, in fact, change.
 	if (`ISCONTROLLERACTIVE && (AbilityInfoTipIsShowing == AbilityInfoTipShouldShow) && (SelectAbilityTipIsShowing == SelectAbilityTipShouldShow))
 	{
-		// KDM : The navigation help system has not changed to just get out.
+		// KDM : The navigation help system has not changed so just get out.
 		return;
 	}
 	else if (`ISCONTROLLERACTIVE && ((AbilityInfoTipIsShowing != AbilityInfoTipShouldShow) || (SelectAbilityTipIsShowing != SelectAbilityTipShouldShow)))
@@ -788,8 +783,8 @@ simulated function UpdateNavHelp()
 
 	NavHelp.ClearButtonHelp();
 	
-	// KDM : The officer promotion screen is not accessible via the post mission squad view, represented by UIAfterAction, so related
-	// code has been removed.
+	// KDM : From what I can see, the officer promotion screen is not accessible via the post mission squad view, represented by UIAfterAction;
+	// therefore, the corresponding code has been removed.
 
 	NavHelp.AddBackButton(OnCancel);
 
@@ -894,7 +889,7 @@ simulated function bool OnUnrealCommand(int cmd, int arg)
 		
 		// KDM : 'Make poster' case has been removed.
 
-		// KDM : 'Go to Training Center' case has been removed
+		// KDM : 'Go to Training Center' case has been removed.
 		
 		default:
 			bHandled = false;
