@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------------------
-//  FILE:    UIAlert_LWOfficerTrainingComplete.uc
+//  FILE:    UIAlert_LWOfficerTrainingComplete.uc 
 //  AUTHOR:  Amineri
 //  PURPOSE: Customized UI Alert for Officer training 
 //---------------------------------------------------------------------------------------

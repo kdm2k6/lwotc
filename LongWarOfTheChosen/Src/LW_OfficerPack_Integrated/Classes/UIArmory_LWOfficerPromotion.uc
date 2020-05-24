@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------------------
-//  FILE:    UIArmory_LWOfficerPromotion
+//  FILE:    UIArmory_LWOfficerPromotion 
 //  AUTHOR:  Amineri (Pavonis Interactive)
 //  PURPOSE: Tweaked ability selection UI for LW officer system
 //--------------------------------------------------------------------------------------- 

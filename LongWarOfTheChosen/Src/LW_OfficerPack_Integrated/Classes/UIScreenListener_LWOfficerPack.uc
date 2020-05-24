@@ -1,9 +1,7 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    UIScreenListener_LWOfficerPack
 //  AUTHOR:  Amineri (Pavonis Interactive)
-//
 //  PURPOSE: Implements event listeners used to interface to other mods
-//
 //--------------------------------------------------------------------------------------- 
 
 class UIScreenListener_LWOfficerPack extends UIScreenListener;
