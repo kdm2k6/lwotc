@@ -264,16 +264,16 @@ simulated function PopulateData()
 	// Update ability summary at the bottom
 	PopulateAbilitySummary(Unit);
 
-	// KDM : If there was no promotion row for some reason, just select the 1st row.
+	// KDM : If there was no promotion row, select the highest ranking row the officer has attained.
 	if (SelectionIndex == INDEX_NONE)
 	{
-		SelectionIndex = 0;
+		SelectionIndex = OfficerState.GetOfficerRank();
 	}
 	
-	// KDM : Whenever list selection is changed, PreviewRow() is called, due to the setting of OnSelectionChanged within InitPromotion().
-	// Note that the parameter, bForce, is set to true so that PreviewRow() is called no matter what. Previously, if you clicked next /
-	// previous soldier, and the 2 soldiers had the same rank, the list would ignore SetSelectedIndex() since it was trying to set
-	// the list to the same index value.
+	// KDM : Whenever list selection is changed, PreviewRow() is called, due to the setting of OnSelectionChanged within InitPromotion();
+	// note that the parameter, bForce, is set to true so that PreviewRow() is called no matter what. 
+	// Previously, if you clicked next / previous soldier, and the 2 soldiers had the same rank, the list would ignore SetSelectedIndex(), 
+	// since it was trying to set the list to the same index value.
 	List.SetSelectedIndex(SelectionIndex, true);
 
 	UpdateNavHelp();

@@ -2,28 +2,27 @@
 //  FILE:    UIAlert_LWOfficerTrainingComplete.uc
 //  AUTHOR:  Amineri
 //  PURPOSE: Customized UI Alert for Officer training 
-//           
 //---------------------------------------------------------------------------------------
 class UIAlert_LWOfficerTrainingComplete extends UIAlert;
 
-//override for UIAlert child to trigger specific Alert built in this class
+// Override for UIAlert child to trigger specific Alert built in this class
 simulated function BuildAlert()
 {
 	BindLibraryItem();
 	BuildOfficerTrainingCompleteAlert();
 }
 
-//New Alert building function
+// New Alert building function
 simulated function BuildOfficerTrainingCompleteAlert()
 {
-	local XComGameState_Unit UnitState;
-	local XComGameState_Unit_LWOfficer OfficerState;
+	local string AbilityIcon, AbilityName, AbilityDescription, ClassIcon, ClassName, RankName;
 	local X2AbilityTemplate TrainedAbilityTemplate;
 	local X2AbilityTemplateManager AbilityTemplateManager;
 	local XComGameState_ResistanceFaction FactionState;
-	local string AbilityIcon, AbilityName, AbilityDescription, ClassIcon, ClassName, RankName;
+	local XComGameState_Unit UnitState;
+	local XComGameState_Unit_LWOfficer OfficerState;
 	
-	if( LibraryPanel == none )
+	if (LibraryPanel == none)
 	{
 		`RedScreen("UI Problem with the alerts! Couldn't find LibraryPanel for current eAlertType: " $ eAlertName);
 		return;
@@ -74,7 +73,7 @@ simulated function BuildOfficerTrainingCompleteAlert()
 	//bsg-crobinson (5.17.17): end
 
 	// Hide "View Soldier" button if player is on top of avenger, prevents ui state stack issues
-	if(Movie.Pres.ScreenStack.IsInStack(class'UIArmory_LWOfficerPromotion'))
+	if (Movie.Pres.ScreenStack.IsInStack(class'UIArmory_LWOfficerPromotion'))
 	{
 		Button1.Hide();
 		Button1.DisableNavigation();
@@ -84,4 +83,27 @@ simulated function BuildOfficerTrainingCompleteAlert()
 	{
 		SetFactionIcon(FactionState.GetFactionIcon());
 	}
+}
+
+simulated function bool OnUnrealCommand(int cmd, int arg)
+{
+	if (!CheckInputIsReleaseOrDirectionRepeat(cmd, arg))
+	{
+		return false;
+	}
+
+	// KDM : OnUnrealCommand() is not set up properly for this particular alert, which uses eAlertName == 'eAlert_TrainingComplete';
+	// therefore, put in custom logic.
+	if ((cmd == class'UIUtilities_Input'.const.FXS_BUTTON_A) && Button1.bIsVisible)
+	{
+		OnConfirmClicked(none);
+		return true;
+	}
+	else if ((cmd == class'UIUtilities_Input'.const.FXS_BUTTON_B) && Button2.bIsVisible)
+	{
+		OnCancelClicked(none);
+		return true;
+	}
+
+	return super.OnUnrealCommand(cmd, arg);
 }
