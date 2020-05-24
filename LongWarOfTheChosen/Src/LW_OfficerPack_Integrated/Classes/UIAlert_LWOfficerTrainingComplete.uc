@@ -67,10 +67,15 @@ simulated function BuildOfficerTrainingCompleteAlert()
 	LibraryPanel.MC.EndOp();
 	GetOrStartWaitingForStaffImage();  // WOTC: Moved from 2nd QueueString to here for unknown reasons.
 	
-	//bsg-crobinson (5.17.17): Buttons need to be in a different area for this screen
-	Button1.OnSizeRealized = OnTrainingButtonRealized;
-	Button2.OnSizeRealized = OnTrainingButtonRealized;
-	//bsg-crobinson (5.17.17): end
+	// KDM : The call to OnTrainingButtonRealized() places the buttons on top of each other in terms of X.
+	// 1.] Controller code places the buttons above/below each other in terms of Y; therefore, this is ok.
+	// 2.] Mouse & keyboard code places the buttons at the same Y location; therefore, they will overlap one another.
+	// The solution for mouse & keyboard users is to simply ignore this code and let ActionScript place them correctly.
+	if (`ISCONTROLLERACTIVE)
+	{
+		Button1.OnSizeRealized = OnTrainingButtonRealized;
+		Button2.OnSizeRealized = OnTrainingButtonRealized;
+	}
 
 	// Hide "View Soldier" button if player is on top of avenger, prevents ui state stack issues
 	if (Movie.Pres.ScreenStack.IsInStack(class'UIArmory_LWOfficerPromotion'))
