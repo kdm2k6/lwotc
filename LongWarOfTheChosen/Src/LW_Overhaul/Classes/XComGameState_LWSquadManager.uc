@@ -145,7 +145,9 @@ simulated function GoToSquadManagement(optional StateObjectReference Facility)
     SubMenu.Message.Label = LabelBarracks_SquadManagement;
     Shortcuts.UpdateSubMenu(eUIAvengerShortcutCat_Barracks, SubMenu);
 
-	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks'))
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks') && 
+		(!class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		kPersonnelList = HQPres.Spawn(class'UIPersonnel_SquadBarracks', HQPres);
 		kPersonnelList.onSelectedDelegate = OnPersonnelSelected;
@@ -602,7 +604,8 @@ function EventListenerReturn SetDisabledSquadListItems(Object EventData, Object 
 		return ELR_NoInterrupt;
 	}
 
-	bInSquadEdit = `SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks');
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
 
 	if(ListItem.UnitRef.ObjectID > 0)
 	{
@@ -657,7 +660,9 @@ function EventListenerReturn ConfigureSquadOnEnterSquadSelect(Object EventData, 
 
 	History = `XCOMHISTORY;
 
-	bInSquadEdit = `SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks');
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
+	
 	if (bInSquadEdit)
 		return ELR_NoInterrupt;
 

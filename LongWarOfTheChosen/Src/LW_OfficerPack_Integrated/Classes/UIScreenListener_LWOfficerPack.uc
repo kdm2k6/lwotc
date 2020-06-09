@@ -490,7 +490,9 @@ function EventListenerReturn CheckOfficerMissionStatus(Object EventData, Object 
 	//MissionData = HQState.GetGeneratedMissionData(HQState.MissionRef.ObjectID);
 	//bAllowWoundedSoldiers = MissionData.Mission.AllowDeployWoundedUnits;
 
-	if (GetFirstScreenByName ('UISquadSelect') != none && GetFirstScreenByName('UIPersonnel_SquadBarracks') == none)
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	if ((GetFirstScreenByName('UISquadSelect') != none) && (GetFirstScreenByName('UIPersonnel_SquadBarracks') == none) &&
+		(!ControllerCapableSquadBarracksIsOnStack()))
 	{
 		if(Unit != none && PersonnelStrings.Id == 'OverrideGetPersonnelStatusSeparate') 
 		{
