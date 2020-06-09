@@ -16,67 +16,87 @@ var localized string strInfiltration;
 
 var localized string strAreaOfOperations;
 
-//var config array<name> NonInfiltrationMissions;
-
 var bool bInSquadEdit;
 var GeneratedMissionData MissionData;
 
 var config float SquadInfo_DelayedInit;
 var const array<string> PlotTypes;
 
-// This event is triggered after a screen is initialized
 event OnInit(UIScreen Screen)
 {
-	local XComGameState_HeadquartersXCom XComHQ;
-	local UISquadSelect SquadSelect;
-	local XComGameState_LWSquadManager SquadMgr;
-	local UISquadSelect_InfiltrationPanel InfiltrationInfo;
-	local UISquadContainer SquadContainer;
-	local XComGameState_MissionSite MissionState;
-	local UITextContainer InfilRequirementText, MissionBriefText;
 	local float RequiredInfiltrationPct;
 	local string BriefingString;
-
-	if(!Screen.IsA('UISquadSelect')) return;
+	local UISquadContainer SquadContainer;
+	local UISquadSelect SquadSelect;
+	local UISquadSelect_InfiltrationPanel InfiltrationInfo;
+	local UITextContainer InfilRequirementText, MissionBriefText;
+	local XComGameState_HeadquartersXCom XComHQ;
+	local XComGameState_LWSquadManager SquadMgr;
+	local XComGameState_MissionSite MissionState;
+	
+	if (!Screen.IsA('UISquadSelect'))
+	{
+		return;
+	}
 
 	`Log("UIScreenListener_SquadSelect_LW: Initializing");
 	
 	SquadSelect = UISquadSelect(Screen);
-	if(SquadSelect == none) return;
+	if (SquadSelect == none)
+	{
+		return;
+	}
 
-	class'LWHelpTemplate'.static.AddHelpButton_Std('SquadSelect_Help', SquadSelect, 1057, 12);
+	// KDM : This button need not be added if a controller is active.
+	if (!`ISCONTROLLERACTIVE)
+	{
+		class'LWHelpTemplate'.static.AddHelpButton_Std('SquadSelect_Help', SquadSelect, 1057, 12);
+	}
 
 	XComHQ = `XCOMHQ;
 	SquadMgr = `LWSQUADMGR;
 
-	// pause and resume all headquarters projects in order to refresh state
-	// this is needed because exiting squad select without going on mission can result in projects being resumed w/o being paused, and they may be stale
+	// LW : Pause and resume all headquarter's projects in order to refresh the state. This is needed because exiting squad select without 
+	// going on a mission can result in projects being resumed without being paused, and they may be stale.
 	XComHQ.PauseProjectsForFlight();
 	XComHQ.ResumeProjectsPostFlight();
 
 	XComHQ = `XCOMHQ;
-	SquadSelect.XComHQ = XComHQ; // Refresh the squad select's XComHQ since it's been updated
+	// LW : Refresh the squad select's XComHQ since it has been updated.
+	SquadSelect.XComHQ = XComHQ;
 
 	MissionData = XComHQ.GetGeneratedMissionData(XComHQ.MissionRef.ObjectID);
 
 	UpdateMissionDifficulty(SquadSelect);
 
-	//check if we got here from the SquadBarracks
-	bInSquadEdit = `SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks');
-	if(bInSquadEdit)
+	// LW : Check if we got here from the SquadBarracks.
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
+	
+	if (bInSquadEdit)
 	{
-		SquadSelect.LaunchButton.OnClickedDelegate = OnSaveSquad;
-		SquadSelect.LaunchButton.SetText(strSquad);
-		SquadSelect.LaunchButton.SetTitle(strSave);
+		if (!`ISCONTROLLERACTIVE)
+		{
+			SquadSelect.LaunchButton.OnClickedDelegate = OnSaveSquad;
+			SquadSelect.LaunchButton.SetText(strSquad);
+			SquadSelect.LaunchButton.SetTitle(strSave);
+		}
+		else
+		{
+			// KDM : If a controller is active, we don't want the save button shown.
+			SquadSelect.LaunchButton.Hide();
+		}
 
 		SquadSelect.m_kMissionInfo.Remove();
 	} 
 	else 
 	{
 		`Log("UIScreenListener_SquadSelect_LW: Arrived from mission");
-		if(SquadMgr.IsValidInfiltrationMission(XComHQ.MissionRef))
+		
+		if (SquadMgr.IsValidInfiltrationMission(XComHQ.MissionRef))
 		{
 			`Log("UIScreenListener_SquadSelect_LW: Setting up for infiltration mission");
+			
 			SquadSelect.LaunchButton.SetText(strStart);
 			SquadSelect.LaunchButton.SetTitle(strInfiltration);
 
@@ -86,7 +106,7 @@ event OnInit(UIScreen Screen)
 			InfiltrationInfo.SquadSoldiers = SquadSelect.XComHQ.Squad;
 			InfiltrationInfo.DelayedInit(default.SquadInfo_DelayedInit);
 
-			// check if we need to infiltrate to 100% and display a message if so
+			// LW : Check if we need to infiltrate to 100%, and display a message if so.
 			MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(`XCOMHQ.MissionRef.ObjectID));
 			RequiredInfiltrationPct = class'XComGameState_LWPersistentSquad'.static.GetRequiredPctInfiltrationToLaunch(MissionState);
 			if (RequiredInfiltrationPct > 0.0)
@@ -100,12 +120,15 @@ event OnInit(UIScreen Screen)
 				InfilRequirementText.SetAlpha(66);
 			}
 		}
-		// create the SquadContainer on a timer, to avoid creation issues that can arise when creating it immediately, when no pawn loading is present
-		SquadContainer = SquadSelect.Spawn(class'UISquadContainer', SquadSelect);
-		SquadContainer.CurrentSquadRef = SquadMgr.LaunchingMissionSquad;
-		SquadContainer.DelayedInit(default.SquadInfo_DelayedInit);
 
-		// 
+		// KDM : If a controller is active, we don't want to show the SquadContainer.
+		if (!`ISCONTROLLERACTIVE)
+		{
+			// LW : Create the SquadContainer on a timer, to avoid creation issues that can arise when creating it immediately, when no pawn loading is present.
+			SquadContainer = SquadSelect.Spawn(class'UISquadContainer', SquadSelect);
+			SquadContainer.CurrentSquadRef = SquadMgr.LaunchingMissionSquad;
+			SquadContainer.DelayedInit(default.SquadInfo_DelayedInit);
+		} 
 
 		MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(XComHQ.MissionRef.ObjectID));
 
@@ -144,7 +167,7 @@ static function string GetPlotTypeFriendlyName(string PlotType)
 {
 	local int i;
 
-	// Use the multiplayer localisation to get the friendly name for a given plot type
+	// LW : Use the multiplayer localisation to get the friendly name for a given plot type.
 	i = default.PlotTypes.Find(PlotType);
 
 	if (i == INDEX_NONE)
@@ -160,9 +183,9 @@ static function string GetPlotTypeFriendlyName(string PlotType)
 
 simulated function string RequiredInfiltrationString(float RequiredValue)
 {
-	local XGParamTag ParamTag;
 	local string ReturnString;
-
+	local XGParamTag ParamTag;
+	
 	ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 	ParamTag.IntValue0 = Round(RequiredValue);
 	ReturnString = `XEXPAND.ExpandString(class'UIMission_LWLaunchDelayedMission'.default.m_strInsuffientInfiltrationToLaunch);
@@ -173,15 +196,14 @@ simulated function string RequiredInfiltrationString(float RequiredValue)
 
 function UpdateMissionDifficulty(UISquadSelect SquadSelect)
 {
-	local XComGameState_MissionSite MissionState;
 	local string Text;
+	local XComGameState_MissionSite MissionState;
 	
 	MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(`XCOMHQ.MissionRef.ObjectID));
 	Text = class'UIUtilities_Text_LW'.static.GetDifficultyString(MissionState);
 	SquadSelect.m_kMissionInfo.MC.ChildSetString("difficultyValue", "htmlText", Caps(Text));
 }
 
-// callback from clicking the rename squad button
 function OnSquadManagerClicked(UIButton Button)
 {
 	local UIPersonnel_SquadBarracks kPersonnelList;
@@ -189,7 +211,9 @@ function OnSquadManagerClicked(UIButton Button)
 
 	HQPres = `HQPRES;
 
-	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks'))
+	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks') &&
+		(!class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		kPersonnelList = HQPres.Spawn(class'UIPersonnel_SquadBarracks', HQPres);
 		kPersonnelList.bSelectSquad = true;
@@ -197,13 +221,16 @@ function OnSquadManagerClicked(UIButton Button)
 	}
 }
 
+// KDM : Since this function is never called when a controller is active, due to its button being hidden, I don't need to worry about it.
+// If this was not the case, I would have to worry about it since it deals with UIPersonnel_SquadBarracks, but not my custom, UIScreen derived,
+// UIPersonnel_SquadBarracks_ForControllers class.
 simulated function OnSaveSquad(UIButton Button)
 {
-	local XComGameState_HeadquartersXCom XComHQ;
-	local XComGameState_LWSquadManager SquadMgr;
 	local UIPersonnel_SquadBarracks Barracks;
 	local UIScreenStack ScreenStack;
-
+	local XComGameState_HeadquartersXCom XComHQ;
+	local XComGameState_LWSquadManager SquadMgr;
+	
 	XComHQ = `XCOMHQ;
 	ScreenStack = `SCREENSTACK;
 	SquadMgr = `LWSQUADMGR;
@@ -211,36 +238,44 @@ simulated function OnSaveSquad(UIButton Button)
 	SquadMgr.GetSquad(Barracks.CurrentSquadSelection).SquadSoldiers = XComHQ.Squad;
 	GetSquadSelect().CloseScreen();
 	ScreenStack.PopUntil(Barracks);
-
 }
 
 simulated function UISquadSelect GetSquadSelect()
 {
-	local UIScreenStack ScreenStack;
 	local int Index;
+	local UIScreenStack ScreenStack;
+	
 	ScreenStack = `SCREENSTACK;
-	for( Index = 0; Index < ScreenStack.Screens.Length;  ++Index)
+	for (Index = 0; Index < ScreenStack.Screens.Length; ++Index)
 	{
-		if(UISquadSelect(ScreenStack.Screens[Index]) != none )
+		if (UISquadSelect(ScreenStack.Screens[Index]) != none)
+		{
 			return UISquadSelect(ScreenStack.Screens[Index]);
+		}
 	}
 	return none; 
 }
 
-// This event is triggered after a screen receives focus
 event OnReceiveFocus(UIScreen Screen)
 {
 	local UISquadSelect SquadSelect;
 	local UISquadSelect_InfiltrationPanel InfiltrationInfo;
 
-	if(!Screen.IsA('UISquadSelect')) return;
+	if (!Screen.IsA('UISquadSelect'))
+	{
+		return;
+	}
 
 	SquadSelect = UISquadSelect(Screen);
-	if(SquadSelect == none) return;
+	if (SquadSelect == none)
+	{
+		return;
+	}
 
 	`Log("UIScreenListener_SquadSelect_LW: Received focus");
 	
-	SquadSelect.bDirty = true; // Workaround for bug in currently published version of squad select
+	// LW : Workaround for bug in currently published version of squad select
+	SquadSelect.bDirty = true; 
 	SquadSelect.UpdateData();
 	SquadSelect.UpdateNavHelp();
 
@@ -251,7 +286,7 @@ event OnReceiveFocus(UIScreen Screen)
 	{
 		`Log("UIScreenListener_SquadSelect_LW: Found infiltration panel");
 		
-		//remove and recreate infiltration info in order to prevent issues with Flash text updates not getting processed
+		// LW : Remove and recreate infiltration info in order to prevent issues with Flash text updates not getting processed.
 		InfiltrationInfo.Remove();
 
 		InfiltrationInfo = SquadSelect.Spawn(class'UISquadSelect_InfiltrationPanel', SquadSelect).InitInfiltrationPanel();
@@ -261,24 +296,25 @@ event OnReceiveFocus(UIScreen Screen)
 	}
 }
 
-// This event is triggered after a screen loses focus
 event OnLoseFocus(UIScreen Screen);
 
-// This event is triggered when a screen is removed
 event OnRemoved(UIScreen Screen)
 {
-	local XComGameState_LWSquadManager SquadMgr;
 	local StateObjectReference SquadRef, NullRef;
-	local XComGameState_LWPersistentSquad SquadState;
-	local XComGameState NewGameState;
 	local UISquadSelect SquadSelect;
-
-	if(!Screen.IsA('UISquadSelect')) return;
+	local XComGameState NewGameState;
+	local XComGameState_LWPersistentSquad SquadState;
+	local XComGameState_LWSquadManager SquadMgr;
+	
+	if(!Screen.IsA('UISquadSelect'))
+	{
+		return;
+	}
 
 	SquadSelect = UISquadSelect(Screen);
 
-	//need to move camera back to the hangar, if was in SquadManagement
-	if(bInSquadEdit)
+	// Need to move camera back to the hangar, if was in SquadManagement
+	if (bInSquadEdit)
 	{
 		`HQPRES.CAMLookAtRoom(`XCOMHQ.GetFacilityByName('Hangar').GetRoom(), `HQINTERPTIME);
 	}
@@ -305,7 +341,6 @@ event OnRemoved(UIScreen Screen)
 
 defaultproperties
 {
-	// Leaving this assigned to none will cause every screen to trigger its signals on this class
 	ScreenClass = none;
 
 	PlotTypes[0]="Duel"
