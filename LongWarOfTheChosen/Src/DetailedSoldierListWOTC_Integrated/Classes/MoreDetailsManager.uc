@@ -40,7 +40,12 @@ simulated function UIPanel InitPanel(optional name InitName, optional name InitL
 {
 	super.InitPanel(InitName, InitLibID);
 
-	AddHelp();
+	// KDM : My controller-capable SquadBarracks mod sets up its own navigation help system; therefore, if a controller-capable
+	// SquadBarracks screen is on the screen stack, do not let MDM add any navigation help.
+	if (!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack())
+	{
+		AddHelp();
+	}
 
 	return self;
 }

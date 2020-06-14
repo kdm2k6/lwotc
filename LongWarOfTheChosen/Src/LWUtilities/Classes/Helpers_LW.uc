@@ -497,6 +497,33 @@ static function bool IsUnitInterruptingEnemyTurn(XComGameState_Unit UnitState)
 	return BattleState.InterruptingGroupRef == UnitState.GetGroupMembership().GetReference();
 }
 
+// KDM : Determines if a UIPersonnel_SquadBarracks_ForControllers screen is on the screen stack; it checks
+// the screen by 'name' so that my custom, controller-capable, SquadBarracks can exist as a separate mod and
+// need not be integrated into LWotC.
+static function bool ControllerCapableSquadBarracksIsOnStack()
+{
+	return (`ISCONTROLLERACTIVE && (GetFirstScreenByName('UIPersonnel_SquadBarracks_ForControllers') != none));
+}
+
+// KDM : Returns the 1st screen, or child screen, of type ScreenType.
+static function UIScreen GetFirstScreenByName(name ScreenType)
+{
+	local UIScreenStack ScreenStack;
+	local int i;
+	
+	ScreenStack = `SCREENSTACK;
+	
+	for (i = 0; i < ScreenStack.Screens.Length; i++)
+	{
+		if (ScreenStack.Screens[i].IsA(ScreenType))
+		{
+			return ScreenStack.Screens[i];
+		}
+	}
+	
+	return none; 
+}
+
 defaultproperties
 {
 	CA_FAILURE_RISK_MARKER="CovertActionRisk_Failure"

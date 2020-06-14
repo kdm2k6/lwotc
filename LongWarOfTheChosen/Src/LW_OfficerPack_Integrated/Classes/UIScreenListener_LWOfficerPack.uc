@@ -461,8 +461,8 @@ function EventListenerReturn CheckOfficerMissionStatus(Object EventData, Object 
 	local XComGameState_Unit Unit;
 
 	// LW : Only do this for squadselect.
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
-	if((!IsInSquadSelect()) && (GetFirstScreenByName('UIPersonnel_SquadBarracks') == none) && (!ControllerCapableSquadBarracksIsOnStack()))
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is not on the screen stack.
+	if((!IsInSquadSelect()) && (GetScreenOrChild('UIPersonnel_SquadBarracks') == none) && (!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack()))
 		return ELR_NoInterrupt;
 
 	PersonnelStrings = XComLWTuple(EventData);
@@ -490,9 +490,9 @@ function EventListenerReturn CheckOfficerMissionStatus(Object EventData, Object 
 	//MissionData = HQState.GetGeneratedMissionData(HQState.MissionRef.ObjectID);
 	//bAllowWoundedSoldiers = MissionData.Mission.AllowDeployWoundedUnits;
 
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
-	if ((GetFirstScreenByName('UISquadSelect') != none) && (GetFirstScreenByName('UIPersonnel_SquadBarracks') == none) &&
-		(!ControllerCapableSquadBarracksIsOnStack()))
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is not on the screen stack.
+	if ((GetScreenOrChild('UISquadSelect') != none) && (GetScreenOrChild('UIPersonnel_SquadBarracks') == none) &&
+		(!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		if(Unit != none && PersonnelStrings.Id == 'OverrideGetPersonnelStatusSeparate') 
 		{
@@ -518,33 +518,6 @@ function EventListenerReturn CheckOfficerMissionStatus(Object EventData, Object 
 	return ELR_NoInterrupt;
 }
 
-// KDM : Returns the 1st screen, or child screen, of type ScreenType; this is a replacement for GetScreenOrChild(name ScreenType).
-static function UIScreen GetFirstScreenByName(name ScreenType)
-{
-	local UIScreenStack ScreenStack;
-	local int i;
-	
-	ScreenStack = `SCREENSTACK;
-	
-	for (i = 0; i < ScreenStack.Screens.Length; i++)
-	{
-		if (ScreenStack.Screens[i].IsA(ScreenType))
-		{
-			return ScreenStack.Screens[i];
-		}
-	}
-	
-	return none; 
-}
-
-// KDM : Determines if my controller capable UIPersonnel_SquadBarracks is on the screen stack.
-// This allows me to perform the check while not having to integrate my mod into LWotC.
-static function bool ControllerCapableSquadBarracksIsOnStack()
-{
-	return (`ISCONTROLLERACTIVE && (GetFirstScreenByName('UIPersonnel_SquadBarracks_ForControllers') != none));
-}
-
-/*
 static function UIScreen GetScreenOrChild(name ScreenType)
 {
 	local UIScreenStack ScreenStack;
@@ -556,7 +529,7 @@ static function UIScreen GetScreenOrChild(name ScreenType)
 			return ScreenStack.Screens[Index];
 	}
 	return none; 
-}*/
+}
 
 function EventListenerReturn CleanUpComponentStateOnDismiss(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
 {

@@ -145,9 +145,9 @@ simulated function GoToSquadManagement(optional StateObjectReference Facility)
     SubMenu.Message.Label = LabelBarracks_SquadManagement;
     Shortcuts.UpdateSubMenu(eUIAvengerShortcutCat_Barracks, SubMenu);
 
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is not on the screen stack.
 	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks') && 
-		(!class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack()))
+		(!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		kPersonnelList = HQPres.Spawn(class'UIPersonnel_SquadBarracks', HQPres);
 		kPersonnelList.onSelectedDelegate = OnPersonnelSelected;
@@ -604,8 +604,8 @@ function EventListenerReturn SetDisabledSquadListItems(Object EventData, Object 
 		return ELR_NoInterrupt;
 	}
 
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
-	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is on the screen stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack());
 
 	if(ListItem.UnitRef.ObjectID > 0)
 	{
@@ -660,8 +660,8 @@ function EventListenerReturn ConfigureSquadOnEnterSquadSelect(Object EventData, 
 
 	History = `XCOMHISTORY;
 
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
-	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is on the screen stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack());
 	
 	if (bInSquadEdit)
 		return ELR_NoInterrupt;

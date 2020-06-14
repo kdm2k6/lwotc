@@ -250,9 +250,9 @@ static protected function EventListenerReturn OnOverridePersonnelStatus(Object E
 			}
 		}
 	}
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is not on the screen stack.
 	else if ((GetScreenOrChild('UIPersonnel_SquadBarracks') == none) &&
-		(!class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack()))
+		(!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		if (`XCOMHQ.IsUnitInSquad(UnitState.GetReference()) && GetScreenOrChild('UISquadSelect') != none)
 		{

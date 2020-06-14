@@ -70,8 +70,8 @@ event OnInit(UIScreen Screen)
 	UpdateMissionDifficulty(SquadSelect);
 
 	// LW : Check if we got here from the SquadBarracks.
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
-	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack());
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is on the screen stack.
+	bInSquadEdit = (`SCREENSTACK.IsInStack(class'UIPersonnel_SquadBarracks') || class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack());
 	
 	if (bInSquadEdit)
 	{
@@ -211,9 +211,9 @@ function OnSquadManagerClicked(UIButton Button)
 
 	HQPres = `HQPRES;
 
-	// KDM : This has been updated to also check for my controller capable squad barracks class on the stack.
+	// KDM : This has been updated to also check if my controller-capable SquadBarracks class is not on the screen stack.
 	if (HQPres.ScreenStack.IsNotInStack(class'UIPersonnel_SquadBarracks') &&
-		(!class'UIScreenListener_LWOfficerPack'.static.ControllerCapableSquadBarracksIsOnStack()))
+		(!class'Helpers_LW'.static.ControllerCapableSquadBarracksIsOnStack()))
 	{
 		kPersonnelList = HQPres.Spawn(class'UIPersonnel_SquadBarracks', HQPres);
 		kPersonnelList.bSelectSquad = true;
