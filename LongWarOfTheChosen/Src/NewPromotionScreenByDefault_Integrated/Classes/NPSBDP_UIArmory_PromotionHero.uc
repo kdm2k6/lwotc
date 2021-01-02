@@ -25,6 +25,7 @@ var config array<int> FactionAbilityCosts;
 var config float BaseAbilityCostModifier;
 
 var config int ScrollbarPositionX;
+var config(LW_UI) bool REMOVE_PROMOTION_SCREEN_DISTORTION;
 
 // Position is the number by which we offset all ability indices.
 // 0 <= Position <= MaxPosition
@@ -92,6 +93,15 @@ simulated function OnInit()
 simulated function InitPromotion(StateObjectReference UnitRef, optional bool bInstantTransition)
 {
 	local XComGameState_Unit Unit; // bsg-nlong (1.25.17): Used to determine which column we should start highlighting
+
+	if (REMOVE_PROMOTION_SCREEN_DISTORTION)
+	{
+		// KDM : Removes the distortion effect played when the promotion screen is initialized. This fixes
+		// a problem in which Flash's elongated "bg" UI element, when distorted, would overextend its boundaries
+		// and partially wrap around to the right side of the screen. The issue could be easily seen when cycling
+		// between a series of soldiers in succession.
+		bPlayAnimateInDistortion = false;
+	}
 
 	`LOG(self.Class.name @ GetFuncName(),, 'PromotionScreen');
 
